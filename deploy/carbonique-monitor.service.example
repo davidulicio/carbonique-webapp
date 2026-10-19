@@ -1,0 +1,17 @@
+[Unit]
+Description=Carbonique read-only tower status collector
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=carbonique
+Group=carbonique
+WorkingDirectory=/srv/carbonique-webapp
+EnvironmentFile=/srv/carbonique-webapp/.env
+ExecStart=/srv/carbonique-webapp/.venv/bin/python manage.py poll_towers --watch --interval 60
+Restart=on-failure
+RestartSec=10
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

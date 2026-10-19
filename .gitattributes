@@ -1,0 +1,9 @@
+# Keep source text portable across Windows and Linux.
+* text=auto eol=lf
+
+# Preserve the bundled report and reference snapshots.
+public/fieldnotes/index.html binary linguist-generated=true
+seed/fieldnotes.json text eol=lf linguist-generated=true
+seed/ecoflux_inventory_export/** -text linguist-generated=true
+seed/badm/schema.json text eol=lf linguist-generated=true
+static/hub/vendor/** -text linguist-vendored=true

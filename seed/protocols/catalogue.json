@@ -1,0 +1,50 @@
+{
+  "Biomet_Maintenance_Protocol.pdf": {
+    "revision": "English v1.0 · March 2026",
+    "size": 992943,
+    "sha256": "f223ea1ce48430febc2af69d477646d2b5fcdbefcd5672fbd9020b930e18b090",
+    "private_source": false
+  },
+  "Data_download.pdf": {
+    "revision": "English v0.7 · June 2025",
+    "size": 687355,
+    "sha256": "225bc11524b652d0f4136ea37c7c31382e2cad6ccd6571d78f54ec8eea51fad7",
+    "private_source": true
+  },
+  "Field Work Safety Plan.pdf": {
+    "revision": "English v1.0 · June 2026",
+    "size": 390586,
+    "sha256": "5f2ed2ab30589460037d2c0b3deb2528cd79f8161b504cc3cf35c17f67477007",
+    "private_source": false
+  },
+  "Fieldwork_maintenance_and_procedures.pdf": {
+    "revision": "English v1.0 · November 2025",
+    "size": 360939,
+    "sha256": "04e730bad6abcb65ddcadf686cb59c4dd7cf53b159239a51204fcfda0b4e28d1",
+    "private_source": false
+  },
+  "Maintenance_LI7200RS.pdf": {
+    "revision": "English v1.0 · October 2024",
+    "size": 1104509,
+    "sha256": "013ff8ee83c1d46faf7d627b4e026e97394c6f34792c30c058db71dedf2ffd9b",
+    "private_source": false
+  },
+  "Maintenance_LI7700.pdf": {
+    "revision": "English v1.0 · October 2024",
+    "size": 474462,
+    "sha256": "1e9b68287df5492112e406d9727bd8eb894514a43993e65dd2e265395e0a273d",
+    "private_source": false
+  },
+  "Maintenance_OTT_Pluvio2.pdf": {
+    "revision": "English v1.0 · June 2026",
+    "size": 273561,
+    "sha256": "0e056050180f5574c3717751cf16d6dec87d3b0a763c6c419c4b29eeb5ca8709",
+    "private_source": false
+  },
+  "Methanol Handling Procedure and Protocol.pdf": {
+    "revision": "English v1.0 · June 2026",
+    "size": 221957,
+    "sha256": "72c77a8c0af74d7802cb948193efc9c91ddba0a9185e0bb816fddf2cce79c297",
+    "private_source": false
+  }
+}

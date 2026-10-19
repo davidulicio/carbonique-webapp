@@ -1,0 +1,25 @@
+.env
+.env.*
+!.env.example
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.sqlite3-*
+# Keep seed/media tracked; only runtime uploads are ignored.
+/media/
+/staticfiles/
+backups/
+exports/
+credentials/
+*.log
+.DS_Store
+node_modules/
+screenshots/
+test-results/
+# Private tower endpoint configuration, even if accidentally placed in checkout.
+*monitor-stations*.json
+!monitor-stations.example.json
+# Contains LI-COR login details; install from the private source on the VM.
+/seed/protocols/Data_download.pdf

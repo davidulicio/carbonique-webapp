@@ -1,0 +1,87 @@
+/* Site context and reference resources share the existing workspace and dialogs. */
+export function createResources(ctx) {
+  const {S, esc, rich, day, time, button, empty, field, openForm, api, refreshCsrf, refreshWorkspace, render, toast, onlineOnly, header, store} = ctx;
+  const manage = () => ["admin", "manager"].includes(S.me?.role);
+  const state = () => S.data?.resources || {};
+  const badm = () => state().badm ? {...state().badm,templates:S.badmTemplates||{}} : null;
+  async function loadSchema(){if(S.badmTemplates)return;const saved=await store.get("meta","badm-schema");if(saved)S.badmTemplates=saved.templates;if(navigator.onLine){const definition=await api("/api/badm/schema/");S.badmTemplates=definition.templates;await store.put("meta","badm-schema",definition);}}
+  const labels = {unknown:"Not assessed", open:"Accessible", caution:"Use caution", restricted:"Restricted access", closed:"Inaccessible"};
+  const link = (label, url, extra="") => `<a class="button secondary small" href="${esc(url)}" ${extra}>${label}</a>`;
+  async function save(path, data, method="PATCH", form) {
+    onlineOnly(); await refreshCsrf();
+    await api(path, {method, data:form?undefined:data, form});
+    await refreshWorkspace(); toast("Saved.");
+  }
+  function conditionHTML(condition=state().condition, compact=false) {
+    const c=condition||{status:"unknown",statement:""};
+    return `<section class="condition-card condition-${esc(c.status)} ${compact?"compact":""}" aria-label="Site condition"><div class="panel-title"><strong>${esc(labels[c.status]||labels.unknown)}</strong>${!compact&&manage()?button("Update condition","resource-condition"):""}</div><p>${esc(c.statement||"No site condition statement has been recorded. Confirm access before travelling.")}</p>${c.valid_until?`<span class="small">Review / restriction date: ${day(c.valid_until)}${c.review_overdue?" · Review overdue; confirm with the site manager":""}</span>`:""}${!compact&&c.updated_at?`<span class="small muted">Updated ${time(c.updated_at)}</span>`:""}</section>`;
+  }
+  function mediaHTML() {
+    const media=state().media||[];
+    return `<div class="panel"><div class="panel-title"><h2>Explore the tower</h2>${manage()?button("＋ Add video / GIF","resource-media-add"):""}</div>${media.length?`<div class="tower-gallery">${media.map(m=>`<figure>${m.content_type.startsWith("video/")?`<video controls playsinline preload="metadata" src="${esc(m.url)}" aria-label="${esc(m.title)}"></video>`:`<img loading="lazy" src="${esc(m.url)}" alt="${esc(m.caption||m.title)}">`}<figcaption><strong>${esc(m.title)}</strong><p>${esc(m.caption)}</p><div class="row-actions">${link("Download",m.url+"?download=1")}${manage()?button("Edit","resource-media-edit",m.id):""}</div></figcaption></figure>`).join("")}</div>`:empty("Tower media has not been added yet",manage()?"Add a short MP4, WebM or animated GIF to show access, equipment and the surrounding ecosystem.":"Site managers can add tower videos and animated images.")}</div>`;
+  }
+  function protocolsView() {
+    const query=S.filter.toLowerCase();
+    const protocols=(S.protocols||[]).filter(p=>(p.title+" "+p.summary+" "+p.category).toLowerCase().includes(query));
+    const categories={safety:"Field safety",maintenance:"Instrument maintenance",data:"Data collection",general:"General procedures"};
+    return header("Protocols & field guides","Approved source documents for field work, instrument care and data collection.",manage()?button("＋ Upload protocol","resource-protocol-add","","primary"):"")+`<div class="toolbar"><input data-search="protocols" aria-label="Search protocols" placeholder="Find a protocol or instrument…" value="${esc(S.filter)}"><span class="small muted">${protocols.length} documents</span></div>${Object.entries(categories).map(([key,label])=>{const rows=protocols.filter(p=>p.category===key);return rows.length?`<section><h2>${label}</h2><div class="protocol-grid">${rows.map(p=>`<article class="panel protocol-card"><span class="eyebrow">PDF · ${(p.size/1024/1024).toFixed(1)} MB</span><h3>${esc(p.title)}</h3><p>${esc(p.summary)}</p><p class="small muted">${esc(p.revision||"Revision not specified")}</p><div class="row-actions">${p.available!==false?button("Read protocol","resource-protocol-read",p.id,"primary small")+link("Download PDF",p.url+"?download=1"):'<span class="small muted">Awaiting private installation or an administrator PDF upload.</span>'}${manage()?button("Edit / archive","resource-protocol-edit",p.id):""}</div></article>`).join("")}</div></section>`:"";}).join("")}${!protocols.length?empty("No matching protocols"):""}`;
+  }
+  function badmView() {
+    const b=badm(); if(!b)return empty("BADM is unavailable in this offline snapshot","Refresh this site while connected.");
+    const v=b.validation, records=b.records.filter(r=>!r.is_archived);
+    const matches=records.filter(r=>(r.group+" "+r.template+" "+JSON.stringify(r.values)+" "+r.notes).toLowerCase().includes(S.filter.toLowerCase()));
+    const good=v.records.filter(r=>r.ok).length;
+    return header("Site BADM", "Biological, Ancillary, Disturbance and Metadata · ICOS template workspace",`${link("Download all BADM",`/sites/${S.siteId}/badm.zip`)}${manage()?button("＋ Add record","resource-badm-add","","primary"):""}`)+`<div class="panel badm-status ${v.ok?"complete":"incomplete"}"><div class="panel-title"><div><span class="eyebrow">${esc(b.profile.station_class)} · ${esc(b.profile.station_id||"ICOS code not assigned")}</span><h2>${esc(v.label)}</h2></div>${manage()?button("Station setup","resource-badm-profile"):""}</div><p>${good} of ${records.length} active records pass local checks. Template definitions retrieved ${esc(b.schema_date)}.</p><p class="small muted">${esc(v.scope)}</p>${v.issues.length?`<ul>${v.issues.map(i=>`<li>${esc(i)}</li>`).join("")}</ul>`:""}${v.missing_groups.length?`<p><strong>Missing station setup groups</strong></p><div class="row-actions">${v.missing_groups.map(g=>manage()?button(esc(g.replace("GRP_","")),"resource-badm-group",g):`<span class="pill draft">${esc(g)}</span>`).join("")}</div>`:""}<details class="section-divider"><summary>Standards and checklist scope</summary><p>Station setup includes ${v.required_groups.map(esc).join(", ")}. Managers can select additional applicable groups. Each record retains its official template version, required-field rules, units and vocabulary. Save incomplete records as drafts, then use the issues below to complete them.</p><p>${link("Official ICOS templates","https://www.icos-etc.eu/icos/documents/templates",'target="_blank" rel="noopener"')} ${link("ICOS BADM instructions","https://www.icos-etc.eu/icos/documents/instructions/badm",'target="_blank" rel="noopener"')}</p></details>${b.profile.notes?`<p class="section-divider">${esc(b.profile.notes)}</p>`:""}</div><div class="toolbar"><input data-search="badm" placeholder="Search groups, variables or values…" aria-label="Search BADM records" value="${esc(S.filter)}"><span class="small muted">${matches.length} records</span></div>${matches.map(r=>{const result=v.records.find(x=>x.id===r.id)||{errors:[],review:[]};return `<details class="panel badm-record"><summary><strong>${esc(r.group.replace("GRP_",""))}</strong><span class="pill ${result.ok?"reviewed":"draft"}">${result.ok?"Local checks passed":"Needs attention"}</span><span class="small muted">${esc(r.template)}</span></summary>${result.errors.length||result.review.length?`<div class="notice"><ul>${[...result.errors,...result.review].map(e=>`<li>${esc(e)}</li>`).join("")}</ul></div>`:""}<dl class="badm-values">${Object.entries(r.values).map(([k,value])=>`<div><dt>${esc(k)}</dt><dd>${esc(value)}</dd></div>`).join("")}</dl>${r.notes?`<p>${esc(r.notes)}</p>`:""}<div class="row-actions"><span class="small muted">Updated ${time(r.updated_at)}</span>${manage()?button("Edit / complete record","resource-badm-edit",r.id)+button("Archive","resource-badm-archive",r.id):""}</div></details>`;}).join("")}${!matches.length?empty("No BADM records yet","Use the missing groups above to start the station description, then add instruments, events and ancillary observations."):""}`;
+  }
+  function conditionForm() {
+    const c=state().condition;
+    openForm("Update site condition",`<p>Describe access and current conditions: flooding, hunting season, road closures or other restrictions. The review date never automatically marks a site accessible.</p>${field("status","Access status",c.status,{options:Object.entries(labels)})}${field("statement","Condition statement",c.statement,{type:"textarea",required:true,help:"Include any reopening date and instructions for visitors."})}${field("valid_until","Review / restriction date",c.valid_until,{type:"date"})}`,async f=>save(`/api/sites/${S.siteId}/condition/`,{...Object.fromEntries(f),valid_until:f.get("valid_until")||null,base_version:c.version}));
+  }
+  function profileForm() {
+    const b=badm(),p=b.profile;
+    const groups=[...new Set(Object.values(b.templates).filter(t=>t.classes.includes(p.station_class)).flatMap(t=>Object.keys(t.groups)))].sort();
+    openForm("BADM station setup",`<p>Use the station class and identifier assigned by ICOS. An AmeriFlux ID is a separate identifier. Changing station class preserves previous records and flags incompatible templates for review.</p>${field("station_id","Assigned ICOS code",p.station_id,{help:"CC-Xxx; leave empty until confirmed."})}${field("station_class","Station class",p.station_class,{options:[["associated","Associated station"],["class1","Class 1"],["class2","Class 2"]]})}${field("applicable_groups","Additional applicable groups",p.applicable_groups,{options:groups.map(g=>[g,g]),multiple:true,help:"Select extra groups needed at this station. The core station setup checklist always applies. After changing class, reopen setup to select additional groups."})}${field("notes","Station applicability / review notes",p.notes,{type:"textarea"})}`,async f=>save(`/api/sites/${S.siteId}/badm/profile/`,{station_id:f.get("station_id"),station_class:f.get("station_class"),applicable_groups:f.get("station_class")===p.station_class?f.getAll("applicable_groups"):[],notes:f.get("notes"),base_version:p.version}));
+  }
+  function recordForm(record, targetGroup) {
+    const b=badm(),defs=Object.entries(b.templates).filter(([,t])=>t.classes.includes(b.profile.station_class)).flatMap(([name,t])=>Object.entries(t.groups).map(([group,fields])=>({key:name+"|"+group,name,group,fields})));
+    const selected=record?defs.find(d=>d.name===record.template&&d.group===record.group):defs.find(d=>d.group===targetGroup)||defs[0];
+    if(!selected)throw new Error("No template is available for this station class.");
+    const controls = d=>`<a href="${esc(b.templates[d.name].source)}" target="_blank" rel="noopener">Official template ${esc(d.name)}</a><p class="small muted">Dates use the exact compact format shown beside each field. Numeric values use a decimal point and the stated units. One record represents one observation or event.</p><div class="form-grid">${d.fields.map(f=>field("badm_"+f.name,`${f.name}${f.requirement?` [${f.requirement}]`:""}`,record?.values[f.name]??"",{type:f.units.toLowerCase().includes("free text")?"textarea":"text",options:f.choices.length?[["","Not entered"],...f.choices.map(c=>[c.value,c.value])]:undefined,help:`${f.description} · ${f.units}. ${f.explanation}`,wide:true})).join("")}</div>`;
+    openForm(record?"Edit BADM record":"Add BADM record",`${record?`<h3>${esc(selected.group)}</h3><p>${esc(selected.name)}</p>`:field("definition","Template and variable group",selected.key,{options:defs.map(d=>[d.key,`${d.group.replace("GRP_","")} · ${d.name}`])})}<div id="badm-fields">${controls(selected)}</div>${field("notes","Record provenance / review notes",record?.notes,{type:"textarea"})}<label><input name="conditions_reviewed" type="checkbox" ${record?.conditions_reviewed?"checked":""}>I have reviewed the official conditional and alternative rules for this record.</label><p class="small muted">Incomplete values are saved as a draft; validation lists what remains to be completed.</p>`,async f=>{const d=record?selected:defs.find(d=>d.key===f.get("definition"));const values={};for(const field of d.fields){const value=f.get("badm_"+field.name);if(value!==null&&value.trim()!=="")values[field.name]=value.trim();}await save(`/api/sites/${S.siteId}/badm/records/${record?record.id+"/":""}`,{template:d.name,group:d.group,values,notes:f.get("notes"),conditions_reviewed:f.has("conditions_reviewed"),...(record?{base_version:record.version}:{})},record?"PATCH":"POST");},"Save record");
+    const select=document.querySelector('[name="definition"]');
+    if(select)select.onchange=()=>{document.querySelector("#badm-fields").innerHTML=controls(defs.find(d=>d.key===select.value));document.querySelector('[name="conditions_reviewed"]').checked=false;};
+  }
+  function protocolForm(protocol) {
+    openForm(protocol?"Edit protocol":"Upload protocol",`${field("title","Protocol title",protocol?.title,{required:true})}${field("category","Category",protocol?.category||"maintenance",{options:[["maintenance","Instrument maintenance"],["data","Data collection"],["safety","Field safety"],["general","General procedures"]]})}${field("revision","Revision / effective date",protocol?.revision)}${field("summary","Summary",protocol?.summary,{type:"textarea"})}<label>${protocol?"Replacement PDF (optional)":"PDF document"}<input type="file" name="file" accept="application/pdf,.pdf" ${protocol?"":"required"}></label>${protocol?`<label><input name="is_archived" type="checkbox">Archive this protocol</label>`:""}`,async f=>{const data=new FormData();for(const k of ["title","category","revision","summary"])data.set(k,f.get(k));const file=f.get("file");if(file?.size)data.set("file",file);if(protocol){data.set("base_version",protocol.version);data.set("is_archived",f.has("is_archived"));}await save(`/api/protocols/${protocol?protocol.id+"/":""}`,undefined,protocol?"PATCH":"POST",data);});
+  }
+  function mediaForm(media) {
+    openForm(media?"Edit tower media":"Add tower video or image",`${field("title","Title",media?.title,{required:true})}${field("caption","Description / accessibility caption",media?.caption,{type:"textarea",help:"Describe the tower and surroundings for users who cannot view the video."})}<label>${media?"Replacement file (optional)":"MP4, WebM, GIF or image"}<input name="file" type="file" accept=".mp4,.m4v,.webm,.gif,.webp,.jpg,.jpeg,.png" ${media?"":"required"}></label><p class="small muted">Up to 100 MB. Short MP4 and WebM clips work best. Files are uploaded while connected.</p>${media?'<label><input name="is_archived" type="checkbox">Archive this media</label>':""}`,async f=>{const data=new FormData();for(const k of ["title","caption"])data.set(k,f.get(k));if(f.get("file")?.size)data.set("file",f.get("file"));if(media){data.set("base_version",media.version);data.set("is_archived",f.has("is_archived"));}await save(`/api/sites/${S.siteId}/media/${media?media.id+"/":""}`,undefined,media?"PATCH":"POST",data);});
+  }
+  async function action(action,id) {
+    if(!action.startsWith("resource-"))return false;
+    if(action==="resource-protocol-read"){
+      const p=S.protocols.find(p=>p.id===id);
+      openForm(p.title,`<div class="row-actions">${link("Open PDF",p.url,'target="_blank" rel="noopener"')}${link("Download PDF",p.url+"?download=1")}</div><div id="protocol-viewer" class="protocol-pages"><p>Loading the original PDF…</p></div>`,null);
+      document.querySelector("#dialog").classList.add("resource-reader");
+      document.querySelector("#dialog").addEventListener("close",()=>document.querySelector("#dialog").classList.remove("resource-reader"),{once:true});
+      let pdfBlob=await store.get("downloads",`${S.me.id}:${p.url}`);if(!pdfBlob){const response=await fetch(p.url,{credentials:"same-origin"});if(!response.ok)throw new Error("Protocol could not be downloaded.");pdfBlob=await response.blob();await store.put("downloads",`${S.me.id}:${p.url}`,pdfBlob);}
+      const {showPDF}=await import("./pdf-viewer.js");const cleanup=await showPDF(document.querySelector("#protocol-viewer"),await pdfBlob.arrayBuffer());
+      document.querySelector("#dialog").addEventListener("close",cleanup,{once:true});
+      return true;
+    }
+    if(!manage())throw new Error("An administrator or manager must make this change.");
+    onlineOnly();
+    if(action==="resource-condition")conditionForm();
+    if(action==="resource-badm-profile")profileForm();
+    if(action==="resource-badm-add")recordForm();
+    if(action==="resource-badm-group")recordForm(null,id);
+    if(action==="resource-badm-edit")recordForm(badm().records.find(r=>r.id===id));
+    if(action==="resource-badm-archive"){const r=badm().records.find(r=>r.id===id);openForm("Archive BADM record?","<p>The record remains in the full JSON export and audit history. It leaves the active ICOS CSV export.</p>",()=>save(`/api/sites/${S.siteId}/badm/records/${id}/`,{is_archived:true,base_version:r.version}),"Archive record");}
+    if(action==="resource-protocol-add")protocolForm();
+    if(action==="resource-protocol-edit")protocolForm(S.protocols.find(p=>p.id===id));
+    if(action==="resource-media-add")mediaForm();
+    if(action==="resource-media-edit")mediaForm(state().media.find(m=>m.id===id));
+    return true;
+  }
+  return {manage,conditionHTML,mediaHTML,protocolsView,badmView,action,loadSchema};
+}

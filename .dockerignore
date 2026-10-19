@@ -1,0 +1,16 @@
+.git
+.env
+*monitor-stations*.json
+credentials/
+seed/protocols/Data_download.pdf
+exports/
+.venv
+node_modules
+__pycache__
+*.sqlite3
+media
+backups
+exports
+staticfiles
+test-results
+screenshots

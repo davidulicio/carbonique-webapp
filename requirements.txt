@@ -1,0 +1,9 @@
+Django==5.2.18
+djangorestframework==3.17.2
+Pillow==12.3.0
+bleach==6.4.0
+python-dotenv==1.2.4
+whitenoise==6.12.0
+gunicorn==23.0.0
+dj-database-url==3.1.2
+psycopg[binary]==3.3.6

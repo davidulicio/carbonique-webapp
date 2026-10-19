@@ -1,0 +1,12 @@
+[Unit]
+Description=Carbonique Hub
+After=network.target
+[Service]
+User=carbonique
+Group=carbonique
+WorkingDirectory=/srv/carbonique-webapp
+EnvironmentFile=/srv/carbonique-webapp/.env
+ExecStart=/srv/carbonique-webapp/.venv/bin/gunicorn carbonique.wsgi:application --bind 127.0.0.1:8000 --workers 2 --timeout 120
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,2132 @@
+{
+ "source": "Info on Carbonique EC sites.docx",
+ "parsed": "2026-09-24, corrected 2026-09-29",
+ "sites": [
+  {
+   "title": "UQAM_1 Lac Saint-Pierre, Quebec (46.1645N, 72.6851W)",
+   "desc": [
+    "It is a transformed marsh near Lac Saint-Pierre that is used as an agricultural site. There is an interannual crop rotation between Glycine max and Zea mays. The water in the field is regulated with pumps."
+   ],
+   "sections": [
+    {
+     "h": "Site info",
+     "items": [
+      {
+       "k": "Site name",
+       "v": "Lac Saint-Pierre Disturbed Marsh"
+      },
+      {
+       "k": "AmeriFlux ID",
+       "v": "CA-CQ1"
+      },
+      {
+       "k": "Location",
+       "v": "Baie-du-Febvre, Quebec"
+      },
+      {
+       "k": "Coordinates",
+       "v": "46.1645 N, 72.6851 W"
+      },
+      {
+       "v": "Canopy height set in SmartFlux is not representative of the site at all times, it is an agricultural site, so the canopy height is dynamic, we have canopy height measurements."
+      },
+      {
+       "k": "Station active since",
+       "v": "2024-07-19 (system installed 8 to 16 July 2024)"
+      },
+      {
+       "k": "Tower",
+       "v": "scaffolding tower, with the EC sensors on a retractable outrigger"
+      },
+      {
+       "k": "Power",
+       "v": "AC line, on a circuit separate from the farm pumps"
+      },
+      {
+       "k": "Phenocam",
+       "v": "phenocam.nau.edu/webcam/sites/lspdisturbedmarsh"
+      }
+     ],
+     "subs": []
+    },
+    {
+     "h": "Instruments info",
+     "items": [],
+     "subs": [
+      {
+       "h": "Sonic anemometer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Campbell Scientific CSAT3B"
+        },
+        {
+         "k": "Sonic height",
+         "v": "7.11 m"
+        },
+        {
+         "k": "North offset",
+         "v": "285°"
+        }
+       ]
+      },
+      {
+       "h": "CO2/H2O gas analyzer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "LI-7200RS (enclosed path) with heated intake tube and 7200-102 flow module"
+        },
+        {
+         "k": "Northward separation",
+         "v": "-4 cm"
+        },
+        {
+         "k": "Eastward separation",
+         "v": "-9 cm"
+        },
+        {
+         "k": "Vertical separation",
+         "v": "0 cm"
+        }
+       ]
+      },
+      {
+       "h": "CH4 gas analyzer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "LI-7700 (open path)"
+        },
+        {
+         "k": "Northward separation",
+         "v": "-21 cm"
+        },
+        {
+         "k": "Eastward separation",
+         "v": "-28 cm"
+        },
+        {
+         "k": "Vertical separation",
+         "v": "1 cm"
+        }
+       ]
+      },
+      {
+       "h": "Temperature and humidity probes",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Both are HygroVue10"
+        },
+        {
+         "k": "TA_1_1_1, RH_1_1_1",
+         "v": "7.1 m"
+        },
+        {
+         "k": "TA_1_2_1, RH_1_2_1",
+         "v": "2 m"
+        }
+       ]
+      },
+      {
+       "h": "Wind Monitor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "RM Young 05103"
+        },
+        {
+         "k": "Variables",
+         "v": "WS_1_1_1, WD_1_1_1"
+        },
+        {
+         "k": "Height",
+         "v": "8 m (on top of the scaffolding)"
+        }
+       ]
+      },
+      {
+       "h": "Digital Barometric Pressure sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "BaroVue10"
+        },
+        {
+         "k": "Variable",
+         "v": "PA_1_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Tipping Bucket Rain Gauge",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Texas Electronics TE525WS"
+        },
+        {
+         "k": "Variable",
+         "v": "P_RAIN_1_1_1"
+        },
+        {
+         "k": "Mounting",
+         "v": "on a pole on the ground at installation; the 2026-05-07 field note says it was fixed at the top of the tower"
+        }
+       ]
+      },
+      {
+       "h": "Sonic Ranging Sensor for Snow Depth",
+       "items": [
+        {
+         "k": "Model",
+         "v": "SnowVue10"
+        },
+        {
+         "k": "Variable",
+         "v": "D_SNOW"
+        },
+        {
+         "k": "Height",
+         "v": "2.2 m"
+        }
+       ]
+      },
+      {
+       "h": "Weighing Precipitation Gauge",
+       "items": [
+        {
+         "k": "Model",
+         "v": "OTT Pluvio2 L 400"
+        },
+        {
+         "v": "On its own structure with a solar panel and batteries, installed in June 2026"
+        }
+       ]
+      },
+      {
+       "h": "Net Radiometer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Kipp & Zonen CNR4 with CNF4 ventilation unit"
+        },
+        {
+         "k": "Variables",
+         "v": "SW_IN, SW_OUT, LW_IN, LW_OUT, NETRAD, ALB"
+        },
+        {
+         "k": "Height",
+         "v": "7 m"
+        },
+        {
+         "v": "Facing 190° from north"
+        }
+       ]
+      },
+      {
+       "h": "Full-spectrum Quantum Sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Apogee SQ-521 (2 sensors, incoming and outgoing)"
+        },
+        {
+         "k": "Variables",
+         "v": "PPFD_IN, PPFD_OUT"
+        }
+       ]
+      },
+      {
+       "h": "Soil Heat Flux Plates",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Hukseflux HFP01 (4 sensors)"
+        },
+        {
+         "v": "Depth 8 cm, at 50 cm and 100 cm on both sides of the CS650 profile"
+        },
+        {
+         "k": "Variables",
+         "v": "G_1_1_1 to G_4_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Soil Moisture and Temperature Probes",
+       "items": [
+        {
+         "k": "Model",
+         "v": "CS650 (5 horizontal sensors, 4 in profile, a total of 8 because there is one that goes in the horizontal and it is the first of the profile ones.)"
+        },
+        {
+         "k": "Horizontal replicas depth 8 cm",
+         "v": "SWC_2_1_1 to SWC_5_1_1 and TS_2_1_1 to TS_5_1_1 (added 2025-08-05)"
+        },
+        {
+         "k": "Vertical profile",
+         "v": "8 cm, 16 cm, 32 cm, 64 cm: SWC_1_1_1 to SWC_1_4_1 and TS_1_1_1 to TS_1_4_1"
+        }
+       ]
+      },
+      {
+       "h": "Water Table Depth Sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Campbell Scientific CS456 vented pressure transducer (0 to 7.25 psig)"
+        },
+        {
+         "k": "Serial number",
+         "v": "70010295"
+        },
+        {
+         "k": "Installed",
+         "v": "2026-05-07"
+        },
+        {
+         "k": "Sensor depth below the surface",
+         "v": "not measured yet"
+        },
+        {
+         "k": "Data",
+         "v": "only about three weeks, in May 2026; the channel reads NAN in the current logger table"
+        },
+        {
+         "k": "Logger offset in the cal file",
+         "v": "1.17 m, never checked"
+        },
+        {
+         "k": "Next visit",
+         "v": "measure the cable drop and check the wiring"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "h": "Processing settings",
+     "items": [
+      {
+       "k": "EC raw data",
+       "v": "20 Hz, stored in 30 min .ghg files by the SmartFlux 2"
+      },
+      {
+       "k": "Biomet variables sent to the SmartFlux",
+       "v": "TA_1_1_1, RH_1_1_1, PA_1_1_1"
+      }
+     ],
+     "subs": []
+    }
+   ],
+   "code": "UQAM_1",
+   "place": "Lac Saint-Pierre, Quebec",
+   "lat": 46.1645,
+   "lon": -72.6851,
+   "photos": [
+    {
+     "file": "images/photo_UQAM_1_1.jpg",
+     "alt": "",
+     "w": 1200,
+     "h": 900
+    }
+   ]
+  },
+  {
+   "title": "UQAM_2 Lac-à-la-Tortue, Quebec (46.5316N, 72.6450W)",
+   "desc": [
+    "It is a natural open bog near Lac-à-la-Tortue. The vegetation is dominated by Sphagnum mosses with Chamaedaphne calyculata, Trichophorum cespitosum and Rhododendron groenlandicum. The site is off-grid (solar powered) and is reached on foot over the peat. It is about 400 m north of UQAM_3."
+   ],
+   "sections": [
+    {
+     "h": "Site info",
+     "items": [
+      {
+       "k": "Site name",
+       "v": "Natural Lac-à-la-Tortue Open bog"
+      },
+      {
+       "k": "AmeriFlux ID",
+       "v": "CA-CQ2"
+      },
+      {
+       "k": "Location",
+       "v": "Notre-Dame-du-Mont-Carmel, Quebec"
+      },
+      {
+       "k": "Coordinates",
+       "v": "46.5316 N, 72.6450 W"
+      },
+      {
+       "k": "Canopy height set in SmartFlux",
+       "v": "0.2 m (displacement height 0.134 m, roughness length 0.03 m)"
+      },
+      {
+       "k": "Station active since",
+       "v": "2025-04-15 (EC sensors reinstalled on 2025-07-02)"
+      },
+      {
+       "k": "Tower",
+       "v": "EC sensors on a boom that can be pulled in for maintenance"
+      },
+      {
+       "k": "Power",
+       "v": "off-grid, solar panels and battery bank"
+      }
+     ],
+     "subs": []
+    },
+    {
+     "h": "Instruments info",
+     "items": [],
+     "subs": [
+      {
+       "h": "Sonic anemometer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Campbell Scientific CSAT3B"
+        },
+        {
+         "k": "Sonic height",
+         "v": "4.80 m"
+        },
+        {
+         "k": "North offset",
+         "v": "264°"
+        }
+       ]
+      },
+      {
+       "h": "CO2/H2O gas analyzer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "LI-7200RS (enclosed path) with 7200-102 flow module"
+        },
+        {
+         "k": "Northward separation",
+         "v": "1 cm"
+        },
+        {
+         "k": "Eastward separation",
+         "v": "1 cm"
+        },
+        {
+         "k": "Vertical separation",
+         "v": "-1 cm"
+        }
+       ]
+      },
+      {
+       "h": "CH4 gas analyzer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "LI-7700 (open path)"
+        },
+        {
+         "k": "Northward separation",
+         "v": "-25 cm"
+        },
+        {
+         "k": "Eastward separation",
+         "v": "-26 cm"
+        },
+        {
+         "k": "Vertical separation",
+         "v": "0 cm"
+        }
+       ]
+      },
+      {
+       "h": "Temperature and humidity probes",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Both are HygroVue10"
+        },
+        {
+         "k": "TA_1_1_1, RH_1_1_1 (upper)",
+         "v": "4.8 m"
+        },
+        {
+         "k": "TA_1_2_1, RH_1_2_1 (lower)",
+         "v": "2 m"
+        }
+       ]
+      },
+      {
+       "h": "Wind Monitor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "RM Young 05103"
+        },
+        {
+         "k": "Variables",
+         "v": "WS_1_1_1, WD_1_1_1"
+        },
+        {
+         "k": "Height",
+         "v": "5.2 m"
+        }
+       ]
+      },
+      {
+       "h": "Digital Barometric Pressure sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "BaroVue10"
+        },
+        {
+         "k": "Variable",
+         "v": "PA_1_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Tipping Bucket Rain Gauge",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Texas Electronics TE525WS"
+        },
+        {
+         "k": "Variable",
+         "v": "P_RAIN_1_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Sonic Ranging Sensor for Snow Depth",
+       "items": [
+        {
+         "k": "Model",
+         "v": "SnowVue10"
+        },
+        {
+         "k": "Variable",
+         "v": "D_SNOW"
+        },
+        {
+         "k": "Height",
+         "v": "2m"
+        }
+       ]
+      },
+      {
+       "h": "Net Radiometer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Kipp & Zonen CNR4 with CNF4 ventilation unit"
+        },
+        {
+         "k": "Variables",
+         "v": "SW_IN, SW_OUT, LW_IN, LW_OUT, NETRAD, ALB"
+        },
+        {
+         "k": "Height",
+         "v": "5 m"
+        }
+       ]
+      },
+      {
+       "h": "Full-spectrum Quantum Sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Apogee SQ-521 (2 sensors, incoming and outgoing)"
+        },
+        {
+         "k": "Variables",
+         "v": "PPFD_IN, PPFD_OUT"
+        }
+       ]
+      },
+      {
+       "h": "Soil Heat Flux Plates",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Hukseflux HFP01 (4 sensors)"
+        },
+        {
+         "v": "Depth 8 cm"
+        },
+        {
+         "k": "Variables",
+         "v": "G_1_1_1 to G_4_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Soil Moisture and Temperature Probes",
+       "items": [
+        {
+         "k": "Model",
+         "v": "CS650 (8 sensors: 4 in the vertical profile and 4 horizontal replicas)"
+        },
+        {
+         "k": "Vertical profile",
+         "v": "8 cm, 16 cm, 32 cm, 64 cm: SWC_1_1_1 to SWC_1_4_1 and TS_1_1_1 to TS_1_4_1"
+        },
+        {
+         "k": "Horizontal replicas depth 8 cm",
+         "v": "SWC_2_1_1 to SWC_5_1_1 and TS_2_1_1 to TS_5_1_1"
+        },
+        {
+         "v": "Positions and serial numbers rechecked in the field on 2026-08-20"
+        }
+       ]
+      },
+      {
+       "h": "Water Table Depth Sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Campbell Scientific CS456 vented pressure transducer (0 to 7.25 psig)"
+        },
+        {
+         "k": "Serial number",
+         "v": "70010296"
+        },
+        {
+         "k": "Installed",
+         "v": "2026-04-27 (data start that day at 13:30; recorded in the written installation note, not in the EcoFlux field notes)"
+        },
+        {
+         "k": "Sensor depth below the surface",
+         "v": "2.05 m, measured at installation (written installation note)"
+        },
+        {
+         "k": "Water table at installation",
+         "v": "0.13 m below the surface"
+        },
+        {
+         "k": "Variable",
+         "v": "WTD_1_1_1 = Lvl_psi_Avg × 0.70307 - 2.05 m"
+        },
+        {
+         "k": "Valid data from",
+         "v": "2026-04-28 00:00 (the sensor was still settling before)"
+        },
+        {
+         "k": "Water table in 2026",
+         "v": "-0.20 to -0.05 m"
+        },
+        {
+         "k": "Logger offset in the cal file",
+         "v": "0.79 m (wrong, do not use Lvl_m_Avg)"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "h": "Processing settings",
+     "items": [
+      {
+       "k": "EC raw data",
+       "v": "20 Hz, stored in 30 min .ghg files by the SmartFlux 2"
+      },
+      {
+       "k": "Biomet variables sent to the SmartFlux",
+       "v": "TA_1_1_1, RH_1_1_1, PA_1_1_1"
+      }
+     ],
+     "subs": []
+    }
+   ],
+   "code": "UQAM_2",
+   "place": "Lac-à-la-Tortue, Quebec",
+   "lat": 46.5316,
+   "lon": -72.645,
+   "photos": [
+    {
+     "file": "images/photo_UQAM_2_1.jpg",
+     "alt": "",
+     "w": 1200,
+     "h": 900
+    }
+   ]
+  },
+  {
+   "title": "UQAM_3 Lac-à-la-Tortue, Quebec (46.5280N, 72.6462W)",
+   "desc": [
+    "It is a natural forested bog near Lac-à-la-Tortue, about 400 m south of UQAM_2. The EC system is on a tall tower above the tree canopy. The site is off-grid and powered by an EFOY methanol fuel cell hybrid system with solar panels."
+   ],
+   "sections": [
+    {
+     "h": "Site info",
+     "items": [
+      {
+       "k": "Site name",
+       "v": "Carbonique Lac-à-la-Tortue Forested bog"
+      },
+      {
+       "k": "AmeriFlux ID",
+       "v": "CA-CQ3"
+      },
+      {
+       "k": "Location",
+       "v": "Notre-Dame-du-Mont-Carmel, Quebec"
+      },
+      {
+       "k": "Coordinates",
+       "v": "46.5280 N, 72.6462 W"
+      },
+      {
+       "k": "Canopy height set in SmartFlux",
+       "v": "12.6 m (displacement height 8.44 m, roughness length 1.89 m)"
+      },
+      {
+       "k": "Station active since",
+       "v": "2025-04-10"
+      },
+      {
+       "k": "Tower",
+       "v": "tall tower, certified every year by a structural engineer"
+      },
+      {
+       "k": "Power",
+       "v": "off-grid, EFOY methanol fuel cell with battery bank"
+      }
+     ],
+     "subs": []
+    },
+    {
+     "h": "Instruments info",
+     "items": [],
+     "subs": [
+      {
+       "h": "Sonic anemometer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Campbell Scientific CSAT3B"
+        },
+        {
+         "k": "Sonic height",
+         "v": "21.9 m"
+        },
+        {
+         "k": "North offset",
+         "v": "332°"
+        }
+       ]
+      },
+      {
+       "h": "CO2/H2O gas analyzer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "LI-7200RS (enclosed path) with 7200-102 flow module"
+        },
+        {
+         "k": "Northward separation",
+         "v": "10 cm"
+        },
+        {
+         "k": "Eastward separation",
+         "v": "2 cm"
+        },
+        {
+         "k": "Vertical separation",
+         "v": "0 cm"
+        }
+       ]
+      },
+      {
+       "h": "CH4 gas analyzer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "LI-7700 (open path)"
+        },
+        {
+         "k": "Northward separation",
+         "v": "-30 cm"
+        },
+        {
+         "k": "Eastward separation",
+         "v": "15 cm"
+        },
+        {
+         "k": "Vertical separation",
+         "v": "-2 cm"
+        }
+       ]
+      },
+      {
+       "h": "Temperature and humidity probes",
+       "items": [
+        {
+         "k": "Model",
+         "v": "HygroVue10 (4 sensors)"
+        },
+        {
+         "k": "TA_1_1_1, RH_1_1_1 (top)",
+         "v": "22 m"
+        },
+        {
+         "k": "TA_1_2_1, RH_1_2_1 (second from the top)",
+         "v": "16 m"
+        },
+        {
+         "k": "TA_1_3_1, RH_1_3_1 (third from the top)",
+         "v": "9 m"
+        },
+        {
+         "k": "TA_1_4_1, RH_1_4_1 (lowest level, near the surface)",
+         "v": "2 m"
+        }
+       ]
+      },
+      {
+       "h": "Wind Monitor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "RM Young 05103"
+        },
+        {
+         "k": "Variables",
+         "v": "WS_1_1_1, WD_1_1_1"
+        },
+        {
+         "k": "Height",
+         "v": "24 m"
+        }
+       ]
+      },
+      {
+       "h": "Digital Barometric Pressure sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "BaroVue10"
+        },
+        {
+         "k": "Variable",
+         "v": "PA_1_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Tipping Bucket Rain Gauge",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Texas Electronics TE525WS"
+        },
+        {
+         "k": "Variable",
+         "v": "P_RAIN_1_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Sonic Ranging Sensor for Snow Depth",
+       "items": [
+        {
+         "k": "Model",
+         "v": "SnowVue10"
+        },
+        {
+         "k": "Variable",
+         "v": "D_SNOW"
+        },
+        {
+         "k": "Height",
+         "v": "1.68 m"
+        }
+       ]
+      },
+      {
+       "h": "Net Radiometer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Kipp & Zonen CNR4 with CNF4 ventilation unit"
+        },
+        {
+         "k": "Variables",
+         "v": "SW_IN, SW_OUT, LW_IN, LW_OUT, NETRAD, ALB"
+        },
+        {
+         "k": "Height",
+         "v": "22 m"
+        }
+       ]
+      },
+      {
+       "h": "Full-spectrum Quantum Sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Apogee SQ-521 (2 sensors, incoming and outgoing)"
+        },
+        {
+         "k": "Variables",
+         "v": "PPFD_IN, PPFD_OUT"
+        }
+       ]
+      },
+      {
+       "h": "Soil Heat Flux Plates",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Hukseflux HFP01 (4 sensors)"
+        },
+        {
+         "k": "Depth",
+         "v": "8 cm"
+        },
+        {
+         "k": "Variables",
+         "v": "G_1_1_1 to G_4_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Soil Moisture and Temperature Probes",
+       "items": [
+        {
+         "k": "Model",
+         "v": "CS650 (8 sensors: 4 in the vertical profile and 4 horizontal replicas)"
+        },
+        {
+         "k": "Vertical profile",
+         "v": "8 cm, 16 cm, 32 cm, 64 cm: SWC_1_1_1 to SWC_1_4_1 and TS_1_1_1 to TS_1_4_1"
+        },
+        {
+         "k": "Horizontal replicas depth 8 cm",
+         "v": "SWC_2_1_1 to SWC_5_1_1 and TS_2_1_1 to TS_5_1_1"
+        },
+        {
+         "v": "Positions and serial numbers rechecked in the field on 2026-08-20"
+        }
+       ]
+      },
+      {
+       "h": "Water Table Depth Sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Campbell Scientific CS456 vented pressure transducer (0 to 7.25 psig)"
+        },
+        {
+         "k": "Serial number",
+         "v": "70010297"
+        },
+        {
+         "k": "Installed",
+         "v": "2026-04-15, in a tube 309 cm long with 110 cm above the ground; logging from 2026-04-21 after the program change"
+        },
+        {
+         "k": "Sensor depth below the surface",
+         "v": "1.83 m, from the water table measured at 11.5 cm below the surface (to confirm: a reading of 0.24 m was also reported, which gives 1.96 m)"
+        },
+        {
+         "k": "Variable",
+         "v": "WTD_1_1_1 = Lvl_psi_Avg × 0.70307 - 1.83 m"
+        },
+        {
+         "k": "Valid data from",
+         "v": "2026-04-21 16:00"
+        },
+        {
+         "k": "Water table in 2026",
+         "v": "+0.11 m in April (ponding at snowmelt) down to -0.49 m by mid-September"
+        },
+        {
+         "k": "Logger offsets used so far",
+         "v": "0.00, 1.75 and 1.48 m (all wrong, do not use Lvl_m_Avg)"
+        }
+       ]
+      },
+      {
+       "h": "Profile System",
+       "items": [
+        {
+         "v": "Intakes and tubing at 4 levels on the tower."
+        },
+        {
+         "k": "Intake heights",
+         "v": "2 m, 9m, 16m, 22m"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "h": "Processing settings",
+     "items": [
+      {
+       "k": "EC raw data",
+       "v": "20 Hz, stored in 30 min .ghg files by the SmartFlux 2"
+      },
+      {
+       "k": "Biomet variables sent to the SmartFlux",
+       "v": "TA_1_1_1, RH_1_1_1, PA_1_1_1"
+      }
+     ],
+     "subs": []
+    }
+   ],
+   "code": "UQAM_3",
+   "place": "Lac-à-la-Tortue, Quebec",
+   "lat": 46.528,
+   "lon": -72.6462,
+   "photos": [
+    {
+     "file": "images/photo_UQAM_3_1.jpg",
+     "alt": "",
+     "w": 1200,
+     "h": 900
+    }
+   ]
+  },
+  {
+   "title": "UQAM_4 Saint-Rémi, Quebec (45.2459N, 73.6823W)",
+   "desc": [
+    "It is a transformed forested peatland near Saint-Rémi that is used as an agricultural site. The station has two parts: a fixed tower on the berm at the edge of the field, powered by AC, that carries the EC system and part of the meteorological sensors, and a rover tripod on a trailer inside the field, powered by a solar panel, that carries the radiation, snow and soil sensors. The trailer is moved out of the field for planting and harvest, so the outgoing radiation and soil data do not represent the field during those periods."
+   ],
+   "sections": [
+    {
+     "h": "Site info",
+     "items": [
+      {
+       "k": "Site name",
+       "v": "Saint-Remi Disturbed Forested Peatland"
+      },
+      {
+       "k": "AmeriFlux ID",
+       "v": "CA-CQ4"
+      },
+      {
+       "k": "Location",
+       "v": "Saint-Rémi, Quebec"
+      },
+      {
+       "k": "Coordinates",
+       "v": "45.2459 N, 73.6823 W"
+      },
+      {
+       "k": "Canopy height set in SmartFlux",
+       "v": "A dynamic canopy that varies between no plants to 40cm height ones. It needs modelling to rerun the flux calculations."
+      },
+      {
+       "k": "Station active since",
+       "v": "2026-01-14"
+      },
+      {
+       "k": "Tower",
+       "v": "fixed tower on the berm with a foldable boom (since 2026-05-08)"
+      },
+      {
+       "k": "Power",
+       "v": "tower on AC; rover tripod on a solar power."
+      },
+      {
+       "k": "Dataloggers",
+       "v": "CR1000X on the tower (tables UQAM_4_*) and a second CR1000X on the tripod (tables UQAM_4b_*)"
+      },
+      {
+       "k": "Phenocam",
+       "v": "phenocam.nau.edu/webcam/sites/strdisturbedforestedpeatland"
+      }
+     ],
+     "subs": []
+    },
+    {
+     "h": "Instruments info",
+     "items": [],
+     "subs": [
+      {
+       "h": "Sonic anemometer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Campbell Scientific CSAT3B"
+        },
+        {
+         "k": "Sonic height",
+         "v": "2.86 m"
+        },
+        {
+         "k": "North offset",
+         "v": "213° (it was 230° in February 2026)"
+        }
+       ]
+      },
+      {
+       "h": "CO2/H2O gas analyzer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "LI-7200RS (enclosed path) with 7200-102 flow module"
+        },
+        {
+         "k": "Northward separation",
+         "v": "-8 cm"
+        },
+        {
+         "k": "Eastward separation",
+         "v": "-4 cm"
+        },
+        {
+         "k": "Vertical separation",
+         "v": "0 cm"
+        }
+       ]
+      },
+      {
+       "h": "CH4 gas analyzer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "LI-7700 (open path)"
+        },
+        {
+         "k": "Northward separation",
+         "v": "30 cm"
+        },
+        {
+         "k": "Eastward separation",
+         "v": "25 cm"
+        },
+        {
+         "k": "Vertical separation",
+         "v": "-10 cm"
+        }
+       ]
+      },
+      {
+       "h": "Temperature and humidity probes",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Both are HygroVue10 (on the tower)"
+        },
+        {
+         "k": "TA_1_1_1, RH_1_1_1 (upper)",
+         "v": "2.8m"
+        },
+        {
+         "k": "TA_1_2_1, RH_1_2_1 (lower)",
+         "v": "2m"
+        }
+       ]
+      },
+      {
+       "h": "Wind Monitor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "RM Young 05103"
+        },
+        {
+         "k": "Variables",
+         "v": "WS_1_1_1, WD_1_1_1"
+        },
+        {
+         "k": "Height",
+         "v": "3m"
+        }
+       ]
+      },
+      {
+       "h": "Digital Barometric Pressure sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "BaroVue10"
+        },
+        {
+         "k": "Variable",
+         "v": "PA_1_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Tipping Bucket Rain Gauge",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Texas Electronics TE525WS"
+        },
+        {
+         "k": "Variable",
+         "v": "P_RAIN_1_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Sonic Ranging Sensor for Snow Depth",
+       "items": [
+        {
+         "k": "Model",
+         "v": "SnowVue10"
+        },
+        {
+         "k": "Variable",
+         "v": "D_SNOW"
+        },
+        {
+         "k": "Height",
+         "v": "around 2m but since it is a rover station it varies."
+        }
+       ]
+      },
+      {
+       "h": "Net Radiometer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Kipp & Zonen CNR4 with CNF4 ventilation unit"
+        },
+        {
+         "k": "Variables",
+         "v": "SW_IN, SW_OUT, LW_IN, LW_OUT, NETRAD, ALB"
+        },
+        {
+         "k": "Height",
+         "v": "2m"
+        },
+        {
+         "v": "On the rover tripod"
+        }
+       ]
+      },
+      {
+       "h": "Full-spectrum Quantum Sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Apogee SQ-521 (2 sensors, incoming and outgoing)"
+        },
+        {
+         "k": "Variables",
+         "v": "PPFD_IN, PPFD_OUT"
+        }
+       ]
+      },
+      {
+       "h": "Soil Heat Flux Plates",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Hukseflux HFP01 (4 sensors, on the rover tripod)"
+        },
+        {
+         "k": "Depth",
+         "v": "5cm"
+        }
+       ]
+      },
+      {
+       "h": "Soil Moisture and Temperature Probes",
+       "items": [
+        {
+         "k": "Model",
+         "v": "CS650 (4 sensors, on the rover tripod, corresponding to the CS650_2_1_1, CS650_3_1_1, CS650_4_1_1, CS650_5_1_1 variables)"
+        },
+        {
+         "k": "Depth",
+         "v": "5cm"
+        },
+        {
+         "k": "Soil profile",
+         "v": "Campbell Scientific SoilVUE10 (0.5 m length) corresponding to the variables SoilVue_1_1_1 (5cm), SoilVue_1_2_1 (15cm), SoilVue_1_3_1 (25cm), SoilVue_1_4_1(35cm), SoilVue_1_5_1(45cm), SoilVue_1_6_1 (55cm)"
+        }
+       ]
+      },
+      {
+       "h": "Water Table Depth Sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Campbell Scientific CS456 vented pressure transducer (0 to 7.25 psig)"
+        },
+        {
+         "k": "Serial number",
+         "v": "70010299"
+        },
+        {
+         "k": "Installed",
+         "v": "2026-05-15, in a hole 2.70 m deep; water was struck at 1.85 m while augering"
+        },
+        {
+         "k": "Sensor depth below the surface",
+         "v": "3.15 m, provisional: it cannot be deeper than the 2.70 m hole, so measure the cable drop on the next visit"
+        },
+        {
+         "k": "Variable",
+         "v": "WTD_1_1_1 = Lvl_psi_Avg × 0.70307 - 3.15 m"
+        },
+        {
+         "k": "Valid data from",
+         "v": "2026-05-16"
+        },
+        {
+         "k": "Water table in 2026",
+         "v": "-2.16 to -1.56 m with the provisional depth (-1.75 to -1.10 m if the depth is 2.70 m)"
+        },
+        {
+         "k": "Logger offset in the cal file",
+         "v": "-1.57 m (wrong sign, do not use Lvl_m_Avg)"
+        },
+        {
+         "k": "Before the CS456",
+         "v": "WTD_1_1_1 came from the EasyProbe level channel, which does not measure the water table"
+        }
+       ]
+      },
+      {
+       "h": "Water Multiprobe",
+       "items": [
+        {
+         "k": "Water multiprobe",
+         "v": "Eureka EasyProbe 20 in the canal beside the field that feeds the crops (since 2026-04-17)"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "h": "Processing settings",
+     "items": [
+      {
+       "k": "EC raw data",
+       "v": "20 Hz, stored in 30 min .ghg files by the SmartFlux 2"
+      },
+      {
+       "k": "Biomet variables sent to the SmartFlux",
+       "v": "TA_1_1_1, RH_1_1_1, PA_1_1_1"
+      },
+      {
+       "k": "Met data",
+       "v": "tower tables UQAM_4_Met_30m and UQAM_4_Met_05m; tripod radiation in UQAM_4b_Met_05m"
+      }
+     ],
+     "subs": []
+    }
+   ],
+   "code": "UQAM_4",
+   "place": "Saint-Rémi, Quebec",
+   "lat": 45.2459,
+   "lon": -73.6823,
+   "photos": [
+    {
+     "file": "images/photo_UQAM_4_1.jpg",
+     "alt": "",
+     "w": 900,
+     "h": 1200
+    },
+    {
+     "file": "images/photo_UQAM_4_2.jpg",
+     "alt": "",
+     "w": 1200,
+     "h": 900
+    }
+   ]
+  },
+  {
+   "title": "UQAM_5 Saint-François-du-Lac, Quebec (46.0886N, 72.9174W)",
+   "desc": [
+    "It is a natural marsh near Saint-François-du-Lac that floods every spring, with water reaching up to 3 m in extreme events. The station sits on two wooden platforms on certified screw piles 3 m above the ground: one for the solar panels and battery bank, the other for the scaffolding tower and equipment. Access may require a boat during floods and a couple of kilometres of walking in winter."
+   ],
+   "sections": [
+    {
+     "h": "Site info",
+     "items": [
+      {
+       "k": "Site name",
+       "v": "Saint-François du Lac Natural Marsh"
+      },
+      {
+       "k": "AmeriFlux ID",
+       "v": "CA-CQ5"
+      },
+      {
+       "k": "Location",
+       "v": "Saint-François-du-Lac, Quebec"
+      },
+      {
+       "k": "Coordinates",
+       "v": "46.0886 N, 72.9174 W"
+      },
+      {
+       "k": "Canopy height set in SmartFlux",
+       "v": "1 m"
+      },
+      {
+       "k": "Station active since",
+       "v": "platforms installed in fall 2025, EC system installed 20 July to 11 August 2026"
+      },
+      {
+       "k": "Valid data from",
+       "v": "2026-08-06 16:00"
+      },
+      {
+       "k": "Power",
+       "v": "off-grid, solar panels and battery bank"
+      },
+      {
+       "k": "Phenocam",
+       "v": "phenocam.nau.edu/webcam/sites/lspnaturalmarsh"
+      }
+     ],
+     "subs": []
+    },
+    {
+     "h": "Instruments info",
+     "items": [],
+     "subs": [
+      {
+       "h": "Sonic anemometer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Campbell Scientific CSAT3B"
+        },
+        {
+         "k": "Sonic height",
+         "v": "4.85 m"
+        },
+        {
+         "k": "North offset",
+         "v": "267°"
+        }
+       ]
+      },
+      {
+       "h": "CO2/H2O gas analyzer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "LI-7200RS (enclosed path) with 7200-102 flow module"
+        },
+        {
+         "k": "Northward separation",
+         "v": "2 cm"
+        },
+        {
+         "k": "Eastward separation",
+         "v": "15 cm"
+        },
+        {
+         "k": "Vertical separation",
+         "v": "4 cm"
+        }
+       ]
+      },
+      {
+       "h": "CH4 gas analyzer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "LI-7700 (open path)"
+        },
+        {
+         "k": "Northward separation",
+         "v": "30 cm"
+        },
+        {
+         "k": "Eastward separation",
+         "v": "25 cm"
+        },
+        {
+         "k": "Vertical separation",
+         "v": "-5 cm"
+        }
+       ]
+      },
+      {
+       "h": "Temperature and humidity probes",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Both are HygroVue10"
+        },
+        {
+         "k": "TA_1_1_1, RH_1_1_1 (upper)",
+         "v": "4.85 m"
+        },
+        {
+         "k": "TA_1_2_1, RH_1_2_1 (lower)",
+         "v": "3.5 m"
+        }
+       ]
+      },
+      {
+       "h": "Wind Monitor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "RM Young 05103"
+        },
+        {
+         "k": "Variables",
+         "v": "WS_1_1_1, WD_1_1_1"
+        },
+        {
+         "k": "Height",
+         "v": "5 m"
+        }
+       ]
+      },
+      {
+       "h": "Digital Barometric Pressure sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "BaroVue10"
+        },
+        {
+         "k": "Variable",
+         "v": "PA_1_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Tipping Bucket Rain Gauge",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Texas Electronics TE525WS"
+        },
+        {
+         "k": "Variable",
+         "v": "P_RAIN_1_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Sonic Ranging Sensor for Snow Depth",
+       "items": [
+        {
+         "k": "Model",
+         "v": "SnowVue10"
+        },
+        {
+         "k": "Variable",
+         "v": "D_SNOW"
+        },
+        {
+         "k": "Height",
+         "v": "To be checked m"
+        }
+       ]
+      },
+      {
+       "h": "Net Radiometer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Kipp & Zonen CNR4 with CNF4 ventilation unit"
+        },
+        {
+         "k": "Variables",
+         "v": "SW_IN, SW_OUT, LW_IN, LW_OUT, NETRAD, ALB"
+        },
+        {
+         "k": "Height",
+         "v": "4.8 m"
+        }
+       ]
+      },
+      {
+       "h": "Full-spectrum Quantum Sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Apogee SQ-521 (2 sensors, incoming and outgoing)"
+        },
+        {
+         "k": "Variables",
+         "v": "PPFD_IN, PPFD_OUT"
+        }
+       ]
+      },
+      {
+       "h": "Soil Heat Flux Plates",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Hukseflux HFP01 (4 sensors)"
+        },
+        {
+         "v": "Horizontal replicas 8 cm below the surface"
+        },
+        {
+         "k": "Variables",
+         "v": "G_1_1_1 to G_4_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Soil Moisture and Temperature Probes",
+       "items": [
+        {
+         "k": "Model",
+         "v": "CS650 (4 sensors)"
+        },
+        {
+         "k": "Horizontal replicas 5 cm below the surface",
+         "v": "SWC_1_1_1 to SWC_4_1_1 and TS_1_1_1 to TS_4_1_1"
+        },
+        {
+         "k": "No vertical profile yet",
+         "v": "the site was too flooded to dig, to be installed when it dries"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "h": "Processing settings",
+     "items": [
+      {
+       "k": "EC raw data",
+       "v": "20 Hz, stored in 30 min .ghg files by the SmartFlux 2"
+      },
+      {
+       "k": "Biomet variables sent to the SmartFlux",
+       "v": "TA_1_1_1, RH_1_1_1, PA_1_1_1"
+      }
+     ],
+     "subs": []
+    }
+   ],
+   "code": "UQAM_5",
+   "place": "Saint-François-du-Lac, Quebec",
+   "lat": 46.0886,
+   "lon": -72.9174,
+   "photos": [
+    {
+     "file": "images/photo_UQAM_5_1.jpg",
+     "alt": "",
+     "w": 1200,
+     "h": 598
+    }
+   ]
+  },
+  {
+   "title": "MCGILL_1 Lac Saint-Pierre, Quebec (46.1488N, 72.7268W)",
+   "desc": [
+    "It is a restored marsh near Lac Saint-Pierre, about 3.7 km southwest of UQAM_1. The tower stands on a floating platform in the marsh and is reached by boat, or on foot over the ice in winter. The site is on National Defence land, so every visit needs an access permit. It is powered by solar panels and a battery bank."
+   ],
+   "sections": [
+    {
+     "h": "Site info",
+     "items": [
+      {
+       "k": "Site name",
+       "v": "Lac Saint-Pierre Restored Marsh"
+      },
+      {
+       "k": "AmeriFlux ID",
+       "v": "CA-CQ9"
+      },
+      {
+       "k": "Location",
+       "v": "Baie-du-Febvre, Quebec"
+      },
+      {
+       "k": "Coordinates",
+       "v": "46.1488 N, 72.7268 W"
+      },
+      {
+       "k": "Canopy height set in SmartFlux",
+       "v": "0.05 m"
+      },
+      {
+       "k": "Station active since",
+       "v": "2025-07-31"
+      },
+      {
+       "k": "Tower",
+       "v": "scaffolding on a floating platform in the marsh, re-levelled after the ice melt and during maintenance visits"
+      },
+      {
+       "k": "Power",
+       "v": "off-grid, solar panels and battery bank"
+      }
+     ],
+     "subs": []
+    },
+    {
+     "h": "Instruments info",
+     "items": [],
+     "subs": [
+      {
+       "h": "Sonic anemometer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Campbell Scientific CSAT3B"
+        },
+        {
+         "k": "Sonic height",
+         "v": "4.55 m"
+        },
+        {
+         "k": "North offset",
+         "v": "290°"
+        }
+       ]
+      },
+      {
+       "h": "CO2/H2O gas analyzer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "LI-7200RS (enclosed path) with heated intake tube and 7200-102 flow module"
+        },
+        {
+         "k": "Northward separation",
+         "v": "-3.8 cm"
+        },
+        {
+         "k": "Eastward separation",
+         "v": "9 cm"
+        },
+        {
+         "k": "Vertical separation",
+         "v": "0 cm"
+        }
+       ]
+      },
+      {
+       "h": "CH4 gas analyzer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "LI-7700 (open path)"
+        },
+        {
+         "k": "Northward separation",
+         "v": "10 cm"
+        },
+        {
+         "k": "Eastward separation",
+         "v": "37 cm"
+        },
+        {
+         "k": "Vertical separation",
+         "v": "1 cm"
+        }
+       ]
+      },
+      {
+       "h": "Temperature and humidity probes",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Both are HygroVue10"
+        },
+        {
+         "k": "TA_1_1_1, RH_1_1_1 (upper)",
+         "v": "4.5m"
+        },
+        {
+         "k": "TA_1_2_1, RH_1_2_1 (lower)",
+         "v": "2m"
+        }
+       ]
+      },
+      {
+       "h": "Wind Monitor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "RM Young 05103"
+        },
+        {
+         "k": "Variables",
+         "v": "WS_1_1_1, WD_1_1_1"
+        },
+        {
+         "k": "Height",
+         "v": "5m"
+        }
+       ]
+      },
+      {
+       "h": "Digital Barometric Pressure sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "BaroVue10"
+        },
+        {
+         "k": "Variable",
+         "v": "PA_1_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Tipping Bucket Rain Gauge",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Texas Electronics TE525WS"
+        },
+        {
+         "k": "Variable",
+         "v": "P_RAIN_1_1_1"
+        }
+       ]
+      },
+      {
+       "h": "Sonic Ranging Sensor for Snow Depth",
+       "items": [
+        {
+         "k": "Model",
+         "v": "SnowVue10"
+        },
+        {
+         "k": "Variable",
+         "v": "D_SNOW"
+        },
+        {
+         "k": "Height",
+         "v": "4m"
+        }
+       ]
+      },
+      {
+       "h": "Net Radiometer",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Kipp & Zonen CNR4 with CNF4 ventilation unit"
+        },
+        {
+         "k": "Variables",
+         "v": "SW_IN, SW_OUT, LW_IN, LW_OUT, NETRAD, ALB"
+        },
+        {
+         "k": "Height",
+         "v": "4.5 m"
+        }
+       ]
+      },
+      {
+       "h": "Full-spectrum Quantum Sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Apogee SQ-521 (2 sensors, incoming and outgoing)"
+        },
+        {
+         "k": "Variables",
+         "v": "PPFD_IN, PPFD_OUT"
+        }
+       ]
+      },
+      {
+       "h": "Water and Sediment Temperature Profile",
+       "items": [
+        {
+         "v": "Thermocouples in a PVC pipe beside the platform (installed 2025-09-25)"
+        },
+        {
+         "k": "Variables",
+         "v": "TW_1_1_1 to TW_1_5_1, TS_1_1_1 to TS_1_3_1"
+        },
+        {
+         "k": "Depths",
+         "v": "TW_1_1_1 100cm from the bottom, TW_1_2_1 50cm from the bottom, TW_1_3_1 20cm from the bottom, TW_1_4_1 10cm from the bottom, TW_1_5_1 5cm from the bottom. TS_1_1_1 5cm below the ground, TS_1_2_1 10cm below the ground, TS_1_3_1 20cm below the ground. It was not possible to dig further so TS_1_4_1 should not be considered."
+        },
+        {
+         "k": "Renamed",
+         "v": "TW_1_5_1 was logged as TW_5_1_1 until 2026-09-28 11:30 (renamed in the logger at 11:40; the 12:00 record is the first under the new name)"
+        }
+       ]
+      },
+      {
+       "h": "Water Level Sensor",
+       "items": [
+        {
+         "k": "Model",
+         "v": "Campbell Scientific CS456 vented pressure transducer (0 to 7.25 psig)"
+        },
+        {
+         "k": "Serial number",
+         "v": "not recorded"
+        },
+        {
+         "k": "Installed",
+         "v": "2026-05-28"
+        },
+        {
+         "k": "Type",
+         "v": "stage sensor in open water, measuring the water column above the lake bed"
+        },
+        {
+         "k": "Sensor position",
+         "v": "0.16 m above the bed, so its depth relative to the bed surface is -0.16 m"
+        },
+        {
+         "k": "Variable",
+         "v": "WTD_1_1_1 = Lvl_psi_Avg × 0.70307 + 0.16 m"
+        },
+        {
+         "k": "Valid data from",
+         "v": "2026-05-28 11:00"
+        },
+        {
+         "k": "Water level in 2026",
+         "v": "+0.87 to +1.01 m above the bed (positive = water above the surface)"
+        },
+        {
+         "k": "Logger offset in the cal file",
+         "v": "1.58 m (wrong, do not use Lvl_m_Avg)"
+        },
+        {
+         "k": "Before the CS456",
+         "v": "WTD_1_1_1 came from the EasyProbe level channel, which does not measure the water level"
+        }
+       ]
+      },
+      {
+       "h": "Water Multiprobe",
+       "items": [
+        {
+         "k": "Water multiprobe",
+         "v": "Eureka EasyProbe 20 (since 2025-09-05; removed for the winter on 2025-11-10 and reinstalled on 2026-04-23)"
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "h": "Processing settings",
+     "items": [
+      {
+       "k": "EC raw data",
+       "v": "20 Hz, stored in 30 min .ghg files by the SmartFlux 2"
+      },
+      {
+       "k": "Biomet variables sent to the SmartFlux",
+       "v": "TA_1_1_1, RH_1_1_1, PA_1_1_1"
+      }
+     ],
+     "subs": []
+    }
+   ],
+   "code": "MCGILL_1",
+   "place": "Lac Saint-Pierre, Quebec",
+   "lat": 46.1488,
+   "lon": -72.7268,
+   "photos": [
+    {
+     "file": "images/photo_MCGILL_1_1.jpg",
+     "alt": "",
+     "w": 900,
+     "h": 1200
+    }
+   ]
+  }
+ ],
+ "common": [
+  {
+   "title": "Setup common to all sites",
+   "desc": [],
+   "sections": [
+    {
+     "h": "Variable names",
+     "items": [
+      {
+       "v": "Names follow the AmeriFlux convention VAR_H_V_R (horizontal position, vertical level, replicate)."
+      },
+      {
+       "k": "For air sensors, level 1 is the highest",
+       "v": "TA_1_1_1 and RH_1_1_1 are always the upper HygroVue10."
+      },
+      {
+       "v": "For soil, SWC_1_1_1 to SWC_1_4_1 and TS_1_1_1 to TS_1_4_1 are the vertical profile from shallow to deep, and the _2_1_1 to _5_1_1 sensors are horizontal replicas."
+      }
+     ],
+     "subs": []
+    },
+    {
+     "h": "Time and data acquisition",
+     "items": [
+      {
+       "v": "All loggers and SmartFlux units record in EST (UTC-5) all year, with no daylight saving time."
+      },
+      {
+       "k": "Datalogger",
+       "v": "Campbell Scientific CR1000X running the same program at every site, with the site-specific calibrations in a .cal file on the CPU drive."
+      },
+      {
+       "v": "The EC instruments are powered through an SDM-CD16ACA relay controller."
+      }
+     ],
+     "subs": []
+    },
+    {
+     "h": "SmartFlux real-time processing",
+     "items": [
+      {
+       "k": "Averaging period",
+       "v": "30 min"
+      },
+      {
+       "k": "Tilt correction",
+       "v": "double rotation"
+      },
+      {
+       "k": "Detrending",
+       "v": "block averaging"
+      },
+      {
+       "k": "Time lag",
+       "v": "covariance maximisation with default"
+      },
+      {
+       "v": "Densities converted to mixing ratios before computing fluxes"
+      },
+      {
+       "k": "Spectral corrections",
+       "v": "Moncrieff et al. (2004) high-pass and Moncrieff et al. (1997) low-pass"
+      },
+      {
+       "k": "Footprint",
+       "v": "Kljun et al. (2004)"
+      },
+      {
+       "k": "Quality flags",
+       "v": "Mauder and Foken (2004), 0-1-2 system"
+      }
+     ],
+     "subs": []
+    },
+    {
+     "h": "Water table depth",
+     "items": [
+      {
+       "k": "Sensor",
+       "v": "Campbell Scientific CS456 vented pressure transducer. It reads gauge pressure, so it needs no barometric correction (checked against station pressure at UQAM_2 and UQAM_3)"
+      },
+      {
+       "k": "Sign convention (AmeriFlux)",
+       "v": "positive = water above the surface, negative = below it"
+      },
+      {
+       "k": "Head above the sensor",
+       "v": "Lvl_psi_Avg × 0.70307 m of water"
+      },
+      {
+       "v": "WTD_1_1_1 = head - sensor depth below the surface, applied in first stage as a dated calibration (recommended ini files of 2026-09-23). The offsets in the logger .cal files, and so Lvl_m_Avg, are not reliable"
+      },
+      {
+       "v": "The EasyProbe level channel (L_WATER_Avg) is not a water table measurement"
+      }
+     ],
+     "subs": []
+    },
+    {
+     "h": "Winter shutdown of the water sensors",
+     "subs": [],
+     "items": [
+      {
+       "v": "At every site the CS456 pressure transducers (WTD) and the EasyProbe water multiprobes are disconnected for the winter, because they get damaged when the water gets close to 0 °C."
+      },
+      {
+       "k": "Data while disconnected",
+       "v": "not a measurement: exclude it in first stage, one dated window per winter"
+      },
+      {
+       "k": "At reinstallation",
+       "v": "re-measure the CS456 depth and add a new dated calibration row; the previous season's datum does not carry over"
+      }
+     ]
+    },
+    {
+     "h": "Sources and where to find the files",
+     "items": [
+      {
+       "v": "Sonic heights, north offsets, separations, tube settings and canopy heights come from the SmartFlux metadata (the .metadata file inside each .ghg)."
+      },
+      {
+       "k": "Raw EC files",
+       "v": "\\Sites\\<SITE>\\HighFrequencyData\\raw\\YYYY\\MM"
+      },
+      {
+       "k": "SmartFlux summaries",
+       "v": "\\Sites\\<SITE>\\Flux"
+      },
+      {
+       "k": "Met logger files",
+       "v": "Sites\\<SITE>\\Met"
+      },
+      {
+       "k": "Database INI files and third stage config",
+       "v": "\\Database\\Calculation_Procedures\\TraceAnalysis_ini\\<SITE>"
+      },
+      {
+       "k": "Field notes, site list and equipment inventory",
+       "v": "EcoFlux Inventory (grandwazoo.ddns.net/ecoflux)"
+      }
+     ],
+     "subs": []
+    }
+   ]
+  }
+ ],
+ "site_summaries": [
+  {
+   "c": "McGill_1",
+   "n": "Lac Saint-Pierre Restored Marsh",
+   "g": "46.1488; -72.7268",
+   "a": "2025-07-31",
+   "d": "Restored marsh near Lac Saint-Pierre. Access by boat across the marsh; site sits on National Defence land, so visits depend on an access permit."
+  },
+  {
+   "c": "UQAM_1",
+   "n": "Lac Saint-Pierre Disturbed Marsh",
+   "g": "46.1645; -72.6850",
+   "a": "2024-07-19",
+   "d": "Disturbed marsh used as an agricultural site (soy). The oldest tower in the network and the reference installation for the others."
+  },
+  {
+   "c": "UQAM_2",
+   "n": "Natural Lac-à-la-Tortue Open bog",
+   "g": "46.5315; -72.6450",
+   "a": "2025-04-15",
+   "d": "Natural open bog (Sphagnum). Solar-powered; access on foot over peat, so a plank boardwalk was added in 2026."
+  },
+  {
+   "c": "UQAM_3",
+   "n": "Carbonique Lac-à-la-Tortue Forested bog",
+   "g": "46.5280; -72.6462",
+   "a": "2025-04-10",
+   "d": "Natural forested bog. Powered by an EFOY methanol fuel-cell hybrid system, which has been the site's main source of trouble."
+  },
+  {
+   "c": "UQAM_4",
+   "n": "Saint-Remi Disturbed Forested Peatland",
+   "g": "45.2458; -73.6823",
+   "a": "2026-01-14",
+   "d": "Disturbed peatland used as an agricultural site (lettuce). Two systems: a fixed AC-powered tower on the berm and a solar rover tripod on a trailer that moves in and out of the field around planting."
+  },
+  {
+   "c": "UQAM_5",
+   "n": "Saint-François du Lac Natural Marsh",
+   "g": "46.0886; -72.9117",
+   "a": "2026-03-10",
+   "d": "Natural marsh that floods each spring (up to 3 m). Newest site: the eddy covariance system was commissioned in August 2026."
+  }
+ ]
+}

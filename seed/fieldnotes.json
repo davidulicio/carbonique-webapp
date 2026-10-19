@@ -1,0 +1,3511 @@
+{
+  "NOTES": [
+    {
+      "id": 59,
+      "s": "McGill_1",
+      "d": "2025-06-28",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Installation",
+      "b": "Installed PAR sensors and the bottom HygroVUE10; connected power cables to the distribution box; mounted the LI-7700, CSAT3B and tipping bucket. Re-used the original LI-7550 (the one that had fallen into the water) after confirming it was undamaged."
+    },
+    {
+      "id": 60,
+      "s": "McGill_1",
+      "d": "2025-07-04",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Installation",
+      "b": "Installed the CNR4 and top HygroVUE10, fitted the LI-7200 head, connected the AM16/32 to the CR1000X, mounted the wind monitor and ran power from the electrical box to the power box."
+    },
+    {
+      "id": 61,
+      "s": "McGill_1",
+      "d": "2025-07-09",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Installation",
+      "b": "Installed the platform ladder; repositioned the sonic anemometer, IRGA head and LI-7700 into their correct orientations; routed radiation-sensor cables along the boom guy wires; added a horizontal pipe for the snow-height sensor; downloaded data from the battery-box CR1000."
+    },
+    {
+      "id": 62,
+      "s": "McGill_1",
+      "d": "2025-07-16",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Installation: grounding and solar fusing",
+      "b": "Short day (diverted by the Phenocam failure at UQAM_1). Connected the ground electrical box to the battery box, built the grounding system for the solar array and installed 20 A inline fuses on each solar string."
+    },
+    {
+      "id": 63,
+      "s": "McGill_1",
+      "d": "2025-07-23",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Installation: wiring completed",
+      "b": "Fitted proper electrical clamps on the lightning-protection cables, brought power to the towers and finished wiring the station."
+    },
+    {
+      "id": 64,
+      "s": "McGill_1",
+      "d": "2025-07-29",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Installation + muskrat cable damage",
+      "b": "Installed a 20 A load breaker in the battery box, fitted surge protectors and wired the whole EC system. PROBLEM: the outer rubber of the electrical cables had been chewed, most likely by the muskrats on site. Metal armour and inner rubber still keep water out, but further diagnosis and a permanent solution are needed. Access through the marsh is difficult: suggested a rope between the battery system and the tower to pull boats across."
+    },
+    {
+      "id": 65,
+      "s": "McGill_1",
+      "d": "2025-07-31",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Installation: station commissioned",
+      "b": "Configured the system and assigned IPs to every component; entered site information into the EC system; sealed electrical box inlets with electrical putty and left desiccants inside; protected most cable glands against humidity. Station running and transmitting data from this date. Zip ties deliberately left unclipped as bird deterrents. Still missing: snow-depth sensor, soil/water sensors, battery-box internet, Phenocam."
+    },
+    {
+      "id": 66,
+      "s": "McGill_1",
+      "d": "2025-08-07",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Vegetation survey + antennas",
+      "b": "Vegetation survey of the area (species to be confirmed in the lab and added to the Phenocam site). Connected internet antennas to give the battery-box datalogger connectivity and installed an Ethernet surge protector on the Phenocam."
+    },
+    {
+      "id": 67,
+      "s": "McGill_1",
+      "d": "2025-08-13",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Clean-up (cut short by storm)",
+      "b": "Intended to remove all remaining boxes and parts and configure the Phenocam, but heavy rain and a thunderstorm stopped work. Only pallets and scraps were brought back to UQAM. Dave visited to see the solar-panel platform as a model for the natural marsh site."
+    },
+    {
+      "id": 68,
+      "s": "McGill_1",
+      "d": "2025-08-19",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Excessive noise in the LI-7200",
+      "b": "PROBLEM: the IRGA produced wildly noisy concentrations (from negative values to thousands) with strongly varying signal strength, alternating with periods of correct measurement. Worked through LI-COR's troubleshooting protocol (check LI-7550 Power/Ready LEDs, reseat and inspect the head cable and connectors for dust or bent pins, check the intake rain cap for blockage, listen to the chopper for grinding, swap head and cable if spares exist). Also found the IRGA base had shifted: probably wind-bent intake tube. Straightening the tube and reseating the cables appeared to fix it, but the fault returned after leaving the site. Phenocam also configured."
+    },
+    {
+      "id": 69,
+      "s": "McGill_1",
+      "d": "2025-08-21",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Whole LI-7200 system replaced",
+      "b": "Since the 2025-08-19 visit did not resolve the noise, the entire IRGA system (LI-7200 head, intake tube, cables and LI-7550) was swapped out so the faulty set could be analysed in the lab while data collection continued. EC system reconfigured. Ethernet cable changed so the Phenocam runs on PoE and is fully protected by the Ethernet surge protector."
+    },
+    {
+      "id": 70,
+      "s": "McGill_1",
+      "d": "2025-09-05",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "EasyProbe installed",
+      "b": "Cleaned LI-7700 mirrors, installed the EasyProbe and updated the program to McGill_05 to include the thermocouples."
+    },
+    {
+      "id": 71,
+      "s": "McGill_1",
+      "d": "2025-09-10",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Improvements",
+      "b": "Connected the water- and soil-temperature thermocouples to the loggers (not yet measuring). Basic maintenance: sensor cleaning and data download."
+    },
+    {
+      "id": 72,
+      "s": "McGill_1",
+      "d": "2025-09-25",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Thermocouple profile installation",
+      "b": "Cleaned the CH4 sensor and moved the thermocouple Ethernet cable from the brainbox to the VOLT116. Installed thermocouples in the large PVC pipe beside the platform: drilled drainage holes, could not hammer the pipe deeper than -20 cm so the -50 cm sensor could not be installed (one spare thermocouple left over); sensors secured with pairs of zip ties, larger access holes drilled for the 50 cm and 100 cm sensors; pipe hammered in and fixed to the adjacent metal pipe. PROBLEM: the wires became tangled during installation and could not be sorted without dismantling; a return visit is needed to unplug and reconnect them at the junction box so each sensor can be identified."
+    },
+    {
+      "id": 73,
+      "s": "McGill_1",
+      "d": "2025-11-10",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Winter preparation",
+      "b": "Connected 12 V, 24 V and current measurements to the main CR1000X for remote monitoring (program modified, now McGill_V06). Replaced desiccant bags. Installed the SnowVUE10 (calibration file updated to the real sensor height on 2025-11-11). Removed the EasyProbe (freezing damage risk) and removed the sonic wicks to stop ice building on the transducers."
+    },
+    {
+      "id": 74,
+      "s": "McGill_1",
+      "d": "2026-01-07",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Flow drive at 100%",
+      "b": "PROBLEM: the flow module's drive had risen to 100%. Reached the site on foot over ice thick enough to carry heavy loads. Changed the LI-7200 intake rain cap and the Swagelok filter of the heated intake tube (2 µm → 15 µm). Levelled the scaffolding to the platform's new inclination, re-tensioned the guy wires and cleaned the LI-7700."
+    },
+    {
+      "id": 85,
+      "s": "McGill_1",
+      "d": "2026-04-23",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Eddy system failure: emergency visit after winter",
+      "b": "PROBLEM: the eddy system stopped working on Friday 17 April. The site access permit had not been renewed, so an emergency supervised visit had to be arranged with National Defence. Diagnosis: the LI-7550 (SN 2497) was damaged, most likely the analog board. Replaced it with SN 2495 and updated the calibration coefficients to the correct IRGA (all calibration files saved). Grounding checked on every sensor and the network switch in the datalogger box also grounded. Levelled platform and tower after the ice melt, tightened tower and solar-structure guy wires and nuts, cleaned the methane sensor, refilled washer fluid with 70% 2-propanol, replaced the SmartFlux (SN00817 → SN00782, 40 GB) and updated firmware to v2.4.4, replaced the LI-7200 intake filter and rain cap, reinstalled the EasyProbe for summer, swapped USB sticks and replaced box desiccants. Pending until the permit is renewed: clean and calibrate the IRGAs, install a security camera, replace the instrument desiccants, ground the battery-box logger."
+    },
+    {
+      "id": 102,
+      "s": "McGill_1",
+      "d": "2026-05-28",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "No communication with the battery-monitoring logger",
+      "b": "PROBLEM: no communication with the CR1000 battery-monitoring logger. The Campbell box had been opened and some Ethernet cables were damaged; they were replaced but further troubleshooting is still required. Grounded the box, the logger and the whole battery-monitoring system, plus the electrical box at the tower. Cleaned the methane and radiation sensors, sorted the thermocouple cables and added a CS456 to measure water table depth (values are negative because the water sits above ground: this is correct). Notes: the tipping bucket had no mesh (replacement ordered); the antennas appear powered but do not communicate."
+    },
+    {
+      "id": 96,
+      "s": "McGill_1",
+      "d": "2026-06-11",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Antenna diagnosis",
+      "b": "Cleaned the LI-7700 and diagnosed the antennas. PROBLEM traced to the battery system's network switch: neither the logger nor the antenna can be reached through it, so it needs replacing."
+    },
+    {
+      "id": 107,
+      "s": "McGill_1",
+      "d": "2026-06-25",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Cleaning",
+      "b": "Cleaned the LI-7700, removed spider webs from the sensors and along the tower, drilled a hole for the boom-holding pin and added an Ethernet switch to the battery box: the antenna connection still needs more troubleshooting."
+    },
+    {
+      "id": 112,
+      "s": "McGill_1",
+      "d": "2026-07-08",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Maintenance and LI-7700 troubleshooting",
+      "b": "Cleaned the methane sensor and swapped the LI-7200 and LI-7550 for calibrated units (72H-1201, AIU-2491). PROBLEM: the methane sensor (TGA-1078) was not working; a blown fuse in the power box blew again as soon as it was replaced, so the power board is probably damaged. Put new desiccant into the sonic anemometer. Next visit: bring a replacement LI-7700 and diagnose the failing one in the lab."
+    },
+    {
+      "id": 116,
+      "s": "McGill_1",
+      "d": "2026-07-15",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "LI-7700 fault resolved; solar panels down",
+      "b": "Brought a replacement LI-7700 (TG1-1030), but the original (TG1-1027) turned out to have only a loose cable and worked once reconnected: probably shaken loose by vibration, so the pipes holding the 7700 were adjusted to reduce movement. Cleaned the Phenocam. PROBLEM: two solar panels fell; the other two in that series were disconnected, so the station now runs on four panels. Next visit: build a new solar-panel structure (current setup should hold through the summer)."
+    },
+    {
+      "id": 120,
+      "s": "McGill_1",
+      "d": "2026-07-30",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Cleaning",
+      "b": "LI-7700 cleaning."
+    },
+    {
+      "id": 125,
+      "s": "McGill_1",
+      "d": "2026-08-18",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Thorough cleaning and maintenance",
+      "b": "PROBLEM: the station was full of spiders, spider eggs and webs, and the LI-7700's signal strength had been wiggling badly as a result; webs strung between the sensor legs move in the wind and modulate the RSSI. An intense cleaning was done but they are expected to come back. Routine work alongside: cleaned the LI-7700, replaced its desiccant and refilled the washer tank, releveled the floating platform, retightened the guy wires, reconnected remote communication to the CR1000 logging the battery-box variables, and photographed the site for the environmental report. Also noted: the sonic anemometer is missing its wicks."
+    },
+    {
+      "id": 134,
+      "s": "McGill_1",
+      "d": "2026-09-04",
+      "w": "Mathis Vossaert",
+      "t": "issue",
+      "ti": "LI-7700 swap and solar panel structure destroyed by wind",
+      "b": "PROBLEM: powerful winds put almost all of the solar panels on the ground. The mounting structures were heavily damaged and many wires and connectors with them; most panels still appear functional but one is cracked. To stop the batteries draining to 0 V the system was shut down almost completely, leaving only the sonic anemometer running, and the panels were stacked facing each other so they would stop generating. Separately the LI-7700 was swapped for a new unit and cleaned with alcohol: pressure data looks better afterwards and, per Zoran, the methane concentration now looks correct for the site. A new SIM card was inserted, spider webs were cleared everywhere including inside the PhenoCam, and the rain gauge checked out fine. The sonic wicks were again not installed because they could not be found."
+    },
+    {
+      "id": 135,
+      "s": "McGill_1",
+      "d": "2026-09-11",
+      "w": "Mathis Vossaert",
+      "t": "issue",
+      "ti": "Four solar panels reconnected after the wind damage",
+      "b": "PROBLEM: follow-up to the 4 September storm damage. Four solar panels were reconnected in series and the modem rebooted with the new SIM card. The array was generating 44 A and the battery charging normally, and the sensors came back on and functional. Some cleaning and vegetation measurements were done at UQAM_5 on the same trip."
+    },
+    {
+      "id": 4,
+      "s": "UQAM_1",
+      "d": "2024-07-08",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Flux tower installation: full instrumentation record",
+      "b": "System installed 8–16 July 2024, configured in UTC-5 (EST); LI-COR and CSI data sent to the McGill server for processing. EC sensors: LI-7200RS (SN 72H-1201), LI-7700 (SN TG1-1008), CSAT3B sonic (SN 1891), north offset 285°, sensor height 7.11 m, mounted on a retractable outrigger. Radiation: CNR4 (SN 234083) with CNF4 ventilation at 190° from north; PAR Apogee SQ-521 incoming (SN 5724) and outgoing (SN 5747). Boxes: SDM-CD16ACA SN 5143; SmartFlux2 SN00775; CR1000X SN 50873; VOLT116 SN 7700; BaroVUE10 SN 2790/2726; Airlink RV50X; AM16/32B SN 40259; LI-7550 SN AIU-491; FlowModule SN FM2-311; water reservoir; electrician's boxes. Soil: heat-flux plates at 50 and 100 cm either side of the CS650 profile, 8 cm depth (SN 23095–23098); CS650 profile at 8, 16, 32 and 64 cm (SN 61421, 61422, 61407, 61408). HygroVue10 SN E5508 at 2 m and SN E5509 at 7 m. Rain gauge TE525WS SN 96386-0923; SnowVUE10 SN 10954 at 2 m; Young 05103 wind monitor SN 196257 on top of the scaffolding; StarDot CAM-SEC5I Phenocam."
+    },
+    {
+      "id": 20,
+      "s": "UQAM_1",
+      "d": "2024-08-29",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Electrical troubleshooting",
+      "b": "PROBLEM: the AC line supplying the tower is shared with the farmer's pump system, so an independent electrical supply is needed. As a stopgap a small battery was installed to power the Biomet sensors while there is no AC power."
+    },
+    {
+      "id": 21,
+      "s": "UQAM_1",
+      "d": "2024-09-18",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Improvements: AC supply isolated",
+      "b": "Replaced the boom retriever pipes, cleaned the LI-7700 lenses, installed guy-wire protection and added a 20 W solar panel to the Biomet electrical system. The electrician isolated the tower's electrical system from the pump's, so the AC line now runs smoothly."
+    },
+    {
+      "id": 22,
+      "s": "UQAM_1",
+      "d": "2024-10-17",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Maintenance",
+      "b": "Cleaned the LI-7700 lenses (signal strength recovered), cut back the remaining aluminium pipe supporting the eddy boom, downloaded data and changed the SmartFlux and LI-7550 USB sticks, cleaned the radiation-sensor lenses. Flagged for next visit: the box humidity indicators show the desiccant packs need changing; the aluminium pipe needs protecting to prevent injuries."
+    },
+    {
+      "id": 23,
+      "s": "UQAM_1",
+      "d": "2024-11-08",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Maintenance: winter preparation",
+      "b": "Data downloaded, USB sticks exchanged, LI-7700 mirrors cleaned, water reservoir filled with -40 °C windshield fluid, radiation-sensor mirrors cleaned, Phenocam case and lens cleaned, desiccants of every box changed and boxes cleaned, protection added to the aluminium lateral stabiliser pipe, sonic wicks removed to prevent snow and ice accumulating on the transducers over winter."
+    },
+    {
+      "id": 24,
+      "s": "UQAM_1",
+      "d": "2025-01-17",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Winter maintenance",
+      "b": "Cleaned the LI-7700 lenses, downloaded data, removed ice from the rain-gauge tipping bucket and installed the security camera and surveillance sign. Observations: the padlocks were frozen and the gate padlock could not be closed; the EasyProbe could not be checked because everything was frozen inside the pipe."
+    },
+    {
+      "id": 25,
+      "s": "UQAM_1",
+      "d": "2025-02-07",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Clogged pump",
+      "b": "PROBLEM: the flow module's drive had risen to 87%. Replaced the cap filter and the 15 µm filter of the LI-7200, which brought the flow drive back to 50%. The old filters were taken to the lab for ultrasonic cleaning. Data downloaded and LI-7700 lenses cleaned."
+    },
+    {
+      "id": 26,
+      "s": "UQAM_1",
+      "d": "2025-06-17",
+      "w": "Martina Schlaipfer",
+      "t": "major",
+      "ti": "Seeding under the radiation sensor",
+      "b": "Soy seeding beneath the radiation sensor with UQAM, McGill and ULaval participants. Seeding density ~170,000 seeds/acre, 30\" between rows, ~1\" between beans in a row, ~2\" depth. Loosening the soil across the whole area would have taken too long, so only the seeded rows were worked: leaving some vegetation on the surface so the patch does not match the rest of the field. Next year: rent a motor-driven tiller or bring a larger team with better tools."
+    },
+    {
+      "id": 27,
+      "s": "UQAM_1",
+      "d": "2025-07-04",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "LI-7700 mirror cleaning",
+      "b": "Cleaned the LI-7700 mirrors. Observation: despite weekly cleaning the methane sensor's mirrors keep getting very dirty; possibly something being sprayed on the agricultural field. The seeded strip under the radiation sensor still looks different from the rest of the field because the machinery did not pass there; more extensive plant removal is recommended before seeding next year."
+    },
+    {
+      "id": 28,
+      "s": "UQAM_1",
+      "d": "2025-07-09",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "LI-7700 mirror cleaning",
+      "b": "Quick stop to clean the methane sensor mirrors."
+    },
+    {
+      "id": 29,
+      "s": "UQAM_1",
+      "d": "2025-07-16",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Phenocam repair",
+      "b": "PROBLEM: the Phenocam had stopped working. Diagnosis: adding the security camera to the same load raised power consumption and burned the 1 A fuse. Solution: replaced it with a 2 A fuse. Also cleaned the LI-7700 mirrors, downloaded data and swapped the USB stick."
+    },
+    {
+      "id": 30,
+      "s": "UQAM_1",
+      "d": "2025-07-17",
+      "w": "not recorded",
+      "t": "routine",
+      "ti": "Drone survey and vegetation height",
+      "b": "Drone flights with the Mavic-3 Pro (RGB) over the sites (Alexandre Roy and Sarah-Ève Dionne). Soy height measured at 10 random points: 26, 31, 24, 24, 20, 25, 24, 26, 27, 26 cm."
+    },
+    {
+      "id": 31,
+      "s": "UQAM_1",
+      "d": "2025-07-29",
+      "w": "Laurent",
+      "t": "routine",
+      "ti": "Drone survey, vegetation and tower maintenance",
+      "b": "Drone survey over the UQAM_1 footprint. Vegetation heights 20–47 cm at 21 random points; mean ~55 cm under the snow-depth sensor with some bare soil. Cleaned the CH4 sensor and adjusted the turnbuckles. Rest of the installation looked good."
+    },
+    {
+      "id": 32,
+      "s": "UQAM_1",
+      "d": "2025-08-05",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "More soil sensors added; EasyProbe removed",
+      "b": "Added four CS650 probes as horizontal replicas of soil temperature, moisture and conductivity. PROBLEM: the EasyProbe was removed because it was not measuring correctly; clay works into the pipes and alters the readings, and the sensor was probably damaged over winter when it could not be pulled out of the ground. It went to the lab for checking. Also cleaned the methane sensor and cleared debris from the tipping bucket."
+    },
+    {
+      "id": 33,
+      "s": "UQAM_1",
+      "d": "2025-08-14",
+      "w": "Laurent",
+      "t": "routine",
+      "ti": "Drone survey, vegetation and tower maintenance",
+      "b": "Drone survey over the footprint. Vegetation heights 38–75 cm at 20 random points. Less vegetation under the snow-depth sensor than before, following the digging for the soil sensors. CH4 sensor cleaned."
+    },
+    {
+      "id": 34,
+      "s": "UQAM_1",
+      "d": "2025-09-05",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Sonic anemometer noise diagnosed",
+      "b": "PROBLEM: noise in the sonic anemometer occurring at the same time as drops in LI-7700 signal strength. Probable cause identified as the missing sonic wicks on the transducers; wicks to be fitted on the next visit to protect them from water. Basic maintenance also performed."
+    },
+    {
+      "id": 35,
+      "s": "UQAM_1",
+      "d": "2025-09-10",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Basic maintenance",
+      "b": "LI-7700 mirrors cleaned, data downloaded, tipping bucket cleared of debris, guy wires tightened."
+    },
+    {
+      "id": 36,
+      "s": "UQAM_1",
+      "d": "2025-09-18",
+      "w": "Laurent",
+      "t": "routine",
+      "ti": "Drone survey, vegetation and tower maintenance",
+      "b": "Drone survey over the footprint. Vegetation heights 53–78 cm at 20 random points. Still limited vegetation under the snow-depth sensor: a mix of bare soil and small plants. CH4 cleaned and turnbuckles adjusted."
+    },
+    {
+      "id": 37,
+      "s": "UQAM_1",
+      "d": "2025-10-03",
+      "w": "Laurent",
+      "t": "routine",
+      "ti": "Drone survey, vegetation and tower maintenance",
+      "b": "Drone survey over the footprint. Vegetation heights 52–72 cm, measured at the top of the highest beans since no leaves remain in the field. CH4 cleaned and turnbuckles adjusted."
+    },
+    {
+      "id": 38,
+      "s": "UQAM_1",
+      "d": "2025-11-10",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Basic maintenance",
+      "b": "Cleaned the methane sensor and the tipping bucket."
+    },
+    {
+      "id": 39,
+      "s": "UQAM_1",
+      "d": "2025-12-15",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Filter and rain cap clogged",
+      "b": "PROBLEM: flow drive at 100%. Replaced the clogged rain cap and filter (15 µm fitted). Remaining concern: the flow drive was at 100% but head pressure was only around -2.5 kPa when the pump should reach -3.5 to -4 kPa, so the system needs checking for leaks on a future visit; hose, connections, filters and everything from the sensor to the pump."
+    },
+    {
+      "id": 40,
+      "s": "UQAM_1",
+      "d": "2026-01-07",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Basic maintenance",
+      "b": "Cleaned the methane sensor and re-secured the small solar panel that was working loose."
+    },
+    {
+      "id": 90,
+      "s": "UQAM_1",
+      "d": "2026-05-01",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Power failure and summer preparation",
+      "b": "PROBLEM: a power failure at the tower, caused by an exposed soil-sensor cable lying in water that short-circuited and blew several fuses. A muskrat was also living in the tower stairs. Diagnosed, troubleshot and fixed the power fault. Installed sonic wicks on the transducers; swapped the LI-7200 (72H-1201) and LI-7550 (AIU-2491) for cleaned and calibrated units (72H-1210 and AIU-2499); cleaned the methane sensor mirrors; replaced the SmartFlux SN00775 with SN00783 (40 GB) and updated firmware to v2.4.4."
+    },
+    {
+      "id": 91,
+      "s": "UQAM_1",
+      "d": "2026-05-07",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Repairs",
+      "b": "Realigned the Phenocam, which had moved on 1 May and stayed misaligned until this visit. Repaired the tipping bucket and fixed it at the top of the tower. Replaced the PPFD_out sensor (SQ-521 SN 5747) with a new one (SQ-521 SN 5757). Cleaned the LI-7700 and CNR4. Connected an EasyProbe20 (SN 10237156) and a CS456 pressure transducer (SN 70010295)."
+    },
+    {
+      "id": 103,
+      "s": "UQAM_1",
+      "d": "2026-05-28",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Two soil sensors removed after animal damage",
+      "b": "Cleaned the methane sensor, filled the fluid washer and checked the station. PROBLEM: two CS650 sensors were found damaged with their cables chewed by an animal, so TS, SWC, S_CS650, E_CS650 and a_CS650 at positions 2_1_1 and 4_1_1 stopped working. Both sensors were taken to the lab for troubleshooting."
+    },
+    {
+      "id": 104,
+      "s": "UQAM_1",
+      "d": "2026-06-04",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Seeding and pluvio installation",
+      "b": "Installed the pluvio sensor structure with a small wooden platform for the solar panel and batteries. The antenna and solar mountings had not yet arrived. PROBLEM: the controller had a burned fuse, so the batteries could not be properly connected. Also seeded the soil under the radiation sensors with soy beans: the intention was to seed the same day the farmer seeded the rest of the field."
+    },
+    {
+      "id": 97,
+      "s": "UQAM_1",
+      "d": "2026-06-11",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Starting the pluvio system and tower maintenance",
+      "b": "Cleaned the LI-7700, added an antenna to the tower, reconnected a CS650 soil-moisture probe repaired in the lab (position 2_1_1 measuring again) and installed a security sign as a deterrent. Pluvio: replaced the blown controller fuse and added an internet connection."
+    },
+    {
+      "id": 108,
+      "s": "UQAM_1",
+      "d": "2026-06-25",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Cleaning",
+      "b": "Cleaned the LI-7700, tightened the pluvio guy wires and checked the amount of water accumulated in the pluvio."
+    },
+    {
+      "id": 113,
+      "s": "UQAM_1",
+      "d": "2026-07-08",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Maintenance",
+      "b": "Cleaned the methane sensor, swapped USB sticks and removed the pluvio's transport bolts."
+    },
+    {
+      "id": 119,
+      "s": "UQAM_1",
+      "d": "2026-07-30",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Cleaning",
+      "b": "Cleaned the LI-7700."
+    },
+    {
+      "id": 122,
+      "s": "UQAM_1",
+      "d": "2026-08-11",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "LI-7200 troubleshooting",
+      "b": "PROBLEM with the LI-7200 system: swapped boards in the LI-7550, using the board from 72H-1206/AIU-2495 while keeping the original sensor and flow module, and replaced a fuse in the 7550. Also cleaned the LI-7700 and installed a soil sensor (SN 69277)."
+    },
+    {
+      "id": 126,
+      "s": "UQAM_1",
+      "d": "2026-08-18",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Maintenance",
+      "b": "Cleaned the LI-7700, replaced the desiccant in both the LI-7700 and the CSAT3B, refilled the washer tank and retightened the guy wires. Worth watching: the Campbell datalogger enclosure is slowly disintegrating and releasing glass fibre, which none of the other boxes in the network are doing."
+    },
+    {
+      "id": 132,
+      "s": "UQAM_1",
+      "d": "2026-09-15",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "PhenoCam repair and maintenance",
+      "b": "PROBLEM: the PhenoCam had stopped sending images on 24 August. A basic reboot and reconfiguration fixed it. Also cleaned the LI-7700 and refilled the washer tank, swapped the USB sticks, checked the tipping bucket, swapped the modem SIM card from Telus to Bell, and tightened the guy wires on the pluviometer structure. Left for next visit: assemble the solar panel structure for the pluvio sensor and replace the rusty padlocks."
+    },
+    {
+      "id": 5,
+      "s": "UQAM_2",
+      "d": "2025-06-03",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Improved grounding system",
+      "b": "Improved the lightning-protection system to avoid ground loops. Took down a string of solar panels that was tilting: a temporary measure until guy wires can be installed on the solar structure. Removed waste from the landowner's property (not all of it produced by the installation)."
+    },
+    {
+      "id": 6,
+      "s": "UQAM_2",
+      "d": "2025-07-02",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Reinstallation of EC sensors",
+      "b": "Reinstalled the LI-7700, LI-7200 head and LI-7550. Installed cross wooden beams on the base structure of the solar panels and five screw piles around them for guy wires. Six-person team from UQAM, McGill and UQTR."
+    },
+    {
+      "id": 7,
+      "s": "UQAM_2",
+      "d": "2025-07-08",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Ethernet surge protectors and configuration",
+      "b": "Continued installing screw piles around the solar base, fitted Ethernet surge protectors inline at both ends of the LI-7700 and LI-7550 connections, and reconfigured the station so it began measuring again."
+    },
+    {
+      "id": 8,
+      "s": "UQAM_2",
+      "d": "2025-07-16",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Communication issue: solar cables disconnected",
+      "b": "PROBLEM: the tower could not be reached remotely. On site the cables from the solar panels were found disconnected from the system. Power was restored by reconnecting the MC4 connectors, but the batteries needed several days to recharge before the system could run again. Also cleaned the methane sensor and installed guy wires for the solar system. Planned follow-up: improve the power system and bury all cables to avoid accidental disconnections."
+    },
+    {
+      "id": 9,
+      "s": "UQAM_2",
+      "d": "2025-07-22",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Flow module not recording data",
+      "b": "PROBLEM: the flow module was not recording. Diagnosis: during the LI-7550 replacement the flow module had not been reconnected to the 7550, although it kept drawing air at 15 L/min all week. Quickly resolved by reconnecting it. Guy wires tightened and methane sensor cleaned."
+    },
+    {
+      "id": 10,
+      "s": "UQAM_2",
+      "d": "2025-07-30",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "CH4 sensor cleaning and guide wires",
+      "b": "Cleaned the CH4 sensor and adjusted the guide wires."
+    },
+    {
+      "id": 11,
+      "s": "UQAM_2",
+      "d": "2025-08-07",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "CH4 sensor cleaning and guide wires",
+      "b": "Cleaned the CH4 sensor and adjusted the guide wires."
+    },
+    {
+      "id": 12,
+      "s": "UQAM_2",
+      "d": "2025-08-12",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "CH4 sensor cleaning",
+      "b": "Cleaned the CH4 sensor."
+    },
+    {
+      "id": 13,
+      "s": "UQAM_2",
+      "d": "2025-08-19",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "CH4 sensor cleaning",
+      "b": "Cleaned the methane sensor."
+    },
+    {
+      "id": 14,
+      "s": "UQAM_2",
+      "d": "2025-08-26",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Maintenance: bird spikes added",
+      "b": "The whole EC system was covered in bird droppings, a recurring problem, so bird spikes were added to the sensors. Phenocam refocused, sensors cleaned, water reservoir refilled."
+    },
+    {
+      "id": 15,
+      "s": "UQAM_2",
+      "d": "2025-09-04",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Cleaning and electrical improvements",
+      "b": "The LI-7700 is still getting dirty: the birds appear unbothered by the spikes. Added a PV array isolator and an inline fuse for the solar panels to improve safety."
+    },
+    {
+      "id": 16,
+      "s": "UQAM_2",
+      "d": "2025-09-11",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Maintenance and voltage measurements",
+      "b": "Basic maintenance (sensor cleaning, data download) and connection of the 12 V and 24 V measurements."
+    },
+    {
+      "id": 17,
+      "s": "UQAM_2",
+      "d": "2025-11-24",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Maintenance after hunting season",
+      "b": "Reinstalled the solar panels, changed the cable from the solar panels to the tower, removed the electrical box and replaced it with MC4 connectors. Cleaned the LI-7700, tipping bucket and radiation sensor; filled the washer reservoir with 2-propanol for winter (lower toxicity than regular washer fluid); returned several boxes and materials to UQAM; removed the sonic wicks for winter. Future tasks: more MC4 connectors for the battery box, replace and bury the second solar array's cable, add guy wires and screw piles to the solar structure, return remaining boxes and pipes."
+    },
+    {
+      "id": 18,
+      "s": "UQAM_2",
+      "d": "2025-12-17",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "LI-7200 and LI-7550 replaced",
+      "b": "PROBLEM: the LI-7xx0 software was flagging sensor issues. On arrival the eddy boom was found to have moved at some point (visible in the data around midnight on 1 December) which may have damaged something, and corroded connections were found in the LI-7550. Weather was too bad for a thorough field diagnosis, so the LI-7550 (AIU-2495) and LI-7200 (72H-1206) were swapped for new units (AIU-2496, 72H-1207) and the originals taken for lab diagnosis. Methane sensor cleaned."
+    },
+    {
+      "id": 19,
+      "s": "UQAM_2",
+      "d": "2026-01-19",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Basic maintenance",
+      "b": "Sealed the boxes properly, changed the box desiccant, cleaned the LI-7700 and installed a parallel MC4 connector on the positive power cables from the solar panels. Next visits: install the parallel MC4 connector on the negative cables, check guy-wire tension, add screw piles with guy wires to hold the solar structure, replace the swivel clamp with the better Global Truss one."
+    },
+    {
+      "id": 79,
+      "s": "UQAM_2",
+      "d": "2026-03-13",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Basic maintenance",
+      "b": "Cleaned the LI-7700 mirrors, removed ice that had accumulated on the sensors and replaced the USB thumb drive."
+    },
+    {
+      "id": 86,
+      "s": "UQAM_2",
+      "d": "2026-04-27",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Maintenance and SmartFlux upgrade",
+      "b": "Replaced the SmartFlux with a 40 GB unit and updated its firmware to v2.4.4. Built a wooden-plank boardwalk between the solar structure and the tower (a permanent walkway is not permitted) to avoid sinking into the peat. Replaced the old boom swivel clamps with stronger ones, cleaned the LI-7700 mirrors, filled the fluid washer with 2-propanol, fitted sonic wicks to the CSAT3B and tightened the guy wires. Pending: replace the power cable and use MC4 connectors throughout, fit a longer boom retriever pipe, reposition the boxes to reduce tension on sensor cables, replace desiccants, add guy wires and screw piles to the solar structure and tighten every part of it."
+    },
+    {
+      "id": 100,
+      "s": "UQAM_2",
+      "d": "2026-05-20",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "LI-7550 not working",
+      "b": "PROBLEM: the eddy system was not working. The cause was a blown fuse in the LI-7550: an easy fix. Grounding lugs were double-checked and some tightened. Methane sensor cleaned."
+    },
+    {
+      "id": 95,
+      "s": "UQAM_2",
+      "d": "2026-06-10",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Basic maintenance",
+      "b": "Cleaned the LI-7700, replaced the pipe that moves the boom with a stronger steel one and tidied the cables on the tower."
+    },
+    {
+      "id": 115,
+      "s": "UQAM_2",
+      "d": "2026-07-09",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Cleaning",
+      "b": "Cleaned the LI-7700 and retrieved an auger left in the field."
+    },
+    {
+      "id": 128,
+      "s": "UQAM_2",
+      "d": "2026-08-20",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Soil probe audit: HFP01 wiring does not match the cal file",
+      "b": "PROBLEM: the soil heat flux plates have an inconsistency between the field wiring and the logger's .cal file. The coefficients in the .cal are listed in ascending serial-number order, but the plates are not wired in that order, so each channel carries the wrong sensitivity. The error is purely multiplicative and can be fixed in the pipeline as G_corrected = G_logged x (S_used / S_true). Measured values: UQAM0137 SN 23102 on 2H/2L, 60.03 uV/W/m2 (16.6583 W/m2 per mV); UQAM0134 SN 23099 on 4H/4L, 61.33 uV/W/m2 (16.3052); UQAM0135 SN 23100 on 6H/6L, 62.61 uV/W/m2 (15.9719); UQAM0136 SN 23101 on 8H/8L, 61.08 uV/W/m2 (16.3720). Every CS650 location, serial number and installation was also rechecked and all were correct: vertical profile 1H SN 61438 (8 cm), 3H SN 61418 (16 cm), 5H SN 61426 (32 cm), 7H SN 61425 (64 cm); horizontal replicates 11H SN 61430, 13H SN 61415, 15H SN 61416, 17H SN 61417, all at 8 cm. Routine work alongside: cleaned the LI-7700, refilled the washer tank and repaired the wooden bridge to the site."
+    },
+    {
+      "id": 131,
+      "s": "UQAM_2",
+      "d": "2026-09-01",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "SIM card switch and cleaning",
+      "b": "Cleaned the LI-7700 and switched the modem SIM card to Bell, which requires the updated IP address to be entered."
+    },
+    {
+      "id": 41,
+      "s": "UQAM_3",
+      "d": "2025-07-02",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Basic maintenance",
+      "b": "Cleaned the LI-7700 mirrors and radiation sensors. The cleaning protocol was demonstrated to Jacob Isabelle (UQTR). Six-person team from UQAM, McGill and UQTR."
+    },
+    {
+      "id": 42,
+      "s": "UQAM_3",
+      "d": "2025-07-16",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Communication error: LI-7700 short circuit",
+      "b": "PROBLEM: the station could not be reached remotely. Diagnosis: the LI-7700 was short-circuiting. Disconnecting the methane sensor brought the rest of the system back online; no fuse had blown, only the LI-7700 was dead. Planned follow-up: replace the methane sensor, but only after installing a proper Ethernet surge protector on the cables. Also connected an Ethernet cable to the EFOY fuel cell for remote monitoring."
+    },
+    {
+      "id": 43,
+      "s": "UQAM_3",
+      "d": "2025-07-22",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "LI-7700 replaced",
+      "b": "Replaced the damaged LI-7700 with a newer unit, then cleaned and reconnected it: this time through Ethernet surge protectors."
+    },
+    {
+      "id": 44,
+      "s": "UQAM_3",
+      "d": "2025-07-30",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "CH4 sensor cleaned",
+      "b": "Cleaned the CH4 sensor."
+    },
+    {
+      "id": 45,
+      "s": "UQAM_3",
+      "d": "2025-08-12",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "CH4 sensor cleaning",
+      "b": "Cleaned the CH4 sensor."
+    },
+    {
+      "id": 46,
+      "s": "UQAM_3",
+      "d": "2025-08-26",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Maintenance: EFOY online, wind monitor reoriented",
+      "b": "Connected the EFOY 2800 hybrid system to the internet and linked it to the EFOY cloud (a licence is needed for remote viewing) and updated its firmware. Cleaned the methane sensor, refocused and grounded the Phenocam. PROBLEM found: the wind monitor box was oriented 300° from north instead of facing south, and was corrected; wind-direction data from before 26-08-2025 14:00 needs a correction applied first."
+    },
+    {
+      "id": 47,
+      "s": "UQAM_3",
+      "d": "2025-09-04",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "LI-7700 mirror cleaning",
+      "b": "Cleaned the LI-7700 mirrors."
+    },
+    {
+      "id": 48,
+      "s": "UQAM_3",
+      "d": "2025-09-11",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Basic maintenance",
+      "b": "LI-7700 cleaning and data download."
+    },
+    {
+      "id": 49,
+      "s": "UQAM_3",
+      "d": "2025-11-24",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Maintenance after hunting season",
+      "b": "Replaced the methanol canisters with new ones. Cleaned the LI-7700, tipping bucket and radiation sensor; filled the washer reservoir with 2-propanol for winter; returned several boxes and materials to UQAM; removed the sonic wicks in preparation for winter. Several pallets and boxes still to be removed."
+    },
+    {
+      "id": 51,
+      "s": "UQAM_3",
+      "d": "2025-12-17",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Hybrid power system check: excess methanol consumption",
+      "b": "PROBLEM: the EFOY hybrid system had been consuming much more methanol than expected. The whole system was reviewed with an SFC/EFOY technician on the phone; everything was correctly connected and the conclusion was that the electrical requirements had been underestimated, so the system will need extra batteries and the hardware to connect them. The technician modified the EFOY heater temperature settings to reduce consumption and one air vent was blocked to keep cold air out (to be removed in warmer months). One methanol canister filled, 2.5 tanks left on site; methane sensor cleaned; 12 V and 24 V measurements connected to the logger."
+    },
+    {
+      "id": 52,
+      "s": "UQAM_3",
+      "d": "2026-01-19",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "SDI-12 sensors not working",
+      "b": "PROBLEM: the SDI-12 sensors were returning large numbers of NAN values. Diagnosis: no visible damage inside the boxes, but the BaroVUE10 (SN 2801) was dead and was replaced with a new one (SN 2896); the old one to be checked in the lab. Terminal screws had loosened, probably from temperature swings, and were retightened. The SnowVUE10 was not working but recovered after a restart. Also sealed the boxes, changed the box desiccant, swapped USB sticks; LI-7700 cleaning was not possible because of heavy snow. Next visits: check guy-wire tension and replace the swivel clamp. Potential improvement: add a relay to power-cycle the SDI-12 sensors remotely."
+    },
+    {
+      "id": 53,
+      "s": "UQAM_3",
+      "d": "2026-01-30",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Maintenance: filters and BaroVUE10",
+      "b": "PROBLEM: flow drive at 100%, so the LI-7200 filters had to be changed. The SDI-12 sensors were also still producing a few NAN values per period, mostly from the BaroVUE10 (SN 2801/2728), which was swapped for another unit (SN 2896/2820) to test whether that fixed it."
+    },
+    {
+      "id": 50,
+      "s": "UQAM_3",
+      "d": "2026-02-16",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "SDI-12 NAN assessment",
+      "b": "PROBLEM: continued SDI-12 failures, specifically the HygroVUE10s (air temperature and RH) and the BaroVUE10 on C5. On site the CR1000X was measuring none of those variables. Conductivity was fine on all ports and terminal blocks (other SDI-12 sensors on the same terminals measured correctly) and a previous BaroVUE10 replacement had not helped. After updating the CR1000X firmware from 8.1.0 to 8.5.0 and reconfiguring naming and Ethernet settings, measurements returned, but NANs came back within a day along with many skipped scans and records. Also moved the SDI-12 sensor power to relay port 14, moved the modem power to the CR1000X 12 V, cleaned the LI-7700 and refilled the methanol canister. Next visits: tighten tower guy wires, measure power drain and voltage drop of each SDI-12 sensor individually, move the brainbox network switch to 12 V, and possibly replace the CR1000X."
+    },
+    {
+      "id": 81,
+      "s": "UQAM_3",
+      "d": "2026-02-19",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "SDI-12 issue: root cause found",
+      "b": "Final diagnosis of the long-running SDI-12 fault. After swapping the CR1000X (SN 50875 → SN 50878) without improvement, each sensor was tested individually and all worked; connecting them one by one revealed that the SQ-521 (PPFD_IN) was the culprit: although the sensor itself worked, it generated noise that prevented the logger from reading the other sensors. The sensor was removed and a replacement was to be brought on the next visit."
+    },
+    {
+      "id": 78,
+      "s": "UQAM_3",
+      "d": "2026-03-13",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Basic maintenance",
+      "b": "Reinstalled the PPFD_IN (PAR) sensor, refilled the methanol canister and cleaned ice off the LI-7700, anemometer, wind monitor and wherever else it had accumulated."
+    },
+    {
+      "id": 80,
+      "s": "UQAM_3",
+      "d": "2026-03-27",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Eddy boom found rotated",
+      "b": "PROBLEM: the eddy boom was found pointing at 60° instead of its usual 332°. The old clamps securing the booms were replaced with heavy-duty ones to prevent further movement. Also tightened the guy wires, returned four pallets to UQAM (four remaining), refilled the LI-7700 washer with 2-propanol and cleaned the methane sensor."
+    },
+    {
+      "id": 84,
+      "s": "UQAM_3",
+      "d": "2026-04-02",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Site tidy-up and cleaning",
+      "b": "Removed pallets from the site (two still remain), cleaned the methane sensors and fitted nuts to the turnbuckles: some of the bottom nuts are still missing."
+    },
+    {
+      "id": 82,
+      "s": "UQAM_3",
+      "d": "2026-04-09",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Tower re-certification",
+      "b": "The tower was certified for another year by engineer Luc Pelletier and everything went well. Note: some 3/4\" reverse-thread nuts are missing from the turnbuckles and need to be installed."
+    },
+    {
+      "id": 83,
+      "s": "UQAM_3",
+      "d": "2026-04-15",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Site preparation for summer season",
+      "b": "After winter the IRGA needed cleaning and calibration: signal strength was around 96%. Rain made field cleaning impractical, so the units were swapped for recently cleaned and calibrated ones: LI-7550 AIU-2494 → AIU-2492 and LI-7200 72H-1205 → 72H-1203 (the removed units to be cleaned and calibrated in the lab). Fitted sonic wicks to the CSAT3B. Swapped SmartFlux SN00780 → SN00785 (upgraded from 8 GB to 40 GB) and updated its firmware to v2.4.4. Installed a CS456 pressure transducer connected to the AM16/32 multiplexer: it still needs a logger program change to work. Water depth 11.5 cm; total tube length 309 cm with 110 cm sticking out."
+    },
+    {
+      "id": 87,
+      "s": "UQAM_3",
+      "d": "2026-04-27",
+      "w": "David Trejo",
+      "t": "routine",
+      "ti": "Basic maintenance and EFOY Modbus configuration",
+      "b": "Filled the methanol tanks, cleaned the methane sensor and configured Modbus on the EFOY computer (Modbus TCP port 502, remote access disabled, IP 192.168.13.55, subnet 255.255.255.0, gateway 192.168.13.31, DNS 8.8.4.4 and 1.1.1.1)."
+    },
+    {
+      "id": 94,
+      "s": "UQAM_3",
+      "d": "2026-06-10",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Cleaning and fuel-cell troubleshooting",
+      "b": "Cleaned the LI-7700. PROBLEM: the fuel cell reported that methanol was completely empty although one container was still full; troubleshooting on site did not work. The fuel manager has a fault on port 1: only one port is working. An email was sent to SFC and a response is awaited."
+    },
+    {
+      "id": 106,
+      "s": "UQAM_3",
+      "d": "2026-06-22",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Profile system installation and EFOY troubleshooting",
+      "b": "PROBLEM: the EFOY was not working, so the system had to be shut down. Set up the profile system (housing and tubing attached at four levels on the tower and the two profile-system boxes fixed to the tower) but it is not running properly because the tower has no power. Next time: bring the missing 12 V positive cable, grounding clamp and cable, and extend the power cable."
+    },
+    {
+      "id": 114,
+      "s": "UQAM_3",
+      "d": "2026-07-09",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "New battery and profile system",
+      "b": "Replaced the battery and connected the profile system's power cables to the batteries: the power system still needs updating before the profile system is fully operational. Powered the eddy system back up, cleaned the LI-7700, replaced the USB sticks, put Carbonique stickers on the boxes and swapped the desiccant of both the LI-7700 and the sonic anemometer. To bring next time: new Ethernet cable head, crimpers, network switch and new filters."
+    },
+    {
+      "id": 127,
+      "s": "UQAM_3",
+      "d": "2026-08-20",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Soil probe audit: HFP01 wiring does not match the cal file",
+      "b": "PROBLEM: same fault as UQAM_2 on the same day. The .cal coefficients are in ascending serial-number order but the plates are wired in a different order, so each channel uses the wrong sensitivity. Per-plate error: HFP(1) on 2H/2L -0.74 %, HFP(2) on 4H/4L +2.58 %, HFP(3) on 6H/6L -3.24 %, HFP(4) on 8H/8L +1.50 %; worst case about 3.2 %. At a soil heat flux of 30 W/m2 that is 0.2-1.0 W/m2 and at 100 W/m2 it is 0.7-2.6 W/m2. The four errors very nearly cancel in the mean (+0.03 %), so a plate-averaged G is essentially unaffected: the problem shows up in per-plate values, in spatial variability between plates, and in any energy-balance closure done plate by plate. It sits well below the HFP01's own ~3 % repeatability and 15 % nominal accuracy, so it is not data-destroying, but it is a genuine per-channel systematic bias and is trivially corrected in the pipeline as G_corrected = G_logged x (S_used / S_true). Measured values: UQAM0139 SN 23104 on 2H/2L, 61.60 uV/W/m2 (16.2338 W/m2 per mV); UQAM0140 SN 23105 on 4H/4L, 63.19 uV/W/m2 (15.8253); UQAM0141 SN 23106 on 6H/6L, 61.14 uV/W/m2 (16.3559); UQAM0138 SN 23103 on 8H/8L, 62.06 uV/W/m2 (16.1134). All CS650 locations and serials were rechecked and correct: vertical profile 1H SN 61423 / U0187 (8 cm), 3H SN 61432 / U0183 (16 cm), 5H SN 61434 / U0188 (32 cm), 7H SN 61427 / U0182 (64 cm); horizontal replicates 11H SN 61431 / U0184, 13H SN 61410 / U0181, 15H SN 61437 / U0185, 17H SN 61433 / U0186, all at 8 cm. Routine work alongside: cleaned the LI-7700, refilled the washer tank and repaired the wooden bridge to the site."
+    },
+    {
+      "id": 130,
+      "s": "UQAM_3",
+      "d": "2026-09-01",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "EFOY swapped for a loaner unit",
+      "b": "PROBLEM: the EFOY fuel cell was exchanged for a loaner. The fuel manager and the original generator unit were removed to be sent back to EFOY, leaving the system running on a single methanol cell. Also cleaned the LI-7700 and replaced the SIM card with a new Bell one, which needs the new IP address entered."
+    },
+    {
+      "id": 54,
+      "s": "UQAM_4",
+      "d": "2025-10-14",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Site preparation",
+      "b": "Installed the screw pile and the base of the tower."
+    },
+    {
+      "id": 55,
+      "s": "UQAM_4",
+      "d": "2025-12-10",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Installation (10–11 Dec): halted by snowstorms",
+      "b": "Installed the tower infrastructure over 10–11 December but could not continue because of intense snowstorms; installation to resume after the holidays. Still missing: wiring all sensors, grounding several boxes, powering the station and configuring the system. The design uses two systems: a stationary AC-powered tower on the berm carrying the full eddy system, 2 HygroVUE10, a Phenocam, a Texas TE525WS tipping bucket, a Young 05103 wind monitor, a BaroVUE10, an EasyProbe and a CS456; plus a battery- and solar-powered moving tripod inside the field with CNR4 + CNF4, 5 HFP01, 5 CS650, a SnowVUE10, a SoilVUE10 and 2 SQ-521."
+    },
+    {
+      "id": 56,
+      "s": "UQAM_4",
+      "d": "2026-01-12",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Final installation",
+      "b": "Stations finished and now remotely accessible on a fixed IP; the Phenocam website is running. PROBLEM: frozen soil prevented installing most of the soil sensors; only one CS650 (TS_3_1_1) went in; a return visit with better weather is needed. Tower: AC power via TECK90 AWG10 cable to the electrical box, with 24 V and 12 V supplies; its CR1000X is the main logger, running the same program and configuration as the other stations. Tripod: 100 W solar panel, MPPT charger and a 12 V 100 Ah lead-carbon battery, with a rover CR1000X on local IP 192.168.13.214 and PakBus address 2. Pending: soil sensors, CNF4 connection, TECK90 cable brackets, anti-tilt solution for the tripod, wireless antennas between the two systems (currently an Ethernet cable), check the solar panel's influence on the radiation sensors, ferrite core on the wind-monitor cable, voltage measurements."
+    },
+    {
+      "id": 57,
+      "s": "UQAM_4",
+      "d": "2026-01-22",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Finishing touches: 12 V supply replaced",
+      "b": "PROBLEM: the 12 V power supply was not working correctly and was replaced with a new one. Reconnected the Phenocam. Connected the CR1000X to the Campbell PS150 battery so power-down alerts arrive and supply voltages can be seen remotely, and added 12 V and 24 V measurements to the CR1000X (variables Voltage_12V and Voltage_24V)."
+    },
+    {
+      "id": 58,
+      "s": "UQAM_4",
+      "d": "2026-02-09",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "CR1000X and modem communication failure",
+      "b": "PROBLEM: the CR1000X had not been working properly since around 23:00 on 7 January. Because the modem and network switch are powered from the logger's SW12-1 and SW12-2, they were down too. Extreme cold (about -31 °C wind chill) left no time to troubleshoot properly; the logger appeared to be stuck in an infinite reboot loop. The logger SN 50876 was swapped for SN 52479, the network switch moved onto the 12 V from the power supply and the modem onto the 12 V from the CR1000X. Improvement identified for all stations: move modem and network-switch power onto the relay so they can be controlled."
+    },
+    {
+      "id": 88,
+      "s": "UQAM_4",
+      "d": "2026-04-08",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Site preparation for summer season",
+      "b": "Trailer construction 50% complete. Updated the SmartFlux2 firmware. Installed the soil sensors: SoilVue10 SN 4403 on SDI-12 address 1; CS650 on addresses 2–5 (SN 69250, 69251, 69252, 69253); HFP01 plates SN 23107–23110 with sensitivities 59.54, 61.12, 59.65 and 61.05. Cleaned the methane sensor mirrors and tightened the guy wires."
+    },
+    {
+      "id": 89,
+      "s": "UQAM_4",
+      "d": "2026-04-17",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Site preparation for summer season",
+      "b": "Finished assembling the trailer for the rover tripod and mounted the system on top of it. Installed the EasyProbe SN 10237155 in the water canal beside the field that feeds water to the crops. Installed antennas on the tower and tripod so the tripod has internet access without an Ethernet cable."
+    },
+    {
+      "id": 93,
+      "s": "UQAM_4",
+      "d": "2026-05-08",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Foldable boom system; trailer moved out of the field",
+      "b": "Moved the EasyProbe20 to controller C7 so its different sampling rate stops interfering with the other SDI-12 sensors. Moved the trailer out of the field to the side so the farmer could plant lettuce: from this point the outward radiation variables (PPFD, SW and LW) no longer represent the field until the trailer goes back. Reinstalled all soil sensors in a new position inside the field. Improved the boom system so it can be folded when needed. Cleaned the sensors and station and filled the fluid washer with 2-propanol."
+    },
+    {
+      "id": 99,
+      "s": "UQAM_4",
+      "d": "2026-05-15",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Installation of water table depth sensor",
+      "b": "Installed a CS456 WTD sensor (SN 70010299). Water was found at 1.85 m depth and the hole goes down to 270 cm, so readings below that value are not valid. Also modified the code slightly so the EasyProbe does not interfere with the other SDI-12 sensors."
+    },
+    {
+      "id": 101,
+      "s": "UQAM_4",
+      "d": "2026-05-22",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Trailer moved back into the field",
+      "b": "Moved the trailer back into the field after lettuce planting, so the outward radiation variables (SW, LW and PPFD) are meaningful again. Cleaned the station and sensors."
+    },
+    {
+      "id": 98,
+      "s": "UQAM_4",
+      "d": "2026-06-12",
+      "w": "Chloe Kaplan",
+      "t": "issue",
+      "ti": "Cleaning and blocked LI-7200 filter",
+      "b": "Cleaned the LI-7700 and added a vertical support pipe plus a new swivel clamp so the boom can be moved easily for field operations. PROBLEM: the LI-7200 filter was blocked; water and compressed air were tried but it never fully unclogged."
+    },
+    {
+      "id": 105,
+      "s": "UQAM_4",
+      "d": "2026-06-15",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Filter replacement",
+      "b": "Replaced the flow filter with a 15 µm one, which brought the flow drive down from 100% to 44%. General cleaning of the station."
+    },
+    {
+      "id": 109,
+      "s": "UQAM_4",
+      "d": "2026-06-30",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Maintenance",
+      "b": "Cleaned the methane sensor, refilled the alcohol, replaced the desiccant in the sonic anemometer, realigned the sonic to be straight and confirmed the connection for the water multiprobe. Outstanding: the CNF4 needs reconnecting."
+    },
+    {
+      "id": 110,
+      "s": "UQAM_4",
+      "d": "2026-07-02",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Moving the trailer",
+      "b": "Moved the trailer onto the grass off the fields, reburied the soil sensors, heat-flux plates and SoilVue, and aligned the solar panel to face south."
+    },
+    {
+      "id": 111,
+      "s": "UQAM_4",
+      "d": "2026-07-07",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Moving the trailer back",
+      "b": "Moved the trailer back into the field and reinstalled the heat-flux plates, SoilVue and soil-moisture probes. Swapped the LI-7550 and LI-7200 for newly calibrated units (AIU-2494, 72H-1205) and cleaned the methane sensor."
+    },
+    {
+      "id": 124,
+      "s": "UQAM_4",
+      "d": "2026-08-12",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Cleaning",
+      "b": "Cleaned the LI-7700, swapped out the USB sticks and refilled the washing unit with alcohol."
+    },
+    {
+      "id": 129,
+      "s": "UQAM_4",
+      "d": "2026-08-26",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Cleaning",
+      "b": "Cleaned the LI-7700, refilled the washer fluid and moved the trailer onto the grass so the field could be harvested."
+    },
+    {
+      "id": 133,
+      "s": "UQAM_4",
+      "d": "2026-09-17",
+      "w": "David Trejo",
+      "t": "issue",
+      "ti": "Trailer returned to the field; SnowVUE not working",
+      "b": "PROBLEM: the SnowVUE has stopped working and needs to be swapped on the next visit, with the faulty one taken back to the lab for diagnosis. The flow drive is also over 70 %, so the filter and rain cap will need replacing next time. The trailer was moved back inside the field and all the soil probes reinstalled in it; general cleaning of the tower (lots of spiders), cleaned the methane sensor and filled the washer tank, and swapped the LI-7550 and SmartFlux USB sticks for empty ones."
+    },
+    {
+      "id": 118,
+      "s": "UQAM_5",
+      "d": "2026-07-22",
+      "w": "Chloe Kaplan",
+      "t": "major",
+      "ti": "Power system and tower installation (20–22 July)",
+      "b": "Solar structure: fixed the panel structure to the platform, replaced the previous bolts with longer, more stable ones, connected the panels to the structure, grounded the solar system, connected it to the batteries, added lightning protection and ran the connection to the tower. Tower structure: built the scaffolding, connected the booms, attached the power, multiplexer, logging and electrical boxes, and added lightning protection. Next time: fit the LI-COR and biomet sensors, configure the system and clear the remaining equipment from the field."
+    },
+    {
+      "id": 121,
+      "s": "UQAM_5",
+      "d": "2026-08-06",
+      "w": "David Trejo",
+      "t": "major",
+      "ti": "Installation details of UQAM_5",
+      "b": "Natural marsh site that floods in spring, with water reaching up to 3 m in extreme events. The system sits on two wooden platforms on certified screw piles 3 m above the ground (one for the solar panels and battery bank, one for the scaffolding and equipment) with power carried over two 70 m 4C 10AWG TECK90 cables. Access can require a boat during flooding and a couple of kilometres of walking in winter. Installed in stages: platforms in autumn 2025 to test them against flooding and freezing, then the solar panels, then the full eddy covariance system on 20–22 July, 4, 6 and 11 August 2026. Data should be considered valid from 2026-08-06 16:00 onwards. Soil: four HFP01 (SN 23111–23114, sensitivities 61.50–62.22) and four CS650 (SN 69255, 69259, 69260, 69261) as horizontal replicas 5 cm below the surface. No vertical profile could be installed (the site was still too flooded to dig) to be retried in the autumn. Instruments: CSAT3B SN 1901 at 4.85 m with north offset 267°; LI-7200 SN 72H-1209 (tube 71.1 cm, flow 18.2); LI-7700 SN TG1-1027. Missing: connect the CNF4 data cables to the logger and the cables to read system voltages."
+    },
+    {
+      "id": 123,
+      "s": "UQAM_5",
+      "d": "2026-08-11",
+      "w": "Chloe Kaplan",
+      "t": "routine",
+      "ti": "Cleaning / finishing installation",
+      "b": "Cleaned the LI-7700, added the cable for the CNF4 ventilation unit, added and configured the Phenocam, and brought some equipment back to UQAM: scaffolding and larger items were left in the field closer to the road."
+    }
+  ],
+  "PIPE": [
+    {
+      "id": "pn1",
+      "ed": "2026-06-01",
+      "s": "ALL",
+      "ti": "LI-7200 intake tube settings are wrong in the metadata",
+      "period": "All data to date",
+      "b": "Every tower (UQAM_1, McGill_1, UQAM_2, UQAM_3 and UQAM_4) carries a LI-7200 tube length of 100 cm and the settings of an <em>insulated</em> intake tube in its metadata, but the heated intake tubes are what is actually installed. The parameters that should be used instead are:<ul><li>Intake tube inside diameter: <b>5.33 mm</b> (0.21\")</li><li>Intake tube outside diameter: <b>6.35 mm</b> (0.25\")</li><li>Intake tube length: <b>71.1 cm</b> (28\")</li></ul>",
+      "fix": "This difference can affect the flux calculations, so apply these values in the EddyPro runs rather than reading the settings from the ghg files.",
+      "links": [
+        {
+          "t": "LI-7200RS specifications",
+          "u": "https://www.licor.com/support/LI-7200RS/topics/specifications.html"
+        }
+      ]
+    },
+    {
+      "id": "pn2",
+      "ed": "2026-06-01",
+      "s": "UQAM_1",
+      "ti": "Tipping bucket damaged: no liquid precipitation record",
+      "period": "2025-11-21 → 2026-05-07",
+      "b": "The tipping bucket was damaged on 2025-11-21 and not repaired until 2026-05-07. It was damaged repeatedly over that period, and it was winter, so there are no records of liquid precipitation. On the day it was repaired there is an artificial spike that was produced for testing.<br><br>McGill_1 sits a few kilometres from UQAM_1, so its precipitation record is plotted alongside to show how the data were affected.",
+      "fix": "Treat the whole window as missing rather than zero precipitation, and discard the test spike on 2026-05-07.",
+      "plots": [
+        {
+          "k": "p_precip_full",
+          "c": "UQAM_1 and McGill_1 precipitation, full record. The UQAM_1 gap from late 2025 and the isolated 39 mm test spike in May 2026 are both visible."
+        },
+        {
+          "k": "p_precip_zoom",
+          "c": "The same two series zoomed to 2025-10 → 2026-06, where McGill_1 keeps recording through the UQAM_1 outage."
+        }
+      ]
+    },
+    {
+      "id": "pn3",
+      "ed": "2026-04-13",
+      "s": "McGill_1",
+      "ti": "Wind monitor misalignment",
+      "period": "Installation → 2026-02-10 10:30",
+      "b": "The Young wind monitor was installed incorrectly. Its reference was looking at 220° instead of 180°, so wind direction was offset until it was corrected at 10:30 on 10 February 2026.",
+      "fix": "Correctable in the First Stage with an offset.",
+      "flag": "The source document describes this as \"a 30° difference\", but 220° − 180° is 40°. Worth confirming which figure is right before applying the offset.",
+      "plots": [
+        {
+          "k": "p_mcgill_wdir",
+          "c": "McGill_1 wind direction, MET vs. sonic, around the 10 February 2026 correction. The two series converge after the grey marker."
+        }
+      ]
+    },
+    {
+      "id": "pn4",
+      "ed": "2026-09-29",
+      "s": "McGill_1",
+      "ti": "TW_5_1_1 renamed TW_1_5_1 in the logger on 2026-09-28",
+      "period": "2025-09-25 → 2026-09-28 11:30 logged as TW_5_1_1",
+      "b": "The deepest water thermocouple of the profile (5 cm above the bottom) was logged as <code>TW_5_1_1</code>, which reads as a horizontal replicate. It belongs to the vertical profile, below <code>TW_1_4_1</code>, so its name is <code>TW_1_5_1</code> (first noted 2026-04-13). The logger program was changed on <b>2026-09-28 at 11:40 EST</b>: the 12:00 half-hour average is the first record written as <code>TW_1_5_1</code>, and everything before it is under <code>TW_5_1_1</code>.",
+      "fix": "Handled in first stage, not by editing the raw files: a single trace <code>TW_1_5_1</code> reads <code>TW_5_1_1_Avg</code> up to the 11:30 record and <code>TW_1_5_1_Avg</code> from the 12:00 record, through two rows of <code>inputFileName_dates</code>. The switch is set at 11:45, between two half-hour records, so no record is claimed by both names. Second stage passes <code>TW_1_5_1</code> through, so no <code>TW_5_1_1</code> reaches AmeriFlux.",
+      "xref": "The profile was installed on 2025-09-25 (the pipe stopped at −20 cm, so the −50 cm sediment sensor could not go in) and its wires were sorted on 2026-05-28. The rename was done in the logger program and has no field note.",
+      "flag": "Two things to check before committing the ini. (1) The logger column names are assumed to be <code>TW_5_1_1_Avg</code> and <code>TW_1_5_1_Avg</code>, following the <code>_Avg</code> pattern of the other traces: check them against the Met file headers. (2) The rest of the profile is not in the McGill_1 first stage yet. <code>TW_1_1_1</code> there is the EasyProbe water temperature (<code>T_WATER_Avg</code>), which clashes with the thermocouple <code>TW_1_1_1</code> (100 cm above the bottom); <code>TW_1_2_1</code> to <code>TW_1_4_1</code> have no trace; and <code>TS_1_1_1</code> to <code>TS_1_4_1</code> are described as CS650 at 8, 16, 32 and 64 cm, while the site has thermocouples at 5, 10 and 20 cm and no usable <code>TS_1_4_1</code>."
+    },
+    {
+      "id": "pn5",
+      "ed": "2026-04-13",
+      "s": "UQAM_1",
+      "ti": "Canopy height changes through the growing season",
+      "period": "Every growing season",
+      "b": "UQAM_1 is an agricultural field, so canopy height changes continuously through the growing season rather than staying at the fixed value in the metadata. Manual measurements are available to complement the canopy height estimations.",
+      "fix": "Use dynamic metadata for canopy height rather than a single static value.",
+      "links": [
+        {
+          "t": "Canopy height measurements (SharePoint)",
+          "u": "https://uqam.sharepoint.com/:f:/r/sites/CARBONIQUE/Documents%20partages/Data/UQAM_1/Canopy%20height?csf=1&web=1&e=GKHo8q"
+        }
+      ]
+    },
+    {
+      "id": "pn6",
+      "ed": "2026-04-13",
+      "s": "UQAM_1",
+      "ti": "New soil sensor variables in the biomet",
+      "period": "From 2025-08-05",
+      "b": "Horizontal replicas of the CS650 sensor were installed, so from 2025-08-05 onwards there are new variables in the biomet file:<ul><li>CS650 <b>SN 61406</b> (<code>TS_2_1_1</code>, <code>SWC_2_1_1</code></li><li>CS650 <b>SN 61439</b>) <code>TS_3_1_1</code>, <code>SWC_3_1_1</code></li><li>CS650 <b>SN 61429</b> (<code>TS_4_1_1</code>, <code>SWC_4_1_1</code></li><li>CS650 <b>SN 61414</b>) <code>TS_5_1_1</code>, <code>SWC_5_1_1</code></li></ul>",
+      "fix": "Expect the column set to change on 2025-08-05; do not treat the new variables as errors."
+    },
+    {
+      "id": "pn7",
+      "ed": "2026-04-13",
+      "s": "UQAM_1",
+      "ti": "Wrong sensitivity used for HFP01_1_1",
+      "period": "All data to date",
+      "b": "<code>HFP01_1_1</code> has been using the wrong sensitivity throughout. The calibration file shows <b>62.15</b> where it should be <b>60.15 V/(W/m²)</b>. Because the logger computes <code>HFP() = 1000 · HFP_mV() / HFP_Sens()</code>, the recorded value is scaled by the ratio of the two sensitivities.",
+      "fix": "Re-weight the variable: <code>G_1_1_1_new = G_1_1_1_from_logger × 62.15 / 60.15</code>: that is, wrong sensitivity divided by correct sensitivity."
+    },
+    {
+      "id": "pn8",
+      "ed": "2026-04-13",
+      "s": "UQAM_2",
+      "ti": "Station struck by lightning: data gap",
+      "period": "2025-05-25 → 2025-07-08",
+      "b": "Expect missing data between 25 May 2025 and 8 July 2025: lightning hit the tower. Improving the grounding and lightning protection systems took time before the sensors could be reinstalled.",
+      "fix": "Treat the window as a hardware outage, not as a measurement.",
+      "xref": "Matches the maintenance record: grounding was rebuilt on 2025-06-03 and the EC sensors reinstalled and reconfigured on 2025-07-02 and 2025-07-08."
+    },
+    {
+      "id": "pn9",
+      "ed": "2026-04-13",
+      "s": "UQAM_2",
+      "ti": "Eddy boom moved by a storm",
+      "period": "2025-12-17 03:30 → 14:00",
+      "b": "A storm damaged some sensors and moved the eddy boom at 03:30 on 17 December 2025, turning it from 264° to 315°. The whole system was reinstalled and realigned at 14:00 the same day. The sonic anemometer was not damaged, but it measured with that different offset for the intervening period.",
+      "fix": "Include dynamic metadata in EddyPro and modify the north offset, plus the northward and eastward distances between the eddy sensors, for that window.",
+      "flag": "The maintenance note for the 2025-12-17 visit places the boom movement \"around midnight Dec 1st\" in the data, and the plot below spans 29 Nov – 3 Dec 2025: neither matches a 17 December event. The affected window may be considerably longer than stated; worth resolving before applying dynamic metadata.",
+      "plots": [
+        {
+          "k": "p_uqam2_wind",
+          "c": "UQAM_2 wind speed and direction, 29 Nov – 3 Dec 2025. MET and sonic directions track each other until 1 December, then diverge sharply."
+        }
+      ]
+    },
+    {
+      "id": "pn10",
+      "ed": "2026-04-13",
+      "s": "UQAM_3",
+      "ti": "Wind monitor not properly aligned",
+      "period": "Installation → 2025-08-26 14:00",
+      "b": "The wind monitor was never correctly aligned after installation: it was looking at 300°. It was corrected to 180° (reference) at 14:00 on 26 August 2025.",
+      "fix": "Apply a direction offset to everything before that timestamp.",
+      "xref": "Confirmed by the maintenance note of 2025-08-26, which records the box found at 300° from north and reoriented to face south."
+    },
+    {
+      "id": "pn11",
+      "ed": "2026-04-13",
+      "s": "UQAM_3",
+      "ti": "Eddy boom moved by intense winds",
+      "period": "From 2026-03-17 03:30",
+      "b": "Intense winds moved the eddy boom at 03:30 on 17 March 2026, from 264° to 315°. The sonic anemometer was not damaged, but it measured with that different offset during the period.",
+      "fix": "Include dynamic metadata in EddyPro and modify the north offset, plus the northward and eastward distances between the eddy sensors, for that window.",
+      "flag": "Three details in this entry look copied from the UQAM_2 one and need checking: the realignment is given as \"2pm on December 17th, 2025\", which is before the event; the angles 264° → 315° are identical to UQAM_2's; and the maintenance record says the UQAM_3 boom was found at 60° instead of its usual 332° and was re-clamped on 2026-03-27, not in March 17–December. The end of the affected window is therefore probably 2026-03-27.",
+      "plots": [
+        {
+          "k": "p_uqam3_wdir",
+          "c": "UQAM_3 wind direction, 14–26 March 2026. MET and sonic diverge from around 17 March onward."
+        }
+      ]
+    },
+    {
+      "id": "pn12",
+      "ed": "2026-04-13",
+      "s": "UQAM_4",
+      "ti": "Dynamic metadata and wind sector filtering needed",
+      "period": "Every growing season",
+      "b": "UQAM_4 will potentially also need dynamic metadata to track the canopy change as the crops grow. The site is also not ideally located, because of restrictions imposed by the landowner, so wind coming from the direction of the trees will potentially need to be filtered out.",
+      "fix": "Plan for a canopy-height time series and a wind-sector filter over the treed fetch.",
+      "links": [
+        {
+          "t": "Site location (Google Maps)",
+          "u": "https://maps.app.goo.gl/nNaJoognyg1s2uSXA"
+        }
+      ]
+    },
+    {
+      "id": "pn13",
+      "ed": "2026-09-23",
+      "s": "ALL",
+      "ti": "Water table depth: every CS456 datum is wrong, and the offset lives in the logger",
+      "period": "Every CS456 installed to date",
+      "b": "<p><b>The sign convention is settled.</b> AmeriFlux's measurement-height page states that <em>\"positive values are heights, and negative values are depths\"</em>, so for WTD: <b>positive = water above the surface, negative = below it</b>. That is the sign the CR1000X already produces: <code>Lvl_m = Lvl_psi*0.70307 - WTD_offset</code>, where the first term is the height of water above the transducer and <code>WTD_offset</code> is the sensor's depth below the surface. The logger's arithmetic was never the problem.</p><p><b>The offsets were.</b> Not one of the four sites had a datum that survives contact with a tape measure, and each is wrong in a different way:</p><table><tr><th>Site</th><th>Offset in the cal file</th><th>What that implies</th><th>True sensor depth</th></tr><tr><td>UQAM_2</td><td>0.79 m</td><td>water 1.1 m <em>above</em> an open bog, all season</td><td>2.05 m <span class=\"pn-q\">(measured)</span></td></tr><tr><td>UQAM_3</td><td>0.00 → 1.75 → 1.48 m</td><td>three different datums in one season, none right</td><td>1.83 m</td></tr><tr><td>UQAM_4</td><td>−1.57 m</td><td>water 2.9 m above a drained peatland</td><td>3.15 m <span class=\"pn-q\">(disputed)</span></td></tr><tr><td>McGill_1</td><td>1.58 m</td><td>0.8 m of water <em>below</em> the bed, at an open-water site under a metre of it</td><td>−0.16 m</td></tr></table><p>Two problems follow from applying the offset inside the logger. First, only the corrected value carries meaning and nothing records which offset was in force on which date: the history above had to be recovered by differencing the archived <code>Lvl_psi_Avg</code> against <code>Lvl_m_Avg</code>. Second, an offset can be tuned to agree with a field tape at exactly one instant and still be wrong everywhere else, which is what happened at UQAM_3 on 10 June.</p><p>Barometric compensation was suspected and is <b>not</b> the problem: the CS456 is a vented gauge sensor and <code>aM1!</code> returns psig. Regressing 30-minute changes in head against 30-minute changes in station pressure gives a slope within 0.01 m/kPa of zero at both bog sites, against +0.102 for a sensor with no vent compensation.</p>",
+      "fix": "Change the logger line to publish raw head only (<code>Lvl_m = Lvl_psi*0.70307</code>) and apply the datum in first stage as a dated calibration: <code>currentCalibration = [0.70307 -&lt;sensor_depth_below_surface&gt; datenum(start) datenum(2999,12,31)]</code>. A negative depth is legitimate where the sensor hangs above the bed, as at McGill_1. That makes a datum correction retroactive and reviewable instead of stamping a step into the record, and since <code>Lvl_psi_Avg</code> is archived everywhere the whole 2026 season can be rebuilt without losing anything. Reprocess all four sites for 2026 and re-export to AmeriFlux. UQAM_1 also has a CS456 with three weeks of data in May 2026 and an offset of 1.17 m that nobody has checked.",
+      "xref": "UQAM_3's CS456 went in on 2026-04-15 and UQAM_4's on 2026-05-15 (SN 70010299), both recorded in the field notes. McGill_1's was added on 2026-05-28, during the visit that chased the battery-logger communication fault.",
+      "flag": "UQAM_2's CS456 appears in no EcoFlux field note. Its data start on 2026-04-27, the day of the 'Maintenance and SmartFlux upgrade' visit, so it was almost certainly installed then. The sensor depth (2.05 m) and the water table at installation (0.13 m below the surface) are in a written installation note; adding that note to EcoFlux would close this.",
+      "plots": [
+        {
+          "k": "p_wtd_network",
+          "c": "The corrected record. The four sites separate exactly as their ecology predicts: an open-water site held near +0.9 m, two bogs tracking the surface through a summer drawdown, and a drained agricultural peatland pinned near −1.8 m."
+        },
+        {
+          "k": "p_wtd_beforeafter",
+          "c": "What is in the database today (red) against the corrected series (blue). McGill_1 and UQAM_4 are the clearest: an open-water site under a metre of water is recorded as 0.8 m drained, and a drained peatland as 2.9 m flooded."
+        },
+        {
+          "k": "p_wtd_baro",
+          "c": "Barometric compensation test at the two bog sites. Each dot is one 30-minute interval. If a vent tube were blocked or the desiccant spent, the cloud would tilt onto the dashed red line; it does not."
+        }
+      ],
+      "links": [
+        {
+          "t": "AmeriFlux measurement height and sign convention",
+          "u": "https://ameriflux.lbl.gov/data/measurement-height/"
+        },
+        {
+          "t": "CS451/CS456 manual (Table 8-3: aM1! returns psig)",
+          "u": "https://s.campbellsci.com/documents/us/manuals/cs451-cs456.pdf"
+        }
+      ]
+    },
+    {
+      "id": "pn14",
+      "ed": "2026-09-23",
+      "s": "UQAM_2",
+      "ti": "WTD datum was 1.3 m short",
+      "period": "2026-04-27 → present (all CS456 data)",
+      "b": "<p>UQAM_2 ran on <code>WTD_offset = 0.79 m</code> from installation and the value was never changed or checked. With the head above the sensor sitting at 1.84–2.01 m all season, the database says the water table has been <b>1.06 to 1.21 m above the surface of an open bog</b> continuously since April.</p><p>The written installation note records the sensor at <b>2.05 m</b> below the surface and the water table 0.13 m below it. The archive starts 2026-04-27 13:30 and the sensor was still equilibrating that evening, its head climbing from 1.41 to 1.95 m; by 2026-04-28 00:00 it had settled at 1.9533 m, which with the measured depth puts the water table 0.10 m below the surface, 3 cm above the installation reading, as expected while a freshly augered hole recovers. An independent estimate, the offset that would place the wettest 1 % of the record exactly at the surface, gives 2.00 m: 5 cm away. (Before the written note turned up, the depth had been tied to the settled reading instead, which gave 2.08 m.)</p><p>Corrected, the season runs −0.20 to −0.05 m: a very wet bog whose water table barely moves, which matches its 6–9 °C water temperature and its weak evapotranspiration signal.</p>",
+      "fix": "Source <code>WTD_1_1_1</code> from <code>Lvl_psi_Avg</code> with <code>currentCalibration = [0.70307 -2.05 datenum(2026,4,28) datenum(2999,12,31)]</code> and start the trace on 2026-04-28, after the equilibration transient.",
+      "xref": "The data begin on 2026-04-27, the day of the SmartFlux upgrade visit. The written installation note gives the sensor depth (2.05 m) and the water table at installation (0.13 m below the surface)."
+    },
+    {
+      "id": "pn15",
+      "ed": "2026-09-23",
+      "s": "UQAM_3",
+      "ti": "Three different datums in one season",
+      "period": "2026-04-21 → present (all CS456 data)",
+      "b": "<p>UQAM_3 has run on three offsets: <code>0.00 m</code> from 21 April (the cal file had not loaded, so the logger was publishing raw head under a WTD name), <code>1.75 m</code> from 27 April, and <code>1.48 m</code> from 10 June. None is right.</p><p>On 10 June the water table was measured at <b>0.115 m below the surface</b> and the offset was set to 1.48 so the logger would display a number near it. Head that day averaged 1.7162 m, so the sensor actually sits <b>1.83 m</b> below the surface. The half-hourly record even catches the visit: a single disturbance spike at 10:30, the cal file rewritten around 11:00, and one record caught mid-write at 1.50 m.</p><p>Corrected, the season runs +0.11 m in April (about 11 cm of ponding at snowmelt) down to −0.49 m by mid-September, tracking the 39 cm fall in head over the same period.</p>",
+      "fix": "Source <code>WTD_1_1_1</code> from <code>Lvl_psi_Avg</code> with <code>currentCalibration = [0.70307 -1.83 datenum(2026,4,21) datenum(2999,12,31)]</code>, starting the trace at 2026-04-21 16:00 once the sensor had settled. Do not reprocess 21–27 April from <code>Lvl_m_Avg</code>: no offset was loaded then.",
+      "xref": "The CS456 was installed on 2026-04-15 and a site visit is recorded for 2026-06-10, consistent with the disturbance spike in the pressure record at 10:30 that day.",
+      "flag": "The 10 June reading was first reported as 0.24 m and later as 11.5 cm rounded to 12 cm. The two give sensor depths of 1.96 m and 1.83 m respectively: a 13 cm difference that shifts the whole series. 1.83 m is used here, per the later and more precise figure, but it is worth confirming which reading the field sheet records."
+    },
+    {
+      "id": "pn17",
+      "ed": "2026-09-23",
+      "s": "UQAM_4",
+      "ti": "WTD came from the EasyProbe, and the CS456 datum has the wrong sign",
+      "period": "All data to date; CS456 from 2026-05-15",
+      "b": "<p>Two faults. First, <code>WTD_1_1_1</code> was sourced from <code>L_WATER_Avg</code> (the EasyProbe level channel) with no date limit, at a site whose EasyProbe has no water table sensor. Second, since the CS456 went in on 15 May the cal file has carried <code>WTD_offset = −1.57 m</code>, a negative depth for a buried sensor, which puts the water table <b>2.6 to 3.2 m above the surface of a drained agricultural peatland</b>.</p><p>Water was found at 1.85 m depth at installation. Head had settled at 1.297 m by 12:59 that day, which implies a sensor depth of <b>3.15 m</b> and a season running −1.56 to −2.16 m.</p>",
+      "fix": "Source <code>WTD_1_1_1</code> from <code>Lvl_psi_Avg</code> with <code>currentCalibration = [0.70307 -3.15 datenum(2026,5,15) datenum(2999,12,31)]</code>, starting the trace on 2026-05-16 so the day the hole was still filling is excluded. If the depth turns out to be 2.70 m, change the two numbers and the season reads −1.10 to −1.75 m instead.",
+      "xref": "The installation note of 2026-05-15 records the CS456 (SN 70010299), water at 1.85 m and a hole going down to 270 cm, with the remark that readings below that value are not valid.",
+      "flag": "A sensor cannot sit 3.15 m down a 2.70 m hole. The likeliest reading is that 1.85 m is where water was first struck while augering rather than the settled water table: the record starts at 10:30 with a head of only 0.169 m and fills through the day, which is the hole recovering. Measure the cable drop on the next visit; until then the UQAM_4 datum is provisional to about 0.45 m."
+    },
+    {
+      "id": "pn18",
+      "ed": "2026-09-23",
+      "s": "McGill_1",
+      "ti": "Open water measured against a datum 1.7 m out",
+      "period": "All data to date; CS456 from 2026-05-28",
+      "b": "<p>McGill_1 is open water. Its CS456 is a <b>stage sensor</b> reading the depth of the water column over the lake bed, not a well in soil: there is no unsaturated zone, so the value is positive all season by construction and the sign convention never bites here. The datum does.</p><p>Two faults. First, <code>WTD_1_1_1</code> was sourced from <code>L_WATER_Avg</code>, the EasyProbe level channel, with no date limit, so the pre-CS456 record is EasyProbe level standing in for water depth. Second, since the CS456 was added on 28 May the cal file has carried <code>WTD_offset = 1.58 m</code>, which reports <b>0.73 to 0.88 m of water below the bed at a site standing under about a metre of it</b>: out by roughly 1.7 m.</p><p>At installation there was 0.87 m of water above the bed and head averaged 0.7109 m, so the transducer sits <b>0.16 m above</b> the bed, on its mount in the water column. Its depth relative to the reference surface is therefore negative. That is the normal case for a stage sensor and not a sign error: the arithmetic is unchanged, <code>WTD = head − depth</code>, so a negative depth adds rather than subtracts. Corrected, the season runs +0.87 to +1.01 m: a lake level creeping up about 14 cm through the summer.</p>",
+      "fix": "Source <code>WTD_1_1_1</code> from <code>Lvl_psi_Avg</code> with <code>currentCalibration = [0.70307 0.16 datenum(2026,5,28) datenum(2999,12,31)]</code> (a positive calibration offset because the sensor depth is negative) starting the trace at 2026-05-28 11:00. The CS456 serial number is recorded nowhere and should be added.",
+      "xref": "The 2026-05-28 field note records the CS456 being added during the visit that chased the battery-logger communication fault.",
+      "flag": "Three things. (1) The installation was reported as reading 1.1265 psi, but the archive holds 1.0098–1.0133 psi across the whole of 28 May and does not exceed 1.10 psi before 2 July; the archived value is used here, and if 1.1265 psi is right the depth becomes −0.08 m instead, an 8 cm difference. (2) The field note reasons that \"values are negative because the water sits above ground: this is correct\". Under the AmeriFlux convention that is backwards: water above the surface is positive. (3) Worth confirming the BASE name before the next upload. <code>WTD</code> is defined as water table depth and this is a surface-water stage measurement; wetland sites commonly report standing water under <code>WTD</code> as a positive value, which is what is done here, but if AmeriFlux has a dedicated surface-water variable it belongs there. The number does not change either way, only the label."
+    },
+    {
+      "id": "pn16",
+      "ed": "2026-09-22",
+      "s": "UQAM_2",
+      "ti": "Deepest soil profile probe: 45 cm or 64 cm?",
+      "period": "All soil profile data",
+      "b": "<p><code>UQAM_2_FirstStage.ini</code> states that the deepest CS650 in the Soil-3 profile is at <b>45 cm</b>, SN 61425, and says explicitly that the 64 cm figure was copied from UQAM_1. The field note of 2026-08-20, which rechecked every probe location and serial number on site, records the same serial at <b>64 cm</b>: <code>7H SN61425 (64cm)</code>. The other three depths agree in both sources (8, 16 and 32 cm, SN 61438 / 61418 / 61426).</p><p>The 2025 temperature record favours 64 cm. Fitting the annual wave's amplitude decay across the four depths gives a damping depth that, divided by &radic;365, should equal the damping depth measured independently from the summer daily wave between 8 and 16 cm. With the deepest probe at 64 cm the two agree to 1.6 % (12.7 cm predicted, 12.9 cm observed); at 45 cm they disagree by 36 %. The 2026 season is only two-thirds complete, so its annual amplitude is biased and the same test there is inconclusive.</p>",
+      "fix": "Do not change the ini on the strength of the temperature test alone: settle it with a tape on the next visit and then correct whichever source is wrong. Meanwhile treat <code>TS_4</code>, <code>SWC_1_4_1</code> and the other <code>*_1_4_1</code> traces at UQAM_2 as being at an uncertain depth between 45 and 64 cm.",
+      "flag": "The ini and the 2026-08-20 field note give different depths for the same serial number (61425). The ini's note that 45 cm replaced a value copied from UQAM_1 suggests somebody deliberately corrected it, but the field check that followed four months later recorded 64 cm. One of the two is wrong and the data lean towards 64 cm."
+    },
+    {
+      "id": "pn19",
+      "ed": "2026-09-29",
+      "s": "ALL",
+      "ti": "Water table sensors and water probes are disconnected every winter",
+      "period": "Every winter, from the fall removal to the spring reinstallation",
+      "b": "At every site the CS456 pressure transducers (<code>WTD_1_1_1</code>) and the Eureka EasyProbe water multiprobes (water temperature, conductivity, dissolved oxygen, ORP, pH and level) are disconnected for the winter, because they get damaged when the water gets close to 0 °C. Whatever these channels record between the fall removal and the spring reinstallation is not a measurement of the water.",
+      "fix": "Exclude each removal-to-reinstallation window in first stage, one dated window per winter and per sensor, rather than relying on the min/max limits to catch it. Each reinstallation changes the transducer's position, so the WTD datum has to be re-measured at every spring reinstallation and entered as a new dated <code>currentCalibration</code> row (see the water table caveat above); the previous season's offset does not carry over. Write the removal and reinstallation dates, and the new sensor depth, in the field note of that visit.",
+      "xref": "The field notes record one winter removal so far: the McGill_1 EasyProbe, taken out on 2025-11-10 for the freezing risk and reinstalled on 2026-04-23. Every CS456 went in during spring 2026 (UQAM_3 on 2026-04-15, UQAM_2 from 2026-04-27, UQAM_1 on 2026-05-07, UQAM_4 on 2026-05-15, McGill_1 on 2026-05-28), so the coming winter is the first one for them. The UQAM_1 EasyProbe stayed in during the 2024–25 winter and was found frozen inside its pipe in January 2025."
+    }
+  ],
+  "SITEINFO": {
+    "source": "Info on Carbonique EC sites.docx",
+    "parsed": "2026-09-24, corrected 2026-09-29",
+    "sites": [
+      {
+        "title": "UQAM_1 Lac Saint-Pierre, Quebec (46.1645N, 72.6851W)",
+        "desc": [
+          "It is a transformed marsh near Lac Saint-Pierre that is used as an agricultural site. There is an interannual crop rotation between Glycine max and Zea mays. The water in the field is regulated with pumps."
+        ],
+        "sections": [
+          {
+            "h": "Site info",
+            "items": [
+              {
+                "k": "Site name",
+                "v": "Lac Saint-Pierre Disturbed Marsh"
+              },
+              {
+                "k": "AmeriFlux ID",
+                "v": "CA-CQ1"
+              },
+              {
+                "k": "Location",
+                "v": "Baie-du-Febvre, Quebec"
+              },
+              {
+                "k": "Coordinates",
+                "v": "46.1645 N, 72.6851 W"
+              },
+              {
+                "v": "Canopy height set in SmartFlux is not representative of the site at all times, it is an agricultural site, so the canopy height is dynamic, we have canopy height measurements."
+              },
+              {
+                "k": "Station active since",
+                "v": "2024-07-19 (system installed 8 to 16 July 2024)"
+              },
+              {
+                "k": "Tower",
+                "v": "scaffolding tower, with the EC sensors on a retractable outrigger"
+              },
+              {
+                "k": "Power",
+                "v": "AC line, on a circuit separate from the farm pumps"
+              },
+              {
+                "k": "Phenocam",
+                "v": "phenocam.nau.edu/webcam/sites/lspdisturbedmarsh"
+              }
+            ],
+            "subs": []
+          },
+          {
+            "h": "Instruments info",
+            "items": [],
+            "subs": [
+              {
+                "h": "Sonic anemometer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Campbell Scientific CSAT3B"
+                  },
+                  {
+                    "k": "Sonic height",
+                    "v": "7.11 m"
+                  },
+                  {
+                    "k": "North offset",
+                    "v": "285°"
+                  }
+                ]
+              },
+              {
+                "h": "CO2/H2O gas analyzer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "LI-7200RS (enclosed path) with heated intake tube and 7200-102 flow module"
+                  },
+                  {
+                    "k": "Northward separation",
+                    "v": "-4 cm"
+                  },
+                  {
+                    "k": "Eastward separation",
+                    "v": "-9 cm"
+                  },
+                  {
+                    "k": "Vertical separation",
+                    "v": "0 cm"
+                  }
+                ]
+              },
+              {
+                "h": "CH4 gas analyzer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "LI-7700 (open path)"
+                  },
+                  {
+                    "k": "Northward separation",
+                    "v": "-21 cm"
+                  },
+                  {
+                    "k": "Eastward separation",
+                    "v": "-28 cm"
+                  },
+                  {
+                    "k": "Vertical separation",
+                    "v": "1 cm"
+                  }
+                ]
+              },
+              {
+                "h": "Temperature and humidity probes",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Both are HygroVue10"
+                  },
+                  {
+                    "k": "TA_1_1_1, RH_1_1_1",
+                    "v": "7.1 m"
+                  },
+                  {
+                    "k": "TA_1_2_1, RH_1_2_1",
+                    "v": "2 m"
+                  }
+                ]
+              },
+              {
+                "h": "Wind Monitor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "RM Young 05103"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "WS_1_1_1, WD_1_1_1"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "8 m (on top of the scaffolding)"
+                  }
+                ]
+              },
+              {
+                "h": "Digital Barometric Pressure sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "BaroVue10"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "PA_1_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Tipping Bucket Rain Gauge",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Texas Electronics TE525WS"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "P_RAIN_1_1_1"
+                  },
+                  {
+                    "k": "Mounting",
+                    "v": "on a pole on the ground at installation; the 2026-05-07 field note says it was fixed at the top of the tower"
+                  }
+                ]
+              },
+              {
+                "h": "Sonic Ranging Sensor for Snow Depth",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "SnowVue10"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "D_SNOW"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "2.2 m"
+                  }
+                ]
+              },
+              {
+                "h": "Weighing Precipitation Gauge",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "OTT Pluvio2 L 400"
+                  },
+                  {
+                    "v": "On its own structure with a solar panel and batteries, installed in June 2026"
+                  }
+                ]
+              },
+              {
+                "h": "Net Radiometer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Kipp & Zonen CNR4 with CNF4 ventilation unit"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "SW_IN, SW_OUT, LW_IN, LW_OUT, NETRAD, ALB"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "7 m"
+                  },
+                  {
+                    "v": "Facing 190° from north"
+                  }
+                ]
+              },
+              {
+                "h": "Full-spectrum Quantum Sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Apogee SQ-521 (2 sensors, incoming and outgoing)"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "PPFD_IN, PPFD_OUT"
+                  }
+                ]
+              },
+              {
+                "h": "Soil Heat Flux Plates",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Hukseflux HFP01 (4 sensors)"
+                  },
+                  {
+                    "v": "Depth 8 cm, at 50 cm and 100 cm on both sides of the CS650 profile"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "G_1_1_1 to G_4_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Soil Moisture and Temperature Probes",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "CS650 (5 horizontal sensors, 4 in profile, a total of 8 because there is one that goes in the horizontal and it is the first of the profile ones.)"
+                  },
+                  {
+                    "k": "Horizontal replicas depth 8 cm",
+                    "v": "SWC_2_1_1 to SWC_5_1_1 and TS_2_1_1 to TS_5_1_1 (added 2025-08-05)"
+                  },
+                  {
+                    "k": "Vertical profile",
+                    "v": "8 cm, 16 cm, 32 cm, 64 cm: SWC_1_1_1 to SWC_1_4_1 and TS_1_1_1 to TS_1_4_1"
+                  }
+                ]
+              },
+              {
+                "h": "Water Table Depth Sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Campbell Scientific CS456 vented pressure transducer (0 to 7.25 psig)"
+                  },
+                  {
+                    "k": "Serial number",
+                    "v": "70010295"
+                  },
+                  {
+                    "k": "Installed",
+                    "v": "2026-05-07"
+                  },
+                  {
+                    "k": "Sensor depth below the surface",
+                    "v": "not measured yet"
+                  },
+                  {
+                    "k": "Data",
+                    "v": "only about three weeks, in May 2026; the channel reads NAN in the current logger table"
+                  },
+                  {
+                    "k": "Logger offset in the cal file",
+                    "v": "1.17 m, never checked"
+                  },
+                  {
+                    "k": "Next visit",
+                    "v": "measure the cable drop and check the wiring"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "h": "Processing settings",
+            "items": [
+              {
+                "k": "EC raw data",
+                "v": "20 Hz, stored in 30 min .ghg files by the SmartFlux 2"
+              },
+              {
+                "k": "Biomet variables sent to the SmartFlux",
+                "v": "TA_1_1_1, RH_1_1_1, PA_1_1_1"
+              }
+            ],
+            "subs": []
+          }
+        ],
+        "code": "UQAM_1",
+        "place": "Lac Saint-Pierre, Quebec",
+        "lat": 46.1645,
+        "lon": -72.6851,
+        "photos": [
+          {
+            "alt": "",
+            "w": 1200,
+            "h": 900,
+            "path": "media/UQAM_1-1.jpg"
+          }
+        ]
+      },
+      {
+        "title": "UQAM_2 Lac-à-la-Tortue, Quebec (46.5316N, 72.6450W)",
+        "desc": [
+          "It is a natural open bog near Lac-à-la-Tortue. The vegetation is dominated by Sphagnum mosses with Chamaedaphne calyculata, Trichophorum cespitosum and Rhododendron groenlandicum. The site is off-grid (solar powered) and is reached on foot over the peat. It is about 400 m north of UQAM_3."
+        ],
+        "sections": [
+          {
+            "h": "Site info",
+            "items": [
+              {
+                "k": "Site name",
+                "v": "Natural Lac-à-la-Tortue Open bog"
+              },
+              {
+                "k": "AmeriFlux ID",
+                "v": "CA-CQ2"
+              },
+              {
+                "k": "Location",
+                "v": "Notre-Dame-du-Mont-Carmel, Quebec"
+              },
+              {
+                "k": "Coordinates",
+                "v": "46.5316 N, 72.6450 W"
+              },
+              {
+                "k": "Canopy height set in SmartFlux",
+                "v": "0.2 m (displacement height 0.134 m, roughness length 0.03 m)"
+              },
+              {
+                "k": "Station active since",
+                "v": "2025-04-15 (EC sensors reinstalled on 2025-07-02)"
+              },
+              {
+                "k": "Tower",
+                "v": "EC sensors on a boom that can be pulled in for maintenance"
+              },
+              {
+                "k": "Power",
+                "v": "off-grid, solar panels and battery bank"
+              }
+            ],
+            "subs": []
+          },
+          {
+            "h": "Instruments info",
+            "items": [],
+            "subs": [
+              {
+                "h": "Sonic anemometer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Campbell Scientific CSAT3B"
+                  },
+                  {
+                    "k": "Sonic height",
+                    "v": "4.80 m"
+                  },
+                  {
+                    "k": "North offset",
+                    "v": "264°"
+                  }
+                ]
+              },
+              {
+                "h": "CO2/H2O gas analyzer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "LI-7200RS (enclosed path) with 7200-102 flow module"
+                  },
+                  {
+                    "k": "Northward separation",
+                    "v": "1 cm"
+                  },
+                  {
+                    "k": "Eastward separation",
+                    "v": "1 cm"
+                  },
+                  {
+                    "k": "Vertical separation",
+                    "v": "-1 cm"
+                  }
+                ]
+              },
+              {
+                "h": "CH4 gas analyzer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "LI-7700 (open path)"
+                  },
+                  {
+                    "k": "Northward separation",
+                    "v": "-25 cm"
+                  },
+                  {
+                    "k": "Eastward separation",
+                    "v": "-26 cm"
+                  },
+                  {
+                    "k": "Vertical separation",
+                    "v": "0 cm"
+                  }
+                ]
+              },
+              {
+                "h": "Temperature and humidity probes",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Both are HygroVue10"
+                  },
+                  {
+                    "k": "TA_1_1_1, RH_1_1_1 (upper)",
+                    "v": "4.8 m"
+                  },
+                  {
+                    "k": "TA_1_2_1, RH_1_2_1 (lower)",
+                    "v": "2 m"
+                  }
+                ]
+              },
+              {
+                "h": "Wind Monitor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "RM Young 05103"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "WS_1_1_1, WD_1_1_1"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "5.2 m"
+                  }
+                ]
+              },
+              {
+                "h": "Digital Barometric Pressure sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "BaroVue10"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "PA_1_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Tipping Bucket Rain Gauge",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Texas Electronics TE525WS"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "P_RAIN_1_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Sonic Ranging Sensor for Snow Depth",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "SnowVue10"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "D_SNOW"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "2m"
+                  }
+                ]
+              },
+              {
+                "h": "Net Radiometer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Kipp & Zonen CNR4 with CNF4 ventilation unit"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "SW_IN, SW_OUT, LW_IN, LW_OUT, NETRAD, ALB"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "5 m"
+                  }
+                ]
+              },
+              {
+                "h": "Full-spectrum Quantum Sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Apogee SQ-521 (2 sensors, incoming and outgoing)"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "PPFD_IN, PPFD_OUT"
+                  }
+                ]
+              },
+              {
+                "h": "Soil Heat Flux Plates",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Hukseflux HFP01 (4 sensors)"
+                  },
+                  {
+                    "v": "Depth 8 cm"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "G_1_1_1 to G_4_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Soil Moisture and Temperature Probes",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "CS650 (8 sensors: 4 in the vertical profile and 4 horizontal replicas)"
+                  },
+                  {
+                    "k": "Vertical profile",
+                    "v": "8 cm, 16 cm, 32 cm, 64 cm: SWC_1_1_1 to SWC_1_4_1 and TS_1_1_1 to TS_1_4_1"
+                  },
+                  {
+                    "k": "Horizontal replicas depth 8 cm",
+                    "v": "SWC_2_1_1 to SWC_5_1_1 and TS_2_1_1 to TS_5_1_1"
+                  },
+                  {
+                    "v": "Positions and serial numbers rechecked in the field on 2026-08-20"
+                  }
+                ]
+              },
+              {
+                "h": "Water Table Depth Sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Campbell Scientific CS456 vented pressure transducer (0 to 7.25 psig)"
+                  },
+                  {
+                    "k": "Serial number",
+                    "v": "70010296"
+                  },
+                  {
+                    "k": "Installed",
+                    "v": "2026-04-27 (data start that day at 13:30; recorded in the written installation note, not in the EcoFlux field notes)"
+                  },
+                  {
+                    "k": "Sensor depth below the surface",
+                    "v": "2.05 m, measured at installation (written installation note)"
+                  },
+                  {
+                    "k": "Water table at installation",
+                    "v": "0.13 m below the surface"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "WTD_1_1_1 = Lvl_psi_Avg × 0.70307 - 2.05 m"
+                  },
+                  {
+                    "k": "Valid data from",
+                    "v": "2026-04-28 00:00 (the sensor was still settling before)"
+                  },
+                  {
+                    "k": "Water table in 2026",
+                    "v": "-0.20 to -0.05 m"
+                  },
+                  {
+                    "k": "Logger offset in the cal file",
+                    "v": "0.79 m (wrong, do not use Lvl_m_Avg)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "h": "Processing settings",
+            "items": [
+              {
+                "k": "EC raw data",
+                "v": "20 Hz, stored in 30 min .ghg files by the SmartFlux 2"
+              },
+              {
+                "k": "Biomet variables sent to the SmartFlux",
+                "v": "TA_1_1_1, RH_1_1_1, PA_1_1_1"
+              }
+            ],
+            "subs": []
+          }
+        ],
+        "code": "UQAM_2",
+        "place": "Lac-à-la-Tortue, Quebec",
+        "lat": 46.5316,
+        "lon": -72.645,
+        "photos": [
+          {
+            "alt": "",
+            "w": 1200,
+            "h": 900,
+            "path": "media/UQAM_2-1.jpg"
+          }
+        ]
+      },
+      {
+        "title": "UQAM_3 Lac-à-la-Tortue, Quebec (46.5280N, 72.6462W)",
+        "desc": [
+          "It is a natural forested bog near Lac-à-la-Tortue, about 400 m south of UQAM_2. The EC system is on a tall tower above the tree canopy. The site is off-grid and powered by an EFOY methanol fuel cell hybrid system with solar panels."
+        ],
+        "sections": [
+          {
+            "h": "Site info",
+            "items": [
+              {
+                "k": "Site name",
+                "v": "Carbonique Lac-à-la-Tortue Forested bog"
+              },
+              {
+                "k": "AmeriFlux ID",
+                "v": "CA-CQ3"
+              },
+              {
+                "k": "Location",
+                "v": "Notre-Dame-du-Mont-Carmel, Quebec"
+              },
+              {
+                "k": "Coordinates",
+                "v": "46.5280 N, 72.6462 W"
+              },
+              {
+                "k": "Canopy height set in SmartFlux",
+                "v": "12.6 m (displacement height 8.44 m, roughness length 1.89 m)"
+              },
+              {
+                "k": "Station active since",
+                "v": "2025-04-10"
+              },
+              {
+                "k": "Tower",
+                "v": "tall tower, certified every year by a structural engineer"
+              },
+              {
+                "k": "Power",
+                "v": "off-grid, EFOY methanol fuel cell with battery bank"
+              }
+            ],
+            "subs": []
+          },
+          {
+            "h": "Instruments info",
+            "items": [],
+            "subs": [
+              {
+                "h": "Sonic anemometer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Campbell Scientific CSAT3B"
+                  },
+                  {
+                    "k": "Sonic height",
+                    "v": "21.9 m"
+                  },
+                  {
+                    "k": "North offset",
+                    "v": "332°"
+                  }
+                ]
+              },
+              {
+                "h": "CO2/H2O gas analyzer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "LI-7200RS (enclosed path) with 7200-102 flow module"
+                  },
+                  {
+                    "k": "Northward separation",
+                    "v": "10 cm"
+                  },
+                  {
+                    "k": "Eastward separation",
+                    "v": "2 cm"
+                  },
+                  {
+                    "k": "Vertical separation",
+                    "v": "0 cm"
+                  }
+                ]
+              },
+              {
+                "h": "CH4 gas analyzer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "LI-7700 (open path)"
+                  },
+                  {
+                    "k": "Northward separation",
+                    "v": "-30 cm"
+                  },
+                  {
+                    "k": "Eastward separation",
+                    "v": "15 cm"
+                  },
+                  {
+                    "k": "Vertical separation",
+                    "v": "-2 cm"
+                  }
+                ]
+              },
+              {
+                "h": "Temperature and humidity probes",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "HygroVue10 (4 sensors)"
+                  },
+                  {
+                    "k": "TA_1_1_1, RH_1_1_1 (top)",
+                    "v": "22 m"
+                  },
+                  {
+                    "k": "TA_1_2_1, RH_1_2_1 (second from the top)",
+                    "v": "16 m"
+                  },
+                  {
+                    "k": "TA_1_3_1, RH_1_3_1 (third from the top)",
+                    "v": "9 m"
+                  },
+                  {
+                    "k": "TA_1_4_1, RH_1_4_1 (lowest level, near the surface)",
+                    "v": "2 m"
+                  }
+                ]
+              },
+              {
+                "h": "Wind Monitor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "RM Young 05103"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "WS_1_1_1, WD_1_1_1"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "24 m"
+                  }
+                ]
+              },
+              {
+                "h": "Digital Barometric Pressure sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "BaroVue10"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "PA_1_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Tipping Bucket Rain Gauge",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Texas Electronics TE525WS"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "P_RAIN_1_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Sonic Ranging Sensor for Snow Depth",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "SnowVue10"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "D_SNOW"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "1.68 m"
+                  }
+                ]
+              },
+              {
+                "h": "Net Radiometer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Kipp & Zonen CNR4 with CNF4 ventilation unit"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "SW_IN, SW_OUT, LW_IN, LW_OUT, NETRAD, ALB"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "22 m"
+                  }
+                ]
+              },
+              {
+                "h": "Full-spectrum Quantum Sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Apogee SQ-521 (2 sensors, incoming and outgoing)"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "PPFD_IN, PPFD_OUT"
+                  }
+                ]
+              },
+              {
+                "h": "Soil Heat Flux Plates",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Hukseflux HFP01 (4 sensors)"
+                  },
+                  {
+                    "k": "Depth",
+                    "v": "8 cm"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "G_1_1_1 to G_4_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Soil Moisture and Temperature Probes",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "CS650 (8 sensors: 4 in the vertical profile and 4 horizontal replicas)"
+                  },
+                  {
+                    "k": "Vertical profile",
+                    "v": "8 cm, 16 cm, 32 cm, 64 cm: SWC_1_1_1 to SWC_1_4_1 and TS_1_1_1 to TS_1_4_1"
+                  },
+                  {
+                    "k": "Horizontal replicas depth 8 cm",
+                    "v": "SWC_2_1_1 to SWC_5_1_1 and TS_2_1_1 to TS_5_1_1"
+                  },
+                  {
+                    "v": "Positions and serial numbers rechecked in the field on 2026-08-20"
+                  }
+                ]
+              },
+              {
+                "h": "Water Table Depth Sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Campbell Scientific CS456 vented pressure transducer (0 to 7.25 psig)"
+                  },
+                  {
+                    "k": "Serial number",
+                    "v": "70010297"
+                  },
+                  {
+                    "k": "Installed",
+                    "v": "2026-04-15, in a tube 309 cm long with 110 cm above the ground; logging from 2026-04-21 after the program change"
+                  },
+                  {
+                    "k": "Sensor depth below the surface",
+                    "v": "1.83 m, from the water table measured at 11.5 cm below the surface (to confirm: a reading of 0.24 m was also reported, which gives 1.96 m)"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "WTD_1_1_1 = Lvl_psi_Avg × 0.70307 - 1.83 m"
+                  },
+                  {
+                    "k": "Valid data from",
+                    "v": "2026-04-21 16:00"
+                  },
+                  {
+                    "k": "Water table in 2026",
+                    "v": "+0.11 m in April (ponding at snowmelt) down to -0.49 m by mid-September"
+                  },
+                  {
+                    "k": "Logger offsets used so far",
+                    "v": "0.00, 1.75 and 1.48 m (all wrong, do not use Lvl_m_Avg)"
+                  }
+                ]
+              },
+              {
+                "h": "Profile System",
+                "items": [
+                  {
+                    "v": "Intakes and tubing at 4 levels on the tower."
+                  },
+                  {
+                    "k": "Intake heights",
+                    "v": "2 m, 9m, 16m, 22m"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "h": "Processing settings",
+            "items": [
+              {
+                "k": "EC raw data",
+                "v": "20 Hz, stored in 30 min .ghg files by the SmartFlux 2"
+              },
+              {
+                "k": "Biomet variables sent to the SmartFlux",
+                "v": "TA_1_1_1, RH_1_1_1, PA_1_1_1"
+              }
+            ],
+            "subs": []
+          }
+        ],
+        "code": "UQAM_3",
+        "place": "Lac-à-la-Tortue, Quebec",
+        "lat": 46.528,
+        "lon": -72.6462,
+        "photos": [
+          {
+            "alt": "",
+            "w": 1200,
+            "h": 900,
+            "path": "media/UQAM_3-1.jpg"
+          }
+        ]
+      },
+      {
+        "title": "UQAM_4 Saint-Rémi, Quebec (45.2459N, 73.6823W)",
+        "desc": [
+          "It is a transformed forested peatland near Saint-Rémi that is used as an agricultural site. The station has two parts: a fixed tower on the berm at the edge of the field, powered by AC, that carries the EC system and part of the meteorological sensors, and a rover tripod on a trailer inside the field, powered by a solar panel, that carries the radiation, snow and soil sensors. The trailer is moved out of the field for planting and harvest, so the outgoing radiation and soil data do not represent the field during those periods."
+        ],
+        "sections": [
+          {
+            "h": "Site info",
+            "items": [
+              {
+                "k": "Site name",
+                "v": "Saint-Remi Disturbed Forested Peatland"
+              },
+              {
+                "k": "AmeriFlux ID",
+                "v": "CA-CQ4"
+              },
+              {
+                "k": "Location",
+                "v": "Saint-Rémi, Quebec"
+              },
+              {
+                "k": "Coordinates",
+                "v": "45.2459 N, 73.6823 W"
+              },
+              {
+                "k": "Canopy height set in SmartFlux",
+                "v": "A dynamic canopy that varies between no plants to 40cm height ones. It needs modelling to rerun the flux calculations."
+              },
+              {
+                "k": "Station active since",
+                "v": "2026-01-14"
+              },
+              {
+                "k": "Tower",
+                "v": "fixed tower on the berm with a foldable boom (since 2026-05-08)"
+              },
+              {
+                "k": "Power",
+                "v": "tower on AC; rover tripod on a solar power."
+              },
+              {
+                "k": "Dataloggers",
+                "v": "CR1000X on the tower (tables UQAM_4_*) and a second CR1000X on the tripod (tables UQAM_4b_*)"
+              },
+              {
+                "k": "Phenocam",
+                "v": "phenocam.nau.edu/webcam/sites/strdisturbedforestedpeatland"
+              }
+            ],
+            "subs": []
+          },
+          {
+            "h": "Instruments info",
+            "items": [],
+            "subs": [
+              {
+                "h": "Sonic anemometer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Campbell Scientific CSAT3B"
+                  },
+                  {
+                    "k": "Sonic height",
+                    "v": "2.86 m"
+                  },
+                  {
+                    "k": "North offset",
+                    "v": "213° (it was 230° in February 2026)"
+                  }
+                ]
+              },
+              {
+                "h": "CO2/H2O gas analyzer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "LI-7200RS (enclosed path) with 7200-102 flow module"
+                  },
+                  {
+                    "k": "Northward separation",
+                    "v": "-8 cm"
+                  },
+                  {
+                    "k": "Eastward separation",
+                    "v": "-4 cm"
+                  },
+                  {
+                    "k": "Vertical separation",
+                    "v": "0 cm"
+                  }
+                ]
+              },
+              {
+                "h": "CH4 gas analyzer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "LI-7700 (open path)"
+                  },
+                  {
+                    "k": "Northward separation",
+                    "v": "30 cm"
+                  },
+                  {
+                    "k": "Eastward separation",
+                    "v": "25 cm"
+                  },
+                  {
+                    "k": "Vertical separation",
+                    "v": "-10 cm"
+                  }
+                ]
+              },
+              {
+                "h": "Temperature and humidity probes",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Both are HygroVue10 (on the tower)"
+                  },
+                  {
+                    "k": "TA_1_1_1, RH_1_1_1 (upper)",
+                    "v": "2.8m"
+                  },
+                  {
+                    "k": "TA_1_2_1, RH_1_2_1 (lower)",
+                    "v": "2m"
+                  }
+                ]
+              },
+              {
+                "h": "Wind Monitor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "RM Young 05103"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "WS_1_1_1, WD_1_1_1"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "3m"
+                  }
+                ]
+              },
+              {
+                "h": "Digital Barometric Pressure sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "BaroVue10"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "PA_1_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Tipping Bucket Rain Gauge",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Texas Electronics TE525WS"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "P_RAIN_1_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Sonic Ranging Sensor for Snow Depth",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "SnowVue10"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "D_SNOW"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "around 2m but since it is a rover station it varies."
+                  }
+                ]
+              },
+              {
+                "h": "Net Radiometer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Kipp & Zonen CNR4 with CNF4 ventilation unit"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "SW_IN, SW_OUT, LW_IN, LW_OUT, NETRAD, ALB"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "2m"
+                  },
+                  {
+                    "v": "On the rover tripod"
+                  }
+                ]
+              },
+              {
+                "h": "Full-spectrum Quantum Sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Apogee SQ-521 (2 sensors, incoming and outgoing)"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "PPFD_IN, PPFD_OUT"
+                  }
+                ]
+              },
+              {
+                "h": "Soil Heat Flux Plates",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Hukseflux HFP01 (4 sensors, on the rover tripod)"
+                  },
+                  {
+                    "k": "Depth",
+                    "v": "5cm"
+                  }
+                ]
+              },
+              {
+                "h": "Soil Moisture and Temperature Probes",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "CS650 (4 sensors, on the rover tripod, corresponding to the CS650_2_1_1, CS650_3_1_1, CS650_4_1_1, CS650_5_1_1 variables)"
+                  },
+                  {
+                    "k": "Depth",
+                    "v": "5cm"
+                  },
+                  {
+                    "k": "Soil profile",
+                    "v": "Campbell Scientific SoilVUE10 (0.5 m length) corresponding to the variables SoilVue_1_1_1 (5cm), SoilVue_1_2_1 (15cm), SoilVue_1_3_1 (25cm), SoilVue_1_4_1(35cm), SoilVue_1_5_1(45cm), SoilVue_1_6_1 (55cm)"
+                  }
+                ]
+              },
+              {
+                "h": "Water Table Depth Sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Campbell Scientific CS456 vented pressure transducer (0 to 7.25 psig)"
+                  },
+                  {
+                    "k": "Serial number",
+                    "v": "70010299"
+                  },
+                  {
+                    "k": "Installed",
+                    "v": "2026-05-15, in a hole 2.70 m deep; water was struck at 1.85 m while augering"
+                  },
+                  {
+                    "k": "Sensor depth below the surface",
+                    "v": "3.15 m, provisional: it cannot be deeper than the 2.70 m hole, so measure the cable drop on the next visit"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "WTD_1_1_1 = Lvl_psi_Avg × 0.70307 - 3.15 m"
+                  },
+                  {
+                    "k": "Valid data from",
+                    "v": "2026-05-16"
+                  },
+                  {
+                    "k": "Water table in 2026",
+                    "v": "-2.16 to -1.56 m with the provisional depth (-1.75 to -1.10 m if the depth is 2.70 m)"
+                  },
+                  {
+                    "k": "Logger offset in the cal file",
+                    "v": "-1.57 m (wrong sign, do not use Lvl_m_Avg)"
+                  },
+                  {
+                    "k": "Before the CS456",
+                    "v": "WTD_1_1_1 came from the EasyProbe level channel, which does not measure the water table"
+                  }
+                ]
+              },
+              {
+                "h": "Water Multiprobe",
+                "items": [
+                  {
+                    "k": "Water multiprobe",
+                    "v": "Eureka EasyProbe 20 in the canal beside the field that feeds the crops (since 2026-04-17)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "h": "Processing settings",
+            "items": [
+              {
+                "k": "EC raw data",
+                "v": "20 Hz, stored in 30 min .ghg files by the SmartFlux 2"
+              },
+              {
+                "k": "Biomet variables sent to the SmartFlux",
+                "v": "TA_1_1_1, RH_1_1_1, PA_1_1_1"
+              },
+              {
+                "k": "Met data",
+                "v": "tower tables UQAM_4_Met_30m and UQAM_4_Met_05m; tripod radiation in UQAM_4b_Met_05m"
+              }
+            ],
+            "subs": []
+          }
+        ],
+        "code": "UQAM_4",
+        "place": "Saint-Rémi, Quebec",
+        "lat": 45.2459,
+        "lon": -73.6823,
+        "photos": [
+          {
+            "alt": "",
+            "w": 900,
+            "h": 1200,
+            "path": "media/UQAM_4-1.jpg"
+          },
+          {
+            "alt": "",
+            "w": 1200,
+            "h": 900,
+            "path": "media/UQAM_4-2.jpg"
+          }
+        ]
+      },
+      {
+        "title": "UQAM_5 Saint-François-du-Lac, Quebec (46.0886N, 72.9174W)",
+        "desc": [
+          "It is a natural marsh near Saint-François-du-Lac that floods every spring, with water reaching up to 3 m in extreme events. The station sits on two wooden platforms on certified screw piles 3 m above the ground: one for the solar panels and battery bank, the other for the scaffolding tower and equipment. Access may require a boat during floods and a couple of kilometres of walking in winter."
+        ],
+        "sections": [
+          {
+            "h": "Site info",
+            "items": [
+              {
+                "k": "Site name",
+                "v": "Saint-François du Lac Natural Marsh"
+              },
+              {
+                "k": "AmeriFlux ID",
+                "v": "CA-CQ5"
+              },
+              {
+                "k": "Location",
+                "v": "Saint-François-du-Lac, Quebec"
+              },
+              {
+                "k": "Coordinates",
+                "v": "46.0886 N, 72.9174 W"
+              },
+              {
+                "k": "Canopy height set in SmartFlux",
+                "v": "1 m"
+              },
+              {
+                "k": "Station active since",
+                "v": "platforms installed in fall 2025, EC system installed 20 July to 11 August 2026"
+              },
+              {
+                "k": "Valid data from",
+                "v": "2026-08-06 16:00"
+              },
+              {
+                "k": "Power",
+                "v": "off-grid, solar panels and battery bank"
+              },
+              {
+                "k": "Phenocam",
+                "v": "phenocam.nau.edu/webcam/sites/lspnaturalmarsh"
+              }
+            ],
+            "subs": []
+          },
+          {
+            "h": "Instruments info",
+            "items": [],
+            "subs": [
+              {
+                "h": "Sonic anemometer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Campbell Scientific CSAT3B"
+                  },
+                  {
+                    "k": "Sonic height",
+                    "v": "4.85 m"
+                  },
+                  {
+                    "k": "North offset",
+                    "v": "267°"
+                  }
+                ]
+              },
+              {
+                "h": "CO2/H2O gas analyzer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "LI-7200RS (enclosed path) with 7200-102 flow module"
+                  },
+                  {
+                    "k": "Northward separation",
+                    "v": "2 cm"
+                  },
+                  {
+                    "k": "Eastward separation",
+                    "v": "15 cm"
+                  },
+                  {
+                    "k": "Vertical separation",
+                    "v": "4 cm"
+                  }
+                ]
+              },
+              {
+                "h": "CH4 gas analyzer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "LI-7700 (open path)"
+                  },
+                  {
+                    "k": "Northward separation",
+                    "v": "30 cm"
+                  },
+                  {
+                    "k": "Eastward separation",
+                    "v": "25 cm"
+                  },
+                  {
+                    "k": "Vertical separation",
+                    "v": "-5 cm"
+                  }
+                ]
+              },
+              {
+                "h": "Temperature and humidity probes",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Both are HygroVue10"
+                  },
+                  {
+                    "k": "TA_1_1_1, RH_1_1_1 (upper)",
+                    "v": "4.85 m"
+                  },
+                  {
+                    "k": "TA_1_2_1, RH_1_2_1 (lower)",
+                    "v": "3.5 m"
+                  }
+                ]
+              },
+              {
+                "h": "Wind Monitor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "RM Young 05103"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "WS_1_1_1, WD_1_1_1"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "5 m"
+                  }
+                ]
+              },
+              {
+                "h": "Digital Barometric Pressure sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "BaroVue10"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "PA_1_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Tipping Bucket Rain Gauge",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Texas Electronics TE525WS"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "P_RAIN_1_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Sonic Ranging Sensor for Snow Depth",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "SnowVue10"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "D_SNOW"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "To be checked m"
+                  }
+                ]
+              },
+              {
+                "h": "Net Radiometer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Kipp & Zonen CNR4 with CNF4 ventilation unit"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "SW_IN, SW_OUT, LW_IN, LW_OUT, NETRAD, ALB"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "4.8 m"
+                  }
+                ]
+              },
+              {
+                "h": "Full-spectrum Quantum Sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Apogee SQ-521 (2 sensors, incoming and outgoing)"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "PPFD_IN, PPFD_OUT"
+                  }
+                ]
+              },
+              {
+                "h": "Soil Heat Flux Plates",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Hukseflux HFP01 (4 sensors)"
+                  },
+                  {
+                    "v": "Horizontal replicas 8 cm below the surface"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "G_1_1_1 to G_4_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Soil Moisture and Temperature Probes",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "CS650 (4 sensors)"
+                  },
+                  {
+                    "k": "Horizontal replicas 5 cm below the surface",
+                    "v": "SWC_1_1_1 to SWC_4_1_1 and TS_1_1_1 to TS_4_1_1"
+                  },
+                  {
+                    "k": "No vertical profile yet",
+                    "v": "the site was too flooded to dig, to be installed when it dries"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "h": "Processing settings",
+            "items": [
+              {
+                "k": "EC raw data",
+                "v": "20 Hz, stored in 30 min .ghg files by the SmartFlux 2"
+              },
+              {
+                "k": "Biomet variables sent to the SmartFlux",
+                "v": "TA_1_1_1, RH_1_1_1, PA_1_1_1"
+              }
+            ],
+            "subs": []
+          }
+        ],
+        "code": "UQAM_5",
+        "place": "Saint-François-du-Lac, Quebec",
+        "lat": 46.0886,
+        "lon": -72.9174,
+        "photos": [
+          {
+            "alt": "",
+            "w": 1200,
+            "h": 598,
+            "path": "media/UQAM_5-1.jpg"
+          }
+        ]
+      },
+      {
+        "title": "MCGILL_1 Lac Saint-Pierre, Quebec (46.1488N, 72.7268W)",
+        "desc": [
+          "It is a restored marsh near Lac Saint-Pierre, about 3.7 km southwest of UQAM_1. The tower stands on a floating platform in the marsh and is reached by boat, or on foot over the ice in winter. The site is on National Defence land, so every visit needs an access permit. It is powered by solar panels and a battery bank."
+        ],
+        "sections": [
+          {
+            "h": "Site info",
+            "items": [
+              {
+                "k": "Site name",
+                "v": "Lac Saint-Pierre Restored Marsh"
+              },
+              {
+                "k": "AmeriFlux ID",
+                "v": "CA-CQ9"
+              },
+              {
+                "k": "Location",
+                "v": "Baie-du-Febvre, Quebec"
+              },
+              {
+                "k": "Coordinates",
+                "v": "46.1488 N, 72.7268 W"
+              },
+              {
+                "k": "Canopy height set in SmartFlux",
+                "v": "0.05 m"
+              },
+              {
+                "k": "Station active since",
+                "v": "2025-07-31"
+              },
+              {
+                "k": "Tower",
+                "v": "scaffolding on a floating platform in the marsh, re-levelled after the ice melt and during maintenance visits"
+              },
+              {
+                "k": "Power",
+                "v": "off-grid, solar panels and battery bank"
+              }
+            ],
+            "subs": []
+          },
+          {
+            "h": "Instruments info",
+            "items": [],
+            "subs": [
+              {
+                "h": "Sonic anemometer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Campbell Scientific CSAT3B"
+                  },
+                  {
+                    "k": "Sonic height",
+                    "v": "4.55 m"
+                  },
+                  {
+                    "k": "North offset",
+                    "v": "290°"
+                  }
+                ]
+              },
+              {
+                "h": "CO2/H2O gas analyzer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "LI-7200RS (enclosed path) with heated intake tube and 7200-102 flow module"
+                  },
+                  {
+                    "k": "Northward separation",
+                    "v": "-3.8 cm"
+                  },
+                  {
+                    "k": "Eastward separation",
+                    "v": "9 cm"
+                  },
+                  {
+                    "k": "Vertical separation",
+                    "v": "0 cm"
+                  }
+                ]
+              },
+              {
+                "h": "CH4 gas analyzer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "LI-7700 (open path)"
+                  },
+                  {
+                    "k": "Northward separation",
+                    "v": "10 cm"
+                  },
+                  {
+                    "k": "Eastward separation",
+                    "v": "37 cm"
+                  },
+                  {
+                    "k": "Vertical separation",
+                    "v": "1 cm"
+                  }
+                ]
+              },
+              {
+                "h": "Temperature and humidity probes",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Both are HygroVue10"
+                  },
+                  {
+                    "k": "TA_1_1_1, RH_1_1_1 (upper)",
+                    "v": "4.5m"
+                  },
+                  {
+                    "k": "TA_1_2_1, RH_1_2_1 (lower)",
+                    "v": "2m"
+                  }
+                ]
+              },
+              {
+                "h": "Wind Monitor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "RM Young 05103"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "WS_1_1_1, WD_1_1_1"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "5m"
+                  }
+                ]
+              },
+              {
+                "h": "Digital Barometric Pressure sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "BaroVue10"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "PA_1_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Tipping Bucket Rain Gauge",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Texas Electronics TE525WS"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "P_RAIN_1_1_1"
+                  }
+                ]
+              },
+              {
+                "h": "Sonic Ranging Sensor for Snow Depth",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "SnowVue10"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "D_SNOW"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "4m"
+                  }
+                ]
+              },
+              {
+                "h": "Net Radiometer",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Kipp & Zonen CNR4 with CNF4 ventilation unit"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "SW_IN, SW_OUT, LW_IN, LW_OUT, NETRAD, ALB"
+                  },
+                  {
+                    "k": "Height",
+                    "v": "4.5 m"
+                  }
+                ]
+              },
+              {
+                "h": "Full-spectrum Quantum Sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Apogee SQ-521 (2 sensors, incoming and outgoing)"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "PPFD_IN, PPFD_OUT"
+                  }
+                ]
+              },
+              {
+                "h": "Water and Sediment Temperature Profile",
+                "items": [
+                  {
+                    "v": "Thermocouples in a PVC pipe beside the platform (installed 2025-09-25)"
+                  },
+                  {
+                    "k": "Variables",
+                    "v": "TW_1_1_1 to TW_1_5_1, TS_1_1_1 to TS_1_3_1"
+                  },
+                  {
+                    "k": "Depths",
+                    "v": "TW_1_1_1 100cm from the bottom, TW_1_2_1 50cm from the bottom, TW_1_3_1 20cm from the bottom, TW_1_4_1 10cm from the bottom, TW_1_5_1 5cm from the bottom. TS_1_1_1 5cm below the ground, TS_1_2_1 10cm below the ground, TS_1_3_1 20cm below the ground. It was not possible to dig further so TS_1_4_1 should not be considered."
+                  },
+                  {
+                    "k": "Renamed",
+                    "v": "TW_1_5_1 was logged as TW_5_1_1 until 2026-09-28 11:30 (renamed in the logger at 11:40; the 12:00 record is the first under the new name)"
+                  }
+                ]
+              },
+              {
+                "h": "Water Level Sensor",
+                "items": [
+                  {
+                    "k": "Model",
+                    "v": "Campbell Scientific CS456 vented pressure transducer (0 to 7.25 psig)"
+                  },
+                  {
+                    "k": "Serial number",
+                    "v": "not recorded"
+                  },
+                  {
+                    "k": "Installed",
+                    "v": "2026-05-28"
+                  },
+                  {
+                    "k": "Type",
+                    "v": "stage sensor in open water, measuring the water column above the lake bed"
+                  },
+                  {
+                    "k": "Sensor position",
+                    "v": "0.16 m above the bed, so its depth relative to the bed surface is -0.16 m"
+                  },
+                  {
+                    "k": "Variable",
+                    "v": "WTD_1_1_1 = Lvl_psi_Avg × 0.70307 + 0.16 m"
+                  },
+                  {
+                    "k": "Valid data from",
+                    "v": "2026-05-28 11:00"
+                  },
+                  {
+                    "k": "Water level in 2026",
+                    "v": "+0.87 to +1.01 m above the bed (positive = water above the surface)"
+                  },
+                  {
+                    "k": "Logger offset in the cal file",
+                    "v": "1.58 m (wrong, do not use Lvl_m_Avg)"
+                  },
+                  {
+                    "k": "Before the CS456",
+                    "v": "WTD_1_1_1 came from the EasyProbe level channel, which does not measure the water level"
+                  }
+                ]
+              },
+              {
+                "h": "Water Multiprobe",
+                "items": [
+                  {
+                    "k": "Water multiprobe",
+                    "v": "Eureka EasyProbe 20 (since 2025-09-05; removed for the winter on 2025-11-10 and reinstalled on 2026-04-23)"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "h": "Processing settings",
+            "items": [
+              {
+                "k": "EC raw data",
+                "v": "20 Hz, stored in 30 min .ghg files by the SmartFlux 2"
+              },
+              {
+                "k": "Biomet variables sent to the SmartFlux",
+                "v": "TA_1_1_1, RH_1_1_1, PA_1_1_1"
+              }
+            ],
+            "subs": []
+          }
+        ],
+        "code": "MCGILL_1",
+        "place": "Lac Saint-Pierre, Quebec",
+        "lat": 46.1488,
+        "lon": -72.7268,
+        "photos": [
+          {
+            "alt": "",
+            "w": 900,
+            "h": 1200,
+            "path": "media/MCGILL_1-1.jpg"
+          }
+        ]
+      }
+    ],
+    "common": [
+      {
+        "title": "Setup common to all sites",
+        "desc": [],
+        "sections": [
+          {
+            "h": "Variable names",
+            "items": [
+              {
+                "v": "Names follow the AmeriFlux convention VAR_H_V_R (horizontal position, vertical level, replicate)."
+              },
+              {
+                "k": "For air sensors, level 1 is the highest",
+                "v": "TA_1_1_1 and RH_1_1_1 are always the upper HygroVue10."
+              },
+              {
+                "v": "For soil, SWC_1_1_1 to SWC_1_4_1 and TS_1_1_1 to TS_1_4_1 are the vertical profile from shallow to deep, and the _2_1_1 to _5_1_1 sensors are horizontal replicas."
+              }
+            ],
+            "subs": []
+          },
+          {
+            "h": "Time and data acquisition",
+            "items": [
+              {
+                "v": "All loggers and SmartFlux units record in EST (UTC-5) all year, with no daylight saving time."
+              },
+              {
+                "k": "Datalogger",
+                "v": "Campbell Scientific CR1000X running the same program at every site, with the site-specific calibrations in a .cal file on the CPU drive."
+              },
+              {
+                "v": "The EC instruments are powered through an SDM-CD16ACA relay controller."
+              }
+            ],
+            "subs": []
+          },
+          {
+            "h": "SmartFlux real-time processing",
+            "items": [
+              {
+                "k": "Averaging period",
+                "v": "30 min"
+              },
+              {
+                "k": "Tilt correction",
+                "v": "double rotation"
+              },
+              {
+                "k": "Detrending",
+                "v": "block averaging"
+              },
+              {
+                "k": "Time lag",
+                "v": "covariance maximisation with default"
+              },
+              {
+                "v": "Densities converted to mixing ratios before computing fluxes"
+              },
+              {
+                "k": "Spectral corrections",
+                "v": "Moncrieff et al. (2004) high-pass and Moncrieff et al. (1997) low-pass"
+              },
+              {
+                "k": "Footprint",
+                "v": "Kljun et al. (2004)"
+              },
+              {
+                "k": "Quality flags",
+                "v": "Mauder and Foken (2004), 0-1-2 system"
+              }
+            ],
+            "subs": []
+          },
+          {
+            "h": "Water table depth",
+            "items": [
+              {
+                "k": "Sensor",
+                "v": "Campbell Scientific CS456 vented pressure transducer. It reads gauge pressure, so it needs no barometric correction (checked against station pressure at UQAM_2 and UQAM_3)"
+              },
+              {
+                "k": "Sign convention (AmeriFlux)",
+                "v": "positive = water above the surface, negative = below it"
+              },
+              {
+                "k": "Head above the sensor",
+                "v": "Lvl_psi_Avg × 0.70307 m of water"
+              },
+              {
+                "v": "WTD_1_1_1 = head - sensor depth below the surface, applied in first stage as a dated calibration (recommended ini files of 2026-09-23). The offsets in the logger .cal files, and so Lvl_m_Avg, are not reliable"
+              },
+              {
+                "v": "The EasyProbe level channel (L_WATER_Avg) is not a water table measurement"
+              }
+            ],
+            "subs": []
+          },
+          {
+            "h": "Winter shutdown of the water sensors",
+            "subs": [],
+            "items": [
+              {
+                "v": "At every site the CS456 pressure transducers (WTD) and the EasyProbe water multiprobes are disconnected for the winter, because they get damaged when the water gets close to 0 °C."
+              },
+              {
+                "k": "Data while disconnected",
+                "v": "not a measurement: exclude it in first stage, one dated window per winter"
+              },
+              {
+                "k": "At reinstallation",
+                "v": "re-measure the CS456 depth and add a new dated calibration row; the previous season's datum does not carry over"
+              }
+            ]
+          },
+          {
+            "h": "Sources and where to find the files",
+            "items": [
+              {
+                "v": "Sonic heights, north offsets, separations, tube settings and canopy heights come from the SmartFlux metadata (the .metadata file inside each .ghg)."
+              },
+              {
+                "k": "Raw EC files",
+                "v": "\\Sites\\<SITE>\\HighFrequencyData\\raw\\YYYY\\MM"
+              },
+              {
+                "k": "SmartFlux summaries",
+                "v": "\\Sites\\<SITE>\\Flux"
+              },
+              {
+                "k": "Met logger files",
+                "v": "Sites\\<SITE>\\Met"
+              },
+              {
+                "k": "Database INI files and third stage config",
+                "v": "\\Database\\Calculation_Procedures\\TraceAnalysis_ini\\<SITE>"
+              },
+              {
+                "k": "Field notes, site list and equipment inventory",
+                "v": "EcoFlux Inventory (grandwazoo.ddns.net/ecoflux)"
+              }
+            ],
+            "subs": []
+          }
+        ]
+      }
+    ]
+  },
+  "plots": {
+    "p_mcgill_wdir": "media/p_mcgill_wdir.jpg",
+    "p_precip_full": "media/p_precip_full.jpg",
+    "p_precip_zoom": "media/p_precip_zoom.jpg",
+    "p_uqam2_wind": "media/p_uqam2_wind.jpg",
+    "p_uqam3_wdir": "media/p_uqam3_wdir.jpg",
+    "p_wtd_baro": "media/p_wtd_baro.jpg",
+    "p_wtd_beforeafter": "media/p_wtd_beforeafter.jpg",
+    "p_wtd_network": "media/p_wtd_network.jpg"
+  },
+  "source_repositories": {
+    "fieldnotes": "c75bdcff90d1f993f53f79c3137176b231ba90d7",
+    "ecoflux": "664dc23ffcaef148b1a66e03d1cc627a7ca810a8",
+    "field_log": "d08166970f69b09480796ba2277f7b56d49522eb"
+  }
+}

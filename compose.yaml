@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: carbonique
+      POSTGRES_USER: carbonique
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U carbonique -d carbonique"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+  web:
+    build: .
+    env_file: .env
+    environment:
+      DEBUG: "False"
+      DATABASE_URL: postgresql://carbonique:${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}@db:5432/carbonique
+      MEDIA_ROOT: /app/media
+      TRUST_PROXY_HEADERS: "True"
+    volumes:
+      - media_data:/app/media
+      # Updating this file on the host immediately updates /fieldnotes/.
+      - ./public/fieldnotes:/app/public/fieldnotes:ro
+    ports:
+      - "127.0.0.1:8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; r=urllib.request.Request('http://127.0.0.1:8000/health/',headers={'X-Forwarded-Proto':'https'}); urllib.request.urlopen(r,timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+volumes:
+  postgres_data:
+  media_data:
