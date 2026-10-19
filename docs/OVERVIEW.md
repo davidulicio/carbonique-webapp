@@ -122,7 +122,9 @@ visits and caveats update on its next load after a team edit. Drafts are labeled
 awaiting review; resolved caveats remain visible. Inventory, BADM, protocols,
 monitoring and uploaded note files require team access. **Download HTML** saves
 a self-contained public snapshot; `/reference/` redirects to the same live report.
-See [Public site](PUBLIC_SITE.md).
+The timeline includes visits and caveats, with unknown affected dates kept in a
+separate area. Use **Refresh public site** to reload all current public records;
+changes queued offline must upload first. See [Public site](PUBLIC_SITE.md).
 
 ### Update processing INIs
 

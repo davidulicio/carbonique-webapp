@@ -1,10 +1,11 @@
 # Validation and release checks
 
 The standalone application was checked on Windows with Python 3.12 and
-Django 5.2.18. Its 111 backend tests cover field workflows, role/site restrictions,
+Django 5.2.18. Its 118 backend tests cover field workflows, role/site restrictions,
 retry-safe operations, version conflicts, frozen reports, imports, resource
 permissions, BADM checks/exports, protected media, live public reports, imported
-caveat review, per-note uploads, INI revisioning and read-only monitoring.
+caveat review, per-note uploads, INI revisioning, synchronized caveat timelines,
+site-condition publication, snapshot refresh behavior and read-only monitoring.
 
 ## Repeatable checks
 

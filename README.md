@@ -65,7 +65,10 @@ Open **/fieldnotes/** without signing in. The server builds this report from the
 current database: site descriptions and conditions, field visits and observations,
 and data caveats. Saving a change in the team workspace updates the report on its
 next page load. Draft caveats are labeled awaiting review; resolved caveats remain
-visible with their status. There is no separate publication checkbox.
+visible with their status. The timeline includes both visits and caveats and
+updates their markers from the same records. Use **Refresh public site** to load
+saved changes, including current site conditions. There is no separate
+publication checkbox; offline changes must finish synchronizing first.
 
 The report retains the supplied site photographs, diagnostic plots, tower
 diagrams, common setup and processing INI downloads. Inventory, BADM, protocols,

@@ -32,18 +32,33 @@ to operational notes require authentication and site access. Only the known
 imported scientific images are embedded publicly. Do not put confidential content
 in site/visit/caveat text, since those records are public.
 
-The visit timeline uses teal circles for routine maintenance, yellow squares
-for major work and red diamonds for faults, with a shared date axis and legend.
-Hover or focus a marker to see its date, title and crew; select it to jump to
-the visit. Left/right arrows move through visits within a site. Timeline markers
-follow the site, record-type and search filters.
+The public page and its timeline read the same current records. New visits,
+observations, completed work, caveats, review statuses, site descriptions,
+conditions, reference metadata, deployments and eligible INIs appear on the next
+load. Use **Refresh public site** in the public header to load the latest saved
+records. The team workspace's Public Field Notes link also opens a fresh report.
+Offline changes must finish uploading through the existing sync queue first.
+
+The timeline uses teal circles for routine maintenance, yellow squares for major
+work and red diamonds for faults. Purple rings represent open/draft caveats;
+green rings represent resolved caveats. A shared caveat has a marker in each
+affected site's row, linking to one public entry, and counts once in the total.
+
+Caveats with a known affected start use that date in fixed EST. If only the end
+is known, that date is explicitly labeled as the affected end. Unknown dates
+remain in a separate **Date unknown** area; reporting/update dates are never
+substituted for measurement dates. Editing dates, affected sites or review status
+updates the current markers without a separate publishing or rebuild step.
+Hover or focus a marker for details; select it to open its record. Arrow keys
+move through dated and undated markers. Site/type/search filters apply to both.
 
 ## Export and hosting
 
 **Download HTML** (`/fieldnotes/download/`) produces a self-contained report with
 embedded fonts, logo, images, styles, scripts and byte-preserving INI downloads.
 Open it locally or host it on GitHub Pages. It is a snapshot: export and replace
-it again after changes. GitHub Pages cannot run the database or the live app.
+it again after changes. Exported snapshots do not offer a live refresh control.
+GitHub Pages cannot run the database or the live app.
 
 `public/fieldnotes/index.html` is the retained original source, not a live page.
 Changing that archive does not publish or overwrite database records. Historical

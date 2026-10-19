@@ -16,6 +16,11 @@
       event.preventDefault(); selectTab(tabs[next]); tabs[next].focus();
     });
   }
+  document.getElementById('refresh-public')?.addEventListener('click',event => {
+    event.currentTarget.disabled = true;
+    event.currentTarget.textContent = 'Refreshing…';
+    location.reload();
+  });
   const records = [...document.querySelectorAll('.record')];
   const site = document.getElementById('site-filter'), type = document.getElementById('type-filter'), search = document.getElementById('search');
   const timeline = setupTimeline();
@@ -45,15 +50,16 @@
     const rows = [...panel.querySelectorAll('.timeline-row')];
     const markers = [...panel.querySelectorAll('.marker')];
     const tooltip = document.getElementById('timeline-tooltip');
-    const dateOf = marker => Date.parse(marker.dataset.date+'T12:00:00Z');
-    const dates = markers.map(dateOf);
+    const dateOf = marker => marker.dataset.date ? Date.parse(marker.dataset.date+'T12:00:00Z') : Infinity;
+    const dates = markers.map(dateOf).filter(Number.isFinite);
     const first = new Date(Math.min(...dates)), last = new Date(Math.max(...dates));
     const start = Date.UTC(first.getUTCFullYear(), Math.floor(first.getUTCMonth()/3)*3, 1);
     const end = Date.UTC(last.getUTCFullYear(), Math.floor(last.getUTCMonth()/3)*3+3, 1);
     const position = date => 2+96*(date-start)/(end-start);
+    const tickMonths = dates.length ? 3*Math.max(1,Math.ceil((last.getUTCFullYear()-first.getUTCFullYear())*4/48)) : 3;
     const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
     const ticks = [];
-    for (let date = new Date(start); date.getTime() <= end; date.setUTCMonth(date.getUTCMonth()+3)) {
+    for (let date = new Date(start); date.getTime() <= end; date.setUTCMonth(date.getUTCMonth()+tickMonths)) {
       const tick = document.createElement('span');
       tick.className = 'timeline-tick';
       tick.style.left = position(date.getTime())+'%';
@@ -61,9 +67,9 @@
       panel.querySelector('.timeline-ticks').append(tick);
       ticks.push(tick);
     }
-    document.getElementById('timeline-range').textContent = `${first.toISOString().slice(0,10)} → ${last.toISOString().slice(0,10)}`;
+    document.getElementById('timeline-range').textContent = dates.length ? `${first.toISOString().slice(0,10)} → ${last.toISOString().slice(0,10)}` : 'Affected dates have not been recorded for these caveats.';
     for (const marker of markers) {
-      marker.style.left = position(dateOf(marker))+'%';
+      if (marker.dataset.date) marker.style.left = position(dateOf(marker))+'%';
       // The native title is a fallback when scripting is unavailable.
       marker.removeAttribute('title');
     }
@@ -85,11 +91,12 @@
       if (marker === activeMarker) return;
       hideTooltip(); activeMarker = marker;
       tooltip.dataset.kind = marker.dataset.kind;
-      tooltip.querySelector('.timeline-tooltip-date').textContent = marker.dataset.date;
+      tooltip.dataset.status = marker.dataset.status;
+      tooltip.querySelector('.timeline-tooltip-date').textContent = marker.dataset.date || 'Date unknown';
       tooltip.querySelector('.timeline-tooltip-kind').textContent = `${marker.dataset.site} · ${marker.dataset.label}`;
       tooltip.querySelector('.timeline-tooltip-title').textContent = marker.dataset.title;
-      const crew = tooltip.querySelector('.timeline-tooltip-crew');
-      crew.textContent = marker.dataset.crew; crew.hidden = !marker.dataset.crew;
+      const detail = tooltip.querySelector('.timeline-tooltip-detail');
+      detail.textContent = marker.dataset.detail; detail.hidden = !marker.dataset.detail;
       tooltip.hidden = false; marker.setAttribute('aria-describedby',tooltip.id);
       const rect = marker.getBoundingClientRect(), tip = tooltip.getBoundingClientRect();
       const left = Math.max(12, Math.min(rect.left+rect.width/2-tip.width/2, innerWidth-tip.width-12));
@@ -108,7 +115,7 @@
     panel.addEventListener('focusin',event => {
       const marker = event.target.closest('.marker');
       if (!marker) return;
-      for (const sibling of marker.closest('.track').querySelectorAll('.marker')) sibling.tabIndex = sibling === marker ? 0 : -1;
+      for (const sibling of marker.closest('.timeline-row').querySelectorAll('.marker')) sibling.tabIndex = sibling === marker ? 0 : -1;
       showTooltip(marker);
     });
     panel.addEventListener('focusout',event => {
@@ -118,7 +125,7 @@
       if (event.key === 'Escape') { hideTooltip(); return; }
       const marker = event.target.closest('.marker');
       if (!marker || !['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
-      const choices = [...marker.closest('.track').querySelectorAll('.marker')].filter(item => !item.hidden).sort((a,b) => dateOf(a)-dateOf(b));
+      const choices = [...marker.closest('.timeline-row').querySelectorAll('.marker')].filter(item => !item.hidden).sort((a,b) => dateOf(a)-dateOf(b));
       const current = choices.indexOf(marker);
       const next = {ArrowLeft:Math.max(0,current-1), ArrowRight:Math.min(choices.length-1,current+1), Home:0, End:choices.length-1}[event.key];
       event.preventDefault(); choices[next].focus();
@@ -165,10 +172,11 @@
     new ResizeObserver(() => { hideTooltip(); layout(); }).observe(plot);
     function update() {
       hideTooltip();
-      let count = 0;
+      const visits = new Set(), caveats = new Set();
       for (const marker of markers) {
-        marker.hidden = !!document.getElementById(marker.getAttribute('href').slice(1))?.hidden;
-        if (!marker.hidden) count++;
+        const target = marker.getAttribute('href').slice(1);
+        marker.hidden = !!document.getElementById(target)?.hidden || (!!site.value && marker.closest('.timeline-row').dataset.site !== site.value);
+        if (!marker.hidden) (marker.dataset.recordKind === 'caveat' ? caveats : visits).add(target);
       }
       for (const row of rows) {
         row.hidden = !!site.value && row.dataset.site !== site.value;
@@ -176,9 +184,10 @@
         const selected = visible.find(marker => marker.tabIndex === 0) || visible[0];
         for (const marker of row.querySelectorAll('.marker')) marker.tabIndex = marker === selected ? 0 : -1;
       }
+      const count = visits.size+caveats.size;
       plot.hidden = count === 0;
       panel.querySelector('.timeline-empty').hidden = count > 0;
-      document.getElementById('timeline-count').textContent = `${count} ${count === 1 ? 'visit' : 'visits'}`;
+      document.getElementById('timeline-count').textContent = `${visits.size} ${visits.size === 1 ? 'visit' : 'visits'} · ${caveats.size} ${caveats.size === 1 ? 'caveat' : 'caveats'}`;
       layout();
     }
     return {update};

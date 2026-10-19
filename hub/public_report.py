@@ -119,8 +119,35 @@ def assets():
     }
 
 
+def timeline_data(sites, visits, caveats):
+    """Project current public records without inventing measurement dates."""
+    rows = {site['id']: {'id': site['id'], 'code': site['code'], 'dated': [], 'undated': []} for site in sites}
+    for visit in visits:
+        rows[visit['site_id']]['dated'].append({
+            'target': 'visit-'+visit['id'], 'record_kind': 'visit', 'kind': visit['classification'],
+            'status': '', 'date': visit['date'].isoformat(), 'label': visit['kind'],
+            'title': visit['title'], 'detail': visit['crew'], 'site': visit['site'],
+        })
+    for caveat in caveats:
+        date = (caveat['affected_from'] or caveat['affected_to']).split(' ')[0]
+        basis = 'Affected start (fixed EST)' if caveat['affected_from'] else 'Affected end (fixed EST)' if caveat['affected_to'] else 'Affected dates not recorded'
+        status = 'Draft · awaiting review' if caveat['status'] == 'draft' else caveat['status_label']
+        for site_id in caveat['site_ids']:
+            if site_id not in rows:
+                continue
+            rows[site_id]['dated' if date else 'undated'].append({
+                'target': 'caveat-'+caveat['id'], 'record_kind': 'caveat', 'kind': 'caveat',
+                'status': caveat['status'], 'date': date, 'label': 'Data caveat · '+status,
+                'title': caveat['title'], 'detail': basis+(' · '+caveat['period'] if caveat['period'] else ''),
+                'site': rows[site_id]['code'],
+            })
+    entries = [entry for row in rows.values() for section in ['dated', 'undated'] for entry in row[section]]
+    return {'rows': list(rows.values()), 'has_entries': bool(entries), 'visits': len(visits),
+        'caveats': len({entry['target'] for entry in entries if entry['record_kind'] == 'caveat'})}
+
+
 def context():
-    sites = list(Site.objects.order_by("code"))
+    sites = list(Site.objects.select_related("condition").order_by("code"))
     site_ids = [site.pk for site in sites]
     visits = list(Visit.objects.filter(site_id__in=site_ids).select_related("site")
         .prefetch_related("observations", "task_activities").order_by("-date", "-started_at", "pk"))
@@ -173,7 +200,15 @@ def context():
             if key not in common_seen:
                 common.append(normalized)
                 common_seen.add(key)
+        condition = getattr(site, 'condition', None)
+        public_condition = {'status': condition.status if condition else 'unknown',
+            'label': condition.get_status_display() if condition else 'Not assessed',
+            'statement': condition.statement if condition else '',
+            'valid_until': condition.valid_until if condition else None,
+            'updated_at': condition.updated_at if condition else None,
+            'review_overdue': bool(condition and condition.valid_until and condition.valid_until < timezone.localdate())}
         public_sites.append({"id": site.pk, "code": site.code, "name": site.name, "amp": site.amp,
+            "condition": public_condition,
             "location": site.location, "coordinates": site.gps_coordinates,
             "active_since": site.date_activated, "archived": site.is_archived, "description": clean_html(site.description),
             "sections": current_sections, "photos": photos.get(site.pk, []), "deployments": []})
@@ -246,10 +281,13 @@ def context():
             "stage": str(data.get("st", "")), "summary": str(data.get("sum", "")), "text": text,
             "bytes":base64.b64encode(raw).decode('ascii')})
     return {"sites": public_sites, "visits": public_visits, "caveats": public_caveats,
+        "timeline": timeline_data(public_sites, public_visits, public_caveats),
         "resolved": [item for item in public_caveats if item["status"] == "resolved"],
         "open_caveats": [item for item in public_caveats if item["status"] != "resolved"],
         "common": common, "ini_files": ini_files, "generated_at": timezone.now(), **assets()}
 
 
-def render_report():
-    return render_to_string("public_report.html", context())
+def render_report(*, snapshot=False):
+    data = context()
+    data["is_snapshot"] = snapshot
+    return render_to_string("public_report.html", data)

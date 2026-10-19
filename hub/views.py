@@ -159,7 +159,7 @@ def fieldnotes_download(request):
     if not settings.PUBLIC_FIELDNOTES_ENABLED:
         raise Http404()
     from .public_report import render_report
-    response = HttpResponse(render_report(), content_type="text/html; charset=utf-8")
+    response = HttpResponse(render_report(snapshot=True), content_type="text/html; charset=utf-8")
     response["Content-Disposition"] = 'attachment; filename="carbonique-fieldnotes.html"'
     response["Cache-Control"] = "no-store"
     response["X-Content-Type-Options"] = "nosniff"
