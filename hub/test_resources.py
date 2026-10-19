@@ -194,7 +194,7 @@ class ResourceTests(TestCase):
 
     def test_import_resources_is_complete_idempotent_and_preserves_edits(self):
         call_command("import_resources",stdout=io.StringIO())
-        self.assertEqual(Protocol.objects.count(),8)
+        self.assertEqual(Protocol.objects.count(),7)
         self.assertEqual(Visit.objects.count(),127)
         self.assertEqual(DataCaveat.objects.count(),19)
         self.assertEqual(ConfigurationVersion.objects.filter(settings__source="EcoFlux inventory export 2026-10-16").count(),8)
@@ -208,21 +208,11 @@ class ResourceTests(TestCase):
         response=self.client.get(f"/protocols/{protocol.pk}/file/")
         self.assertEqual(response.status_code,200);self.assertTrue(b"".join(response.streaming_content).startswith(b"%PDF-"))
 
-    def test_private_protocol_is_not_required_in_git_and_can_be_uploaded_privately(self):
-        original_is_file = Path.is_file
-        with patch.object(Path,"is_file",lambda path: False if path.name=="Data_download.pdf" else original_is_file(path)):
+    def test_removed_data_download_protocol_is_not_reimported(self):
+        for _ in range(2):
             call_command("import_resources",stdout=io.StringIO())
-            protocol=Protocol.objects.get(filename="Data_download.pdf")
-            response=self.client.get("/api/protocols/")
-            item=next(p for p in response.data if p["id"]==str(protocol.pk))
-            self.assertFalse(item["available"])
-            self.assertEqual(len(response.data),8)
-        response=self.client.patch(f"/api/protocols/{protocol.pk}/",{"file":SimpleUploadedFile("Data_download.pdf",b"%PDF-1.4\nprivate source"),"base_version":1},format="multipart")
-        self.assertEqual(response.status_code,200,response.data)
-        self.assertTrue(response.data["available"])
-        protocol.refresh_from_db()
-        self.assertFalse(protocol.bundled_file)
-        self.assertTrue(str(protocol.file.path).startswith(self.temp.name))
+        self.assertEqual(Protocol.objects.count(),7)
+        self.assertFalse(Protocol.objects.filter(filename="Data_download.pdf").exists())
 
     def test_inventory_source_download_contains_every_supplied_file(self):
         response=self.client.get("/inventory-source.zip")

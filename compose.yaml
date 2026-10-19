@@ -23,8 +23,6 @@ services:
       TRUST_PROXY_HEADERS: "True"
     volumes:
       - media_data:/app/media
-      # Updating this file on the host immediately updates /fieldnotes/.
-      - ./public/fieldnotes:/app/public/fieldnotes:ro
     ports:
       - "127.0.0.1:8000:8000"
     depends_on:

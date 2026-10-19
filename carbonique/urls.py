@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from hub import api, views
 from hub import resources_api as resources
-from hub import monitor
+from hub import monitor, processing_files
 
 router = DefaultRouter()
 for prefix, cls in [("sites", api.SiteViewSet), ("equipment", api.EquipmentViewSet), ("deployments", api.DeploymentViewSet), ("configurations", api.ConfigurationViewSet), ("caveats", api.CaveatViewSet), ("dois", api.DOIViewSet), ("equipment-history", api.HistoryViewSet), ("checklists", api.ChecklistViewSet)]:
@@ -14,6 +14,8 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls),
     path("api/bootstrap/", api.bootstrap), path("api/snapshot/", api.snapshot),
+    path("api/processing-files/", processing_files.library),
+    path("processing-files/<uuid:pk>/", processing_files.version_file),
     path("api/monitor/", monitor.tower_status),
     path("api/badm/schema/", resources.badm_schema),
     path("api/sites/<int:site_id>/condition/", resources.condition),
@@ -36,6 +38,7 @@ urlpatterns = [
     path("export.csv", views.export_csv),
     path("reference/", views.public_reference), path("health/", views.health),
     path("fieldnotes/", views.public_fieldnotes, name="public_fieldnotes"),
+    path("fieldnotes/download/", views.fieldnotes_download, name="fieldnotes_download"),
     path("fieldnotes/content/", views.fieldnotes_content, name="fieldnotes_content"),
     path("sw.js", views.service_worker), path("manifest.webmanifest", views.manifest),
 ]

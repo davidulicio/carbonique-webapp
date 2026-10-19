@@ -43,7 +43,7 @@ def bootstrap(request):
     sites = accessible_sites(request.user).order_by("code")
     from .resources_api import ProtocolSerializer
     from .models import Protocol
-    return Response({"me": {"id": request.user.pk, "username": request.user.username, "name": display_name(request.user), "email": request.user.email, "role": role_for(request.user)}, "sites": SiteSerializer(sites, many=True).data, "protocols": ProtocolSerializer(Protocol.objects.filter(is_archived=False), many=True).data, "checklists": ChecklistSerializer(ChecklistTemplate.objects.filter(is_active=True), many=True).data, "server_time": timezone.now(), "public_reference_enabled": settings.PUBLIC_REFERENCE_ENABLED})
+    return Response({"me": {"id": request.user.pk, "username": request.user.username, "name": display_name(request.user), "email": request.user.email, "role": role_for(request.user)}, "sites": SiteSerializer(sites, many=True).data, "protocols": ProtocolSerializer(Protocol.objects.filter(is_archived=False), many=True).data, "checklists": ChecklistSerializer(ChecklistTemplate.objects.filter(is_active=True), many=True).data, "server_time": timezone.now(), "public_reference_enabled": settings.PUBLIC_FIELDNOTES_ENABLED})
 
 @api_view(["GET"])
 def snapshot(request):
@@ -53,8 +53,9 @@ def snapshot(request):
     equipment = Equipment.objects.filter(Q(site__in=accessible_sites(request.user)) | Q(site__isnull=True)).order_by("instrument", "serial_number")
     attachments = Attachment.objects.filter(Q(site=site) | Q(equipment__in=equipment, site__in=accessible_sites(request.user))).distinct()
     caveats = DataCaveat.objects.filter(sites=site).prefetch_related("sites", "configurations").distinct()
+    from .processing_files import library_state
     from .resources_api import resource_state
-    return Response({"resources": resource_state(site), "site": SiteSerializer(site).data, "tasks": TaskSerializer(site.tasks.all(), many=True).data, "visits": VisitSerializer(visits, many=True).data, "activities": TaskActivitySerializer(TaskActivity.objects.filter(task__site=site), many=True).data, "observations": VisitObservationSerializer(VisitObservation.objects.filter(visit__site=site), many=True).data, "equipment": EquipmentSerializer(equipment, many=True).data, "equipment_history": HistorySerializer(History.objects.filter(item__in=equipment), many=True).data, "deployments": DeploymentSerializer(site.deployments.all(), many=True).data, "configurations": ConfigurationSerializer(site.configurations.all(), many=True).data, "caveats": CaveatSerializer(caveats, many=True).data, "attachments": AttachmentSerializer(attachments, many=True).data + legacy_attachments(site, equipment), "dois": DOISerializer(site.doi_records.all(), many=True).data, "server_time": timezone.now()})
+    return Response({"processing_files": library_state(request.user), "resources": resource_state(site), "site": SiteSerializer(site).data, "tasks": TaskSerializer(site.tasks.all(), many=True).data, "visits": VisitSerializer(visits, many=True).data, "activities": TaskActivitySerializer(TaskActivity.objects.filter(task__site=site), many=True).data, "observations": VisitObservationSerializer(VisitObservation.objects.filter(visit__site=site), many=True).data, "equipment": EquipmentSerializer(equipment, many=True).data, "equipment_history": HistorySerializer(History.objects.filter(item__in=equipment), many=True).data, "deployments": DeploymentSerializer(site.deployments.all(), many=True).data, "configurations": ConfigurationSerializer(site.configurations.all(), many=True).data, "caveats": CaveatSerializer(caveats, many=True).data, "attachments": AttachmentSerializer(attachments, many=True).data + legacy_attachments(site, equipment), "dois": DOISerializer(site.doi_records.all(), many=True).data, "server_time": timezone.now()})
 
 @api_view(["POST"])
 def sync(request):
@@ -188,8 +189,23 @@ class ConfigurationViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mix
 class CaveatViewSet(ScopedViewSet):
     queryset = DataCaveat.objects.prefetch_related("sites", "configurations")
     serializer_class = CaveatSerializer
+    def save_validated(self, serializer, **kwargs):
+        previous = serializer.instance.status if serializer.instance else "draft"
+        status = serializer.validated_data.get("status", previous)
+        now = timezone.now()
+        if status == "draft":
+            kwargs.update(reviewed_at=None, resolved_at=None)
+        else:
+            if previous == "draft":
+                kwargs["reviewed_at"] = now
+            if status == "resolved" and previous != "resolved":
+                kwargs["resolved_at"] = now
+            elif status != "resolved":
+                kwargs["resolved_at"] = None
+        return super().save_validated(serializer, **kwargs)
     def get_queryset(self):
-        return super().get_queryset().filter(sites__in=accessible_sites(self.request.user)).distinct()
+        allowed = DataCaveat.objects.filter(sites__in=accessible_sites(self.request.user)).values("pk")
+        return super().get_queryset().filter(pk__in=allowed)
     def validate_scope(self, data, instance=None):
         sites = data.get("sites", list(instance.sites.all()) if instance else [])
         if not sites:
@@ -314,7 +330,8 @@ def upload_attachment(request):
     file.seek(0)
     sha = digest.hexdigest()
     linked = {}
-    for field, model in [("visit", Visit), ("equipment", Equipment), ("caveat", DataCaveat), ("configuration", ConfigurationVersion)]:
+    targets = [("visit", Visit), ("task", Task), ("activity", TaskActivity), ("observation", VisitObservation), ("equipment", Equipment), ("caveat", DataCaveat), ("configuration", ConfigurationVersion)]
+    for field, model in targets:
         value = request.data.get(field)
         if not value:
             continue
@@ -327,9 +344,26 @@ def upload_attachment(request):
         if field == "caveat":
             if not obj.sites.filter(pk=site.pk).exists():
                 raise PermissionDenied("The caveat is not linked to this site.")
-        elif obj.site_id != site.pk and not (field == "equipment" and obj.site_id is None):
-            raise PermissionDenied("The attachment target is not linked to this site.")
+        else:
+            target_site = obj.task.site_id if field == "activity" else obj.visit.site_id if field == "observation" else obj.site_id
+            if target_site != site.pk and not (field == "equipment" and target_site is None):
+                raise PermissionDenied("The attachment target is not linked to this site.")
         linked[field] = obj
+    def associate(field, obj):
+        if obj is None:
+            return
+        if field in linked and linked[field].pk != obj.pk:
+            raise ValidationError("The selected note, task and visit do not belong together.")
+        linked[field] = obj
+    if "activity" in linked:
+        if "visit" in linked and linked["activity"].visit_id != linked["visit"].pk:
+            raise ValidationError("This activity was not recorded during the selected visit.")
+        associate("task", linked["activity"].task)
+        associate("visit", linked["activity"].visit)
+    if "observation" in linked:
+        associate("visit", linked["observation"].visit)
+    if "activity" in linked and "observation" in linked:
+        raise ValidationError("Attach a file to one individual note at a time.")
     content_type = "application/octet-stream"
     if file.name.lower().endswith((".jpg", ".jpeg", ".png", ".gif", ".webp")):
         try:
@@ -344,11 +378,14 @@ def upload_attachment(request):
             raise ValidationError("This file is not a valid PDF.")
         content_type = "application/pdf"
         file.seek(0)
+    elif file.name.lower().endswith((".mp4", ".m4v", ".mov", ".webm", ".mp3", ".wav", ".ogg", ".flac", ".m4a")):
+        import mimetypes
+        content_type = mimetypes.guess_type(file.name)[0] or "application/octet-stream"
     with transaction.atomic():
         request.user.__class__.objects.select_for_update().get(pk=request.user.pk)
         previous = Attachment.objects.filter(pk=attachment_id).first()
         if previous:
-            if previous.site_id != site.pk or previous.sha256 != sha or previous.uploaded_by_id != request.user.pk or any(str(getattr(previous, field + "_id")) != str(obj.pk) for field, obj in linked.items()):
+            if previous.site_id != site.pk or previous.sha256 != sha or previous.uploaded_by_id != request.user.pk or any(getattr(previous, field + "_id") != (linked[field].pk if field in linked else None) for field, _ in targets):
                 raise Conflict("This upload identifier already belongs to another file or record.")
             return Response(AttachmentSerializer(previous).data)
         obj = Attachment(id=attachment_id, site=site, file=file, filename=Path(file.name).name[:250], caption=str(request.data.get("caption", ""))[:500], content_type=content_type, sha256=sha, size=file.size, uploaded_by=request.user, **linked)

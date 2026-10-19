@@ -26,9 +26,10 @@ default accounts are supplied. Create other accounts under Administration.
 | `seed/ecoflux_inventory_export/images/`, `seed/media/` | Supplied tower/site photographs and diagnostic plots, linked to the reference records |
 | `seed/ecoflux_inventory_export/ini/` | Eight complete TraceAnalysis configuration files, with descriptions and caveat links |
 | `seed/ecoflux_inventory_export/*.md` | Human-readable source descriptions, conventions and known gaps; included in the source export download |
-| `seed/protocols/`, `catalogue.json` | Eight protocol entries; seven bundled original PDFs and one privately installed original |
+| `seed/protocols/`, `catalogue.json` | Seven bundled protocol PDFs; the data-download procedure is retired |
+| `seed/processing_files/`, `catalogue.json` | Twenty current INI source copies, SHA-256 hashes and source modification times |
 | `seed/badm/schema.json` | Official ICOS template definitions, vocabulary, requirements and source/version information |
-| `public/fieldnotes/index.html` | Public editorial report, independent of private team records |
+| `public/fieldnotes/index.html` | Original source archive; live public report now reads database records |
 | `static/hub/` | Carbonique logos, colors, Roboto typography and local application/PDF assets |
 
 The supplied inventory export contains summaries rather than every original
@@ -47,19 +48,17 @@ The supplied public HTML and inventory-export overview have had obsolete
 editor-service integrations removed; scientific records, figures, photographs,
 protocol PDFs and processing files retain their supplied content.
 
-## Install the private protocol
+## Processing files and protocol changes
 
-`Data_download.pdf` contains device login details. It is excluded from Git and
-Docker contexts. Keep the original outside the checkout/web root, then run:
+`import_resources` installs seven protocols and initializes the twenty-file INI
+library. The retired data-download procedure is removed by migration 0006,
+including its installed protected file. Its original outside the app is untouched.
+It is no longer in the catalogue or import options.
 
-```bash
-python manage.py import_resources --protocol-directory /etc/carbonique/protocols
-```
-
-Alternatively set `PRIVATE_PROTOCOLS_DIR` before importing, or upload the PDF in
-Protocols using a manager/admin account. The original becomes protected media.
-Without it, its catalogue entry says it is awaiting private installation.
-See [Resources and monitoring](RESOURCES_AND_MONITORING.md).
+The INI import copies source bytes into protected version storage; it never
+modifies or executes originals. Bundled initialization skips existing revisions,
+preserving later team uploads. See [Processing files](PROCESSING_FILES.md) for
+bulk uploads and explicit imports from a newer source directory.
 
 ## Repeat imports and later updates
 
@@ -72,8 +71,9 @@ are preserved. Replacing source files does not silently overwrite a reviewed
 caveat or edited site. Reconcile changed source records deliberately through
 the app, retaining provenance.
 
-For public display alone, replace `public/fieldnotes/index.html`; no import or
-restart is needed. To extract a replacement report into structured reference:
+The live public report reads current records; edit them in the team workspace.
+The original HTML remains an archive. For a separately reviewed historical
+source import, extraction tools remain available:
 
 ```bash
 python scripts/extract_fieldnotes.py public/fieldnotes/index.html --output /private/path/reference-extract

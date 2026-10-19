@@ -1,0 +1,102 @@
+{
+  "EC_FirstStage_include.ini": {
+    "sha256": "9e727cf228bdad6bf0cc204f89c6213cd534ae5654f43cacd4aafabc2242e0b2",
+    "size": 54565,
+    "modified_at": "2026-09-05T20:21:39.061495+00:00"
+  },
+  "ECCC_FirstStage_include.ini": {
+    "sha256": "7436fed6d5945a4fc126e1e9d74d5285ade9fb5baa1e4e164cce31b82518d5ca",
+    "size": 3709,
+    "modified_at": "2026-09-05T20:21:39.065520+00:00"
+  },
+  "EddyPro_Common_FirstStage_include.ini": {
+    "sha256": "ff1ae4f857e53f5eb548de65809e2823a43a3c7cf742fd5b805b7a60a4b40a46",
+    "size": 51687,
+    "modified_at": "2026-09-05T20:21:39.067535+00:00"
+  },
+  "EddyPro_LI7200_FirstStage_include.ini": {
+    "sha256": "00f736f08b318d7864c80740480ffef8f27076d0f78f85600ee43073c620d0c2",
+    "size": 8824,
+    "modified_at": "2026-09-05T20:21:39.067535+00:00"
+  },
+  "EddyPro_LI7500_FirstStage_include.ini": {
+    "sha256": "695aa0f9ea560b818018b5a9db5b37ea38988be27e875eba2c91adc04e442bde",
+    "size": 4814,
+    "modified_at": "2026-09-05T20:21:39.069548+00:00"
+  },
+  "EddyPro_LI7700_FirstStage_include.ini": {
+    "sha256": "f641bb2c4093e403bde3f2e9882d9bec188ab8fed6000779c04fc26a773a6050",
+    "size": 17106,
+    "modified_at": "2026-09-05T20:21:39.069548+00:00"
+  },
+  "EP_auto_run_FirstStage_include.ini": {
+    "sha256": "5a76856624bf6cfa570a32673f845a74e5e2f1211f3b6b0545707712fac7a88f",
+    "size": 51193,
+    "modified_at": "2026-09-05T20:21:39.071556+00:00"
+  },
+  "MCGILL_1/MCGILL_1_FirstStage.ini": {
+    "sha256": "22e80ea2d5de643c8a85c31c1bdc0e45f6e8ca575e78a9a8cc0a74d57f4464fa",
+    "size": 49589,
+    "modified_at": "2026-09-25T00:39:29.092916+00:00"
+  },
+  "MCGILL_1/MCGILL_1_SecondStage.ini": {
+    "sha256": "8fd3502d6f1503b3f9a23012ab034f5a8d50aa89d7748f765a3ebbff80b129f6",
+    "size": 19140,
+    "modified_at": "2026-09-25T00:39:29.104373+00:00"
+  },
+  "RAD_FirstStage_include.ini": {
+    "sha256": "6d793e2ef7d730dbee5e75da66f443712ed066ca555fc5c09acd0fd5b37df84a",
+    "size": 5938,
+    "modified_at": "2026-09-05T20:21:39.071556+00:00"
+  },
+  "UQAM_0/UQAM_0_FirstStage.ini": {
+    "sha256": "bb2ff1cfe58c2feb3ab18bb501e62fae1cebdd366a124da881f80980365196f2",
+    "size": 53540,
+    "modified_at": "2024-05-21T16:56:40.652075+00:00"
+  },
+  "UQAM_0/UQAM_0_SecondStage.ini": {
+    "sha256": "4e483f316d5b55eb9eb2a0590381a45c4255df440982ae16b43c6befd34f569c",
+    "size": 14536,
+    "modified_at": "2024-05-14T00:26:20.055598+00:00"
+  },
+  "UQAM_1/UQAM_1_FirstStage.ini": {
+    "sha256": "423e5bea961596b0f1d9614a05bf55386eb2a55e0fe23899156006edcadf1549",
+    "size": 53513,
+    "modified_at": "2026-09-25T00:39:29.128066+00:00"
+  },
+  "UQAM_1/UQAM_1_SecondStage.ini": {
+    "sha256": "5651693e60ff77fb5691c16fffd4a4778f14b65a87eb1c038c25080c49cf3dbc",
+    "size": 23761,
+    "modified_at": "2026-09-25T00:39:29.140033+00:00"
+  },
+  "UQAM_2/UQAM_2_FirstStage.ini": {
+    "sha256": "960ff4417823a76975762c1a88a025b44b3c3faba85f6b43dafe7afe3769f4b9",
+    "size": 66369,
+    "modified_at": "2026-09-25T00:39:29.502634+00:00"
+  },
+  "UQAM_2/UQAM_2_SecondStage.ini": {
+    "sha256": "5841b1402d870d904bd0dcdf70f3ebc2a5252c8f80f985392d5e39a48e7238b5",
+    "size": 25015,
+    "modified_at": "2026-09-25T00:39:29.514631+00:00"
+  },
+  "UQAM_3/UQAM_3_FirstStage.ini": {
+    "sha256": "e04b2dc8d1d7e8652b7e04b6f69279bedd8f072cb4ac15da84a68b4d17c6ed52",
+    "size": 73366,
+    "modified_at": "2026-09-25T00:39:29.792522+00:00"
+  },
+  "UQAM_3/UQAM_3_SecondStage.ini": {
+    "sha256": "6259bd6e10b38d740ddbe4c1ee8226cf5e824b1bcd7cf4f4763f0dfbd49aa663",
+    "size": 26811,
+    "modified_at": "2026-09-25T00:39:29.803828+00:00"
+  },
+  "UQAM_4/UQAM_4_FirstStage.ini": {
+    "sha256": "438d464d888596b08152e0131fb9a9daf6ec4a8f7b105314416c83eec1d007c2",
+    "size": 48704,
+    "modified_at": "2026-09-25T00:39:29.828734+00:00"
+  },
+  "UQAM_4/UQAM_4_SecondStage.ini": {
+    "sha256": "b8799bdd0cd1bb39829cbe33fb3fd079f7559fd599d037bba21fa5764b8b1541",
+    "size": 17287,
+    "modified_at": "2026-09-25T00:39:29.838812+00:00"
+  }
+}

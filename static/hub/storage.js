@@ -16,7 +16,8 @@ async function transact(store, mode, callback) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction(store, mode);
     let result;
-    const req = callback(tx.objectStore(store));
+    let req;
+    try { req = callback(tx.objectStore(store)); } catch (error) { tx.abort(); reject(error); return; }
     if (req) req.onsuccess = () => { result = req.result; };
     tx.oncomplete = () => resolve(result);
     tx.onerror = () => reject(tx.error);
@@ -25,6 +26,7 @@ async function transact(store, mode, callback) {
 }
 export const get = (store, key) => transact(store, "readonly", s => s.get(key));
 export const put = (store, key, value) => transact(store, "readwrite", s => s.put(value, key));
+export const putMany = (store, entries) => transact(store, "readwrite", s => { for (const [key,value] of entries) s.put(value,key); });
 export const remove = (store, key) => transact(store, "readwrite", s => s.delete(key));
 export const all = store => transact(store, "readonly", s => s.getAll());
 export async function clearDevice() {

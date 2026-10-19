@@ -240,24 +240,10 @@ class HubTests(TestCase):
         self.client.force_login(self.admin)
         r=self.client.get(f"/export.csv?site={self.site.pk}")
         self.assertIn("'=HYPERLINK",r.content.decode())
-    def test_fieldnotes_public_and_live_file_replacement(self):
-        path=Path(self.media.name)/"index.html";path.write_text("<html>Version A</html>")
+    def test_public_reference_bookmark_opens_the_current_report(self):
         self.client.force_authenticate(None)
-        with override_settings(FIELDNOTES_HTML=path):
-            self.assertEqual(self.client.get("/fieldnotes/").status_code,200)
-            r=self.client.get("/fieldnotes/content/");self.assertEqual(b"".join(r.streaming_content),b"<html>Version A</html>")
-            self.assertIn("sandbox allow-scripts",r["Content-Security-Policy"])
-            self.assertNotIn("allow-same-origin",r["Content-Security-Policy"])
-            path.write_text("<html>Version B</html>")
-            r=self.client.get("/fieldnotes/content/");self.assertIn(b"Version B",b"".join(r.streaming_content))
-            self.assertEqual(r["Cache-Control"],"no-store")
-    def test_public_dynamic_reference_hides_drafts_and_private_sites(self):
-        self.site.public_reference=True;self.site.save()
-        c=DataCaveat.objects.create(title="Private draft",status="draft",public_reference=True);c.sites.add(self.site)
-        self.client.force_authenticate(None)
-        with override_settings(PUBLIC_REFERENCE_ENABLED=True):
-            r=self.client.get("/reference/")
-            self.assertEqual(r.status_code,200);self.assertNotContains(r,"Private draft");self.assertNotContains(r,self.other.name)
+        self.assertRedirects(self.client.get("/reference/"),"/fieldnotes/",fetch_redirect_response=False)
+
     def test_legacy_note_backfill_is_idempotent(self):
         note=FieldNote.objects.create(site=self.site,date_visited="2026-01-01",note="Original",summary="Maintenance")
         for _ in range(2):call_command("backfill_visits",stdout=io.StringIO())

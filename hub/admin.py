@@ -18,7 +18,7 @@ class TeamMemberAdmin(admin.ModelAdmin):
     list_display = ["user", "role"]
     filter_horizontal = ["sites"]
 
-for model in [Visit, Task, TaskActivity, VisitObservation, VisitReport, AuditEvent, OperationReceipt, ImportRecord, ConfigurationVersion, SiteCondition, BADMProfile, BADMRecord, Protocol, SiteMedia, TowerStatus, TowerReading]:
+for model in [Visit, Task, TaskActivity, VisitObservation, VisitReport, AuditEvent, OperationReceipt, ImportRecord, ConfigurationVersion, SiteCondition, BADMProfile, BADMRecord, Protocol, SiteMedia, TowerStatus, TowerReading, ProcessingFile, ProcessingFileVersion]:
     admin.site.register(model, ImmutableAdmin)
 for model in [Deployment, DataCaveat, Attachment, ChecklistTemplate]:
     admin.site.register(model, ArchiveOnlyAdmin)

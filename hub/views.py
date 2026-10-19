@@ -6,13 +6,13 @@ from django.contrib.auth.decorators import login_required
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
-from django.views.decorators.http import require_GET
+from django.views.decorators.http import require_GET, require_http_methods
 from django.views.decorators.clickjacking import xframe_options_exempt
 from rest_framework.exceptions import PermissionDenied
 from inventory.models import Photo, Document, Site
 from .models import Attachment, Task, Visit, DataCaveat
 from .permissions import require_site, role_for
-from .serializers import SiteSerializer, CaveatSerializer, clean_html
+from .serializers import clean_html
 
 @login_required
 @ensure_csrf_cookie
@@ -38,12 +38,16 @@ def file_response(field, filename, content_type="application/octet-stream", inli
     return response
 
 @login_required
+@require_http_methods(["GET", "HEAD"])
 def attachment_download(request, pk):
     obj = get_object_or_404(Attachment, pk=pk)
     try:
         require_site(request.user, obj.site_id)
     except PermissionDenied:
         return HttpResponse("Access denied", status=403)
+    if obj.content_type.startswith(("video/", "audio/")):
+        from .media import stream_file
+        return stream_file(request, obj.file, obj.filename, obj.content_type, download=request.GET.get("download") == "1")
     inline = obj.content_type in {"image/jpeg", "image/png", "image/webp", "image/gif"}
     return file_response(obj.file, obj.filename, obj.content_type, inline)
 
@@ -116,14 +120,10 @@ def export_csv(request):
 
 @require_GET
 def public_reference(request):
-    if not settings.PUBLIC_REFERENCE_ENABLED:
+    # Keep old bookmarks pointing to the one current public report.
+    if not settings.PUBLIC_FIELDNOTES_ENABLED:
         raise Http404()
-    sites = Site.objects.filter(public_reference=True, is_archived=False).order_by("code")
-    data = []
-    for site in sites:
-        # Explicitly selected fields; no crew, visits, inventory serials or attachments.
-        data.append({"code": site.code, "name": site.name, "amp": site.amp, "location": site.location, "description": clean_html(site.description), "date_activated": site.date_activated, "caveats": [{"title": c.title, "description": clean_html(c.description), "treatment": clean_html(c.treatment), "period_label": c.period_label} for c in site.caveats.filter(public_reference=True).exclude(status="draft")]})
-    return render(request, "public_reference.html", {"sites": data})
+    return redirect("public_fieldnotes")
 
 @require_GET
 def health(request):
@@ -136,22 +136,31 @@ def health(request):
 def public_fieldnotes(request):
     if not settings.PUBLIC_FIELDNOTES_ENABLED:
         raise Http404()
-    path = settings.FIELDNOTES_HTML
-    if not path.is_file():
-        raise Http404("The public Field Notes HTML has not been added yet.")
-    response = render(request, "public_fieldnotes.html", {"revision": path.stat().st_mtime_ns})
+    from django.utils import timezone
+    response = render(request, "public_fieldnotes.html", {"revision": timezone.now().timestamp()})
     response["Cache-Control"] = "no-store"
     return response
+
 
 @require_GET
 @xframe_options_exempt
 def fieldnotes_content(request):
-    if not settings.PUBLIC_FIELDNOTES_ENABLED or not settings.FIELDNOTES_HTML.is_file():
+    if not settings.PUBLIC_FIELDNOTES_ENABLED:
         raise Http404()
-    path = settings.FIELDNOTES_HTML
-    response = FileResponse(path.open("rb"), content_type="text/html; charset=utf-8")
+    from .public_report import render_report
+    response = HttpResponse(render_report(), content_type="text/html; charset=utf-8")
     response["Cache-Control"] = "no-store"
-    # Permit the report's own JavaScript without granting access to the app origin,
-    # session cookies or its authenticated APIs. Applied even when opened directly.
-    response["Content-Security-Policy"] = "sandbox allow-scripts allow-popups; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'"
+    response["Content-Security-Policy"] = "sandbox allow-scripts allow-popups allow-downloads; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'"
+    return response
+
+
+@require_GET
+def fieldnotes_download(request):
+    if not settings.PUBLIC_FIELDNOTES_ENABLED:
+        raise Http404()
+    from .public_report import render_report
+    response = HttpResponse(render_report(), content_type="text/html; charset=utf-8")
+    response["Content-Disposition"] = 'attachment; filename="carbonique-fieldnotes.html"'
+    response["Cache-Control"] = "no-store"
+    response["X-Content-Type-Options"] = "nosniff"
     return response

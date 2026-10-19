@@ -87,14 +87,18 @@ class ConfigurationSerializer(serializers.ModelSerializer):
         return value
 
 class CaveatSerializer(serializers.ModelSerializer):
+    configuration_details = serializers.SerializerMethodField()
     class Meta:
         model = DataCaveat
         fields = "__all__"
-        read_only_fields = ["id", "created_by", "updated_at", "version"]
+        read_only_fields = ["id", "created_by", "updated_at", "version", "reviewed_at", "resolved_at"]
     def validate_description(self, value):
         return clean_html(value)
     def validate_treatment(self, value):
         return clean_html(value)
+    def get_configuration_details(self, obj):
+        return [{"id": str(config.pk), "site": config.site_id, "label": config.label,
+            "effective_from": config.effective_from.isoformat()} for config in obj.configurations.all()]
 
 class AttachmentSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()

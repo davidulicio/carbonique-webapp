@@ -62,6 +62,31 @@ class Protocol(models.Model):
         ordering = ["category", "title", "-created_at"]
 
 
+class ProcessingFile(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    path = models.CharField(max_length=250, unique=True)
+    site = models.ForeignKey(Site, null=True, blank=True, on_delete=models.PROTECT)
+    site_code = models.CharField(max_length=10, blank=True)
+    class Meta:
+        ordering = ["path"]
+
+
+class ProcessingFileVersion(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    document = models.ForeignKey(ProcessingFile, on_delete=models.PROTECT, related_name="revisions")
+    revision = models.PositiveIntegerField()
+    file = models.FileField(upload_to=resource_path)
+    sha256 = models.CharField(max_length=64)
+    size = models.PositiveBigIntegerField()
+    note = models.CharField(max_length=500, blank=True)
+    source_modified_at = models.DateTimeField(null=True, blank=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    uploaded_by = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+    class Meta:
+        ordering = ["-revision"]
+        constraints = [models.UniqueConstraint(fields=["document", "revision"], name="unique_processing_file_revision")]
+
+
 class SiteMedia(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     site = models.ForeignKey(Site, on_delete=models.PROTECT, related_name="tower_media")

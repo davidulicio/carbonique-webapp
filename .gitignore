@@ -21,5 +21,5 @@ test-results/
 # Private tower endpoint configuration, even if accidentally placed in checkout.
 *monitor-stations*.json
 !monitor-stations.example.json
-# Contains LI-COR login details; install from the private source on the VM.
+# Retired procedure contains device login details; keep it outside the repository.
 /seed/protocols/Data_download.pdf

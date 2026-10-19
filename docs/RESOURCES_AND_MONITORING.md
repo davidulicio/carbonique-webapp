@@ -1,11 +1,11 @@
-# Site resources and tower monitoring — 2026-10-16
+# Site resources and tower monitoring
 
 The application runs from the repository root using `manage.py`. Site resources
 and tower monitoring share its accounts, site access rules and database.
 
 ## Upgrade an existing VM
 
-Back up the database and media together before migrating. From the Hub directory,
+Back up the database and media together before migrating. From the repository root,
 using its Python environment:
 
 ```bash
@@ -50,46 +50,31 @@ The export explicitly lacks the live stock/equipment database; instrument
 specifications remain visible under Sites & instruments. Purchase dates and
 unknown serial numbers have not been invented to populate tracked equipment.
 
-The library includes all eight protocol entries. Seven PDFs are preserved under
-`seed/protocols/`. The original `Data_download.pdf` contains default LI-COR login
-details, so that file is excluded from Git and Docker build contexts. Its local
-original is preserved, and `import_resources` copies it into protected media
-storage when available. Admins and
-managers can upload PDF documents, replace a PDF, change its description or
-archive it. Every team role can read and download installed protocols. A missing private
-source is shown as awaiting installation, with no broken download button. Files remain private
-behind authenticated Django routes. Mozilla PDF.js 6.4.299 is bundled locally
-under its Apache-2.0 license; documents are not sent to an external PDF service.
+The protocol library contains seven bundled original PDFs. Managers/admins can
+upload, replace and archive PDFs; all team roles can read/download installed
+files. The data-download procedure is retired and removed by migration 0006.
+Mozilla PDF.js is bundled with its Apache-2.0 license, so PDFs are not sent to an
+external viewer. Protected media remains authenticated and site scoped.
 
-Each site's condition has a status, free-text statement, review/restriction date,
-editor and timestamp. The date never automatically makes a site accessible.
-An overdue review is explicitly shown. Only admins/managers with access to that
-site can change it. Videos/GIFs use the same access restrictions and can be
-uploaded under Sites & instruments; MP4, WebM, GIF, WebP, JPEG and PNG are accepted.
-No sample tower video is included because none was supplied.
+Twenty current INIs copied from the supplied TraceAnalysis source initialize a
+separate versioned library in Data & processing. The original eight configuration
+evidence files are retained. See [Processing files](PROCESSING_FILES.md).
 
-The Carbonique logos, palette, Roboto body, Roboto Condensed headings and Roboto
-Mono variable labels are bundled locally. The latest provided public HTML
-replaces `public/fieldnotes/index.html` and remains an independent public snapshot.
-Private site conditions, BADM, media and telemetry are never added to that public
-snapshot automatically. Do not publish private material through public-reference
-settings unless intended.
+Each site's condition has a status, statement, review/restriction date, editor
+and timestamp. An overdue date prompts review; it never automatically opens a
+site. Managers/admins with access can edit it. Tower media accepts MP4, WebM,
+GIF, WebP, JPEG and PNG in the authenticated site resource controls.
 
-## Install the credential-bearing protocol privately
+Per-note documents, images, audio and video can be recorded in off-site planning,
+on-site work and History. Files target a particular task/activity/observation,
+are queued with offline field notes, and remain authenticated. The default limit
+is 25 MiB per file; tower media has a separate 100 MiB limit.
 
-Copy the original `Data_download.pdf` to a directory outside the checkout and web
-root on the VM, for example `/etc/carbonique/protocols/`. Give only the service
-account access, then run:
-
-```bash
-python manage.py import_resources --protocol-directory /etc/carbonique/protocols
-```
-
-Alternatively set `PRIVATE_PROTOCOLS_DIR=/etc/carbonique/protocols` in the VM
-environment before importing, or use the protocol card’s Edit / archive action
-to upload the original through the authenticated app. The private original
-becomes a protected `MEDIA_ROOT` file and is never added to Git. Other protocol
-PDFs can also be uploaded there in future. Keep database/media backups private.
+Carbonique logos, colors and Roboto fonts are bundled locally. The live public
+report now reads sites, visits and caveats from the database, including site
+conditions and all caveat statuses. BADM, inventory, protocols, tower telemetry
+and newly uploaded note media stay in the team workspace. See
+[Public site](PUBLIC_SITE.md).
 
 ## BADM scope and checks
 
@@ -218,6 +203,6 @@ and failure handling. Final routing/firewall checks must be done on the VM.
 ## Verification
 
 See [VALIDATION.md](VALIDATION.md) for the application checks and deployment
-boundaries. Public report presentation and export documentation may be updated
-independently of the underlying supplied scientific records. Original protocol
-PDFs, structured inventory records, photographs, plots and INI files are retained.
+boundaries. The public report is generated from current records, and its HTML
+export is a snapshot. Seven protocol PDFs, structured inventory records, supplied
+photographs/plots and historical/current INI source copies are retained.

@@ -59,33 +59,35 @@ Open **http://127.0.0.1:8000/** for the team workspace and **http://127.0.0.1:80
 
 To start without the bundled records, use `python manage.py setup_hub` without `--with-reference` and create sites under Administration.
 
-## Public Field Notes: drop in a replacement HTML
+## Public Field Notes: current records, read only
 
-The supplied `carbonique_fieldnotes` report is included at:
+Open **/fieldnotes/** without signing in. The server builds this report from the
+current database: site descriptions and conditions, field visits and observations,
+and data caveats. Saving a change in the team workspace updates the report on its
+next page load. Draft caveats are labeled awaiting review; resolved caveats remain
+visible with their status. There is no separate publication checkbox.
 
-```text
-public/fieldnotes/index.html
-```
+The report retains the supplied site photographs, diagnostic plots, tower
+diagrams, common setup and processing INI downloads. Inventory, BADM, protocols,
+monitoring, accounts and newly uploaded operational attachments stay in the
+authenticated workspace. Public visitors have no editing controls or write API.
 
-Replace this file with your updated self-contained HTML, keeping the filename. **/fieldnotes/** immediately reads the current file on the running server, without a login, database import or restart. The maintenance timeline, caveats, plots, site cards and mast diagrams remain those of the supplied report.
-
-- If you replace the file on the server, the next page load uses the new version.
-- If you upload it to GitHub, pull/deploy that commit to the server.
-- The supplied Docker Compose setup mounts this folder, so host-file replacements appear immediately.
-- It runs in a sandbox that allows its own scripts but isolates it from private workspace cookies and APIs.
-- The public HTML is a snapshot; replacing it does not overwrite database records.
-
-An optional database-driven public view at **/reference/** publishes only selected sites and reviewed caveats. Enable `PUBLIC_REFERENCE_ENABLED=True`, then explicitly mark sites and caveats for publication. The richer original HTML remains available at `/fieldnotes/`.
+**Download HTML** produces a self-contained snapshot with embedded assets and
+INI downloads. It can be shared or hosted on GitHub Pages, but must be exported
+again after later changes. The live app requires a Django server. `/reference/`
+redirects to the same report. `public/fieldnotes/index.html` is retained only as
+the original source archive; replacing it does not change the live report.
+See [Public site behavior](docs/PUBLIC_SITE.md).
 
 ## What the team workspace includes
 
 | Section | Features |
 |---|---|
 | Overview | Site network, editable site conditions, pending tasks, visits and unresolved caveats |
-| Field work | Off-site planning; on-site visits; task completion; unplanned work; observations; checklists |
+| Field work | Off-site planning; on-site visits; tasks; observations; checklists; documents, images, audio and video attached to individual notes |
 | History | Searchable visits and all task activity, classifications, frozen report revisions, CSV exports and attachments |
 | Sites & instruments | Tabs for reference metadata, sensor-height/deployment history, site equipment, visits, photos/documents and DOI records |
-| Data & processing | Draft/reviewed/resolved caveats, affected periods, evidence and immutable configuration versions |
+| Data & processing | Draft/reviewed/resolved caveats, evidence, current INI file library with revision history, and scientific configuration history |
 | Inventory | Serial numbers, models, current locations, service-history/files tabs and archived equipment |
 | Site resources | ICOS BADM records, completeness checks and exports; tower photos, videos and GIFs |
 | Protocols | In-app PDF reading, downloads and manager/admin document uploads |
@@ -104,13 +106,13 @@ The selected site is shared by all sections. The browser polls changes every 15 
 | Manager | Yes | Yes | Yes; also site conditions, BADM, protocols and tower media | No |
 | Admin | Yes | Yes | Yes | Yes |
 
-Only managers and administrators edit site conditions, BADM, protocols and tower media. Every team role with site access can download BADM/protocols and view monitoring. A superuser is an administrator. Other accounts need a `TeamMember` role. An empty allowed-sites list means all sites; selecting sites restricts access to those sites. The public HTML is intentionally visible to everyone independently of private team restrictions. Create accounts in Administration; passwords are hashed by Django. No automatic invitation email is sent.
+Only managers and administrators edit site conditions, BADM, protocols and tower media. Every team role with site access can download BADM/protocols and view monitoring. A superuser is an administrator. Other accounts need a `TeamMember` role. An empty allowed-sites list means all sites; selecting sites restricts access to those sites. The public site/visit/caveat report is visible to everyone independently of team site restrictions. Write these records with that public audience in mind. Create accounts in Administration; passwords are hashed by Django. No automatic invitation email is sent.
 
 ## Offline fieldwork
 
 1. Sign in while connected, on a trusted device.
 2. Use **Prepare for fieldwork** and select the sites and attachments to download.
-3. Open the prepared site. Visits, tasks, observations, draft issues and files are stored in IndexedDB before upload.
+3. Open the prepared site. Visits, tasks, observations, draft issues and their files are stored in IndexedDB before upload. Each note and its dependent files enter the queue together; upload order preserves their associations.
 4. The app can be reopened offline after its shell and site data have been prepared. This needs **HTTPS**, or `localhost` / `127.0.0.1` during development.
 5. Reconnect and open the app. Check that the sync queue is empty before clearing the device.
 
@@ -133,20 +135,43 @@ The app must be open to upload; it does not promise synchronization while a phon
 `migrate` creates the new database schema. `setup_hub --with-reference` loads
 the bundled reference and maintenance checklists without requiring Hank's
 database. It includes the six sites, 127 classified visit summaries, 19 caveats,
-site/instrument descriptions, photos, diagnostic plots, eight processing INI
-files and the protocol catalogue. The scientific records retain their source IDs
+site/instrument descriptions, photos, diagnostic plots, eight historical processing
+INI files, twenty current INI source copies and seven protocol PDFs. The scientific records retain their source IDs
 and uncertainties. Site conditions, new field operations and additional BADM
 records are maintained in this app.
 
-See [docs/IMPORTS.md](docs/IMPORTS.md) for the source map, repeat imports and the
-private protocol installation. Create your own administrator account; old
+See [docs/IMPORTS.md](docs/IMPORTS.md) for the source map and repeat imports, and
+[the INI library guide](docs/PROCESSING_FILES.md) for file updates and revisions. Create your own administrator account; old
 accounts and passwords are not imported.
+
+## Updating INI files
+
+In **Data & processing → TraceAnalysis INI library**, researchers, managers and admins
+can select multiple `.ini` files, drop files onto the panel or choose a folder.
+Changed files create immutable revisions; uploading identical current bytes
+does not create a duplicate. Read, download and inspect prior revisions there.
+All team roles can read files permitted by their site access. Shared/unassigned
+files require network-wide access to update. Uploads need a connection.
+
+Twenty files copied from the supplied TraceAnalysis directory initialize the
+library. Original files are never changed or executed. See
+[Processing files](docs/PROCESSING_FILES.md) for limits and repeat imports.
 
 ## Deployment
 
-See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for a Linux/Gunicorn installation and Docker Compose with PostgreSQL. GitHub stores the source; **GitHub Pages cannot run this Django backend**. Serve the application at the root of its own hostname; subpath hosting such as `/ecoflux/` is not configured in this build.
+See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for Linux/Gunicorn and Docker
+Compose with PostgreSQL. GitHub stores source; GitHub Pages can host an exported
+public snapshot, while the live report and team workspace require the server.
+Serve at the root of a dedicated hostname; subpath hosting is not configured.
 
-Before production, set a strong random `SECRET_KEY`, `DEBUG=False`, your hostname in `ALLOWED_HOSTS`, HTTPS/CSRF origin settings, a persistent database/media location, and SMTP if password resets are needed. The application refuses an insecure development secret with `DEBUG=False`.
+Before production, set a random `SECRET_KEY`, `DEBUG=False`, allowed hostname,
+HTTPS/CSRF settings, persistent database/media and SMTP for password resets.
+The app rejects the development secret with `DEBUG=False`.
+
+For an existing installation: back up database/media, deploy source, run
+`python manage.py migrate`, `python manage.py import_resources` and
+`python manage.py collectstatic --noinput`, then restart the service. Imports
+preserve existing records and later INI uploads.
 
 ## Checks and backups
 
@@ -164,7 +189,7 @@ python manage.py backup_hub --output backups/carbonique.zip
 python manage.py restore_hub --file /path/to/carbonique.zip
 ```
 
-Public `public/fieldnotes/index.html` is managed by the repository and should be backed up through Git as well.
+The live public report is rebuilt from database records and stored scientific images/INIs. Back up database and media together; keep bundled source archives under Git.
 
 ## Important information for GitHub users
 
@@ -172,16 +197,16 @@ This repository contains the standalone application. Run commands from its root;
 there is one Django entry point, `manage.py`. GitHub stores the source; the running
 service and its persistent data belong on a VM or another Django-capable host.
 
-- **Public content:** `public/fieldnotes/index.html` and the bundled `seed/` reference
-  files are part of the repository. The report is accessible without signing in
-  when `PUBLIC_FIELDNOTES_ENABLED=True`, the default. Review replacements before
-  committing them. Team records are accessible only after authentication.
+- **Public content:** `/fieldnotes/` exposes all sites, visits and caveats when
+  `PUBLIC_FIELDNOTES_ENABLED=True`, the default. Drafts and resolved caveats are
+  included and labeled. Uploaded note files remain protected. The bundled `seed/`
+  and historical HTML source files are also part of the repository.
 - **Private configuration:** never commit `.env`, actual tower connection files,
   credentials, databases, uploaded media or backups. `.env.example` contains local
-  development placeholders and is safe to copy; use new production secrets.
-- **Private protocol:** `Data_download.pdf` includes device login details and is
-  intentionally excluded. Install it privately using the instructions in
-  [Resources and monitoring](docs/RESOURCES_AND_MONITORING.md).
+  development placeholders; use new production secrets.
+- **Protocol catalogue:** seven PDFs are included. The data-download protocol
+  has been retired and is removed by the upgrade migration.
+
 - **Read-only monitoring:** tower queries are restricted on the server. Configure
   private network access on the VM; the application provides no instrument controls.
 - **Scientific scope:** supplied visit descriptions are classified summaries,

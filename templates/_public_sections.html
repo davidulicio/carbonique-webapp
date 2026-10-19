@@ -1,0 +1,6 @@
+{% for section in sections %}
+<section class="reference-section"><h4>{{ section.heading }}</h4>
+{% if section.items %}<dl>{% for item in section.items %}{% if item.key %}<dt>{{ item.key }}</dt>{% endif %}<dd{% if not item.key %} class="full"{% endif %}>{{ item.value|linebreaksbr }}</dd>{% endfor %}</dl>{% endif %}
+{% if section.groups %}<div class="instruments">{% for group in section.groups %}<section><h5>{{ group.heading }}</h5><dl>{% for item in group.items %}{% if item.key %}<dt>{{ item.key }}</dt>{% endif %}<dd{% if not item.key %} class="full"{% endif %}>{{ item.value|linebreaksbr }}</dd>{% endfor %}</dl></section>{% endfor %}</div>{% endif %}
+</section>
+{% endfor %}

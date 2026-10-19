@@ -1,9 +1,10 @@
 # Validation and release checks
 
 The standalone application was checked on Windows with Python 3.12 and
-Django 5.2.18. Its 76 backend tests cover field workflows, role/site restrictions,
+Django 5.2.18. Its 111 backend tests cover field workflows, role/site restrictions,
 retry-safe operations, version conflicts, frozen reports, imports, resource
-permissions, BADM checks/exports, protected media and read-only monitoring.
+permissions, BADM checks/exports, protected media, live public reports, imported
+caveat review, per-note uploads, INI revisioning and read-only monitoring.
 
 ## Repeatable checks
 
@@ -25,6 +26,8 @@ node --check static/hub/monitor.js
 node --check static/hub/pdf-viewer.js
 node --check static/hub/storage.js
 node --check static/hub/sw.js
+node --check static/hub/processing-files.js
+node --check static/hub/public-report.js
 ```
 
 GitHub Actions runs these checks on Linux from
@@ -41,7 +44,13 @@ They do not establish connectivity to actual towers.
 Browser checks during feature development covered the public report, offline
 fieldwork/reconnection, site tabs, forms, mobile layout, multi-page protocol
 reading, BADM forms, network checks and individual tower status. The standalone
-public report retains the supplied data and uses native browser downloads.
+public report retains the supplied scientific material and uses native browser
+downloads. The latest isolated browser checks covered resolving an imported
+caveat while retaining eight linked configurations, current public status and
+site diagrams/photos, a second INI revision with its original retained, planning
+attachments, offline note/photo/document persistence across a full reload,
+reconnection without duplicate uploads, and files added to a closed visit note.
+No test accounts or test scientific edits are installed in the working database.
 
 ## Deployment validation
 

@@ -156,6 +156,9 @@ def apply_operation(user, operation):
         note = VisitObservation.objects.create(id=record_id, visit=visit, text=nonempty(payload.get("text"), "Observation", 20000), author=user, author_name=name, occurred_at=occurred_at)
         audit(user, kind, note, site)
     elif kind.startswith("task."):
+        activity_id = entity_uuid(payload["activity_id"]) if payload.get("activity_id") else uuid.uuid4()
+        if TaskActivity.objects.filter(pk=activity_id).exists():
+            raise Conflict("Another task activity already uses this identifier.")
         visit = same_site_visit(site, payload.get("visit_id"))
         text = str(payload.get("text", ""))[:20000]
         if kind == "task.create":
@@ -213,7 +216,8 @@ def apply_operation(user, operation):
                     raise ValidationError("Unknown task operation.")
                 task.version += 1
                 task.save()
-        TaskActivity.objects.create(task=task, visit=visit, action=action, task_title=task.title, text=text, author=user, author_name=name, occurred_at=occurred_at)
+        TaskActivity.objects.create(id=activity_id, task=task, visit=visit, action=action, task_title=task.title, text=text, author=user, author_name=name, occurred_at=occurred_at)
+        result["activity_id"] = str(activity_id)
         result["record"] = TaskSerializer(task).data
         audit(user, kind, task, site, {"version": task.version})
     elif kind == "caveat.draft":

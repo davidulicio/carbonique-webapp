@@ -16,10 +16,7 @@ from hub.models import Protocol, ConfigurationVersion, Attachment, ImportRecord,
 
 
 class Command(BaseCommand):
-    help = "Import all bundled inventory-export information, INI files and eight protocols; safe to rerun."
-
-    def add_arguments(self, parser):
-        parser.add_argument("--protocol-directory", help="Private source directory for credential-bearing protocol PDFs; files are copied into protected media storage.")
+    help = "Import all bundled inventory-export information, INI files and seven protocols; safe to rerun."
 
     @transaction.atomic
     def handle(self, *args, **options):
@@ -75,7 +72,6 @@ class Command(BaseCommand):
             ImportRecord.objects.create(source="inventory-export", source_id=source_id, entity_type="hub.configurationversion", entity_id=str(config.pk), payload=entry)
         titles = {
             "Biomet_Maintenance_Protocol.pdf": ("Biomet sensor maintenance", "maintenance"),
-            "Data_download.pdf": ("Data download procedure", "data"),
             "Field Work Safety Plan.pdf": ("Field work safety plan", "safety"),
             "Fieldwork_maintenance_and_procedures.pdf": ("Fieldwork maintenance and procedures", "general"),
             "Maintenance_LI7200RS.pdf": ("LI-7200RS maintenance", "maintenance"),
@@ -84,21 +80,11 @@ class Command(BaseCommand):
             "Methanol Handling Procedure and Protocol.pdf": ("Methanol handling procedure and protocol", "safety"),
         }
         catalogue = json.loads((settings.BASE_DIR / "seed/protocols/catalogue.json").read_text(encoding="utf-8"))
-        private_dir = options.get("protocol_directory") or settings.PRIVATE_PROTOCOLS_DIR
         for filename, (title, category) in titles.items():
             path = settings.BASE_DIR / "seed/protocols" / filename
             info = catalogue[filename]
-            if info["private_source"] and private_dir:
-                path = Path(private_dir) / filename
-            if not path.is_file() and not info["private_source"]:
+            if not path.is_file():
                 raise CommandError(f"Missing supplied protocol: {filename}")
-            obj, _ = Protocol.objects.get_or_create(pk=uuid.uuid5(uuid.NAMESPACE_URL, "carbonique-protocol:" + filename), defaults={"title": title, "category": category, "bundled_file": "" if info["private_source"] else filename, "filename": filename, "sha256": info["sha256"], "size": info["size"], "revision": info["revision"], "summary": "Original supplied protocol. Open the PDF for the complete instructions, figures and revision details."})
-            if info["private_source"] and path.is_file() and not obj.file:
-                data = path.read_bytes()
-                if hashlib.sha256(data).hexdigest() != info["sha256"]:
-                    raise CommandError("Private source PDF differs from the supplied version. Upload a revised protocol through the app instead.")
-                obj.bundled_file = ""
-                obj.file.save(filename, ContentFile(data), save=True)
-            elif info["private_source"] and not path.is_file() and not obj.file:
-                self.stdout.write("Data download protocol needs private installation or an administrator upload; its source contains login details and is excluded from Git.")
+            Protocol.objects.get_or_create(pk=uuid.uuid5(uuid.NAMESPACE_URL, "carbonique-protocol:" + filename), defaults={"title": title, "category": category, "bundled_file": filename, "filename": filename, "sha256": info["sha256"], "size": info["size"], "revision": info["revision"], "summary": "Original supplied protocol. Open the PDF for the complete instructions, figures and revision details."})
+        call_command("import_processing_files", stdout=self.stdout)
         self.stdout.write(self.style.SUCCESS(f"Resource snapshot installed: {len(sites['sites'])} sites, {len(notes)} source notes, {len(caveats)} caveats, {len(ini_files)} INI files and {len(titles)} protocols. Existing edits preserved."))

@@ -63,7 +63,7 @@ docker compose up -d web
 
 4. Put the HTTPS reverse proxy in front of `127.0.0.1:8000`. Include `localhost,127.0.0.1` in ALLOWED_HOSTS for the internal healthcheck.
 
-Database and media have persistent named volumes. `public/fieldnotes/` is bind-mounted read-only into the container, so replacing its HTML on the host updates the public report without rebuilding the image. Do not use `docker compose down -v` unless intentionally deleting persistent data.
+Database and media have persistent named volumes. The public report reads those current records; it does not require an HTML bind mount. Do not use `docker compose down -v` unless intentionally deleting persistent data.
 
 ## Update from GitHub
 
@@ -80,7 +80,7 @@ python manage.py collectstatic --noinput
 sudo systemctl restart carbonique
 ```
 
-For a pure Field Notes replacement in `public/fieldnotes/index.html`, a source pull/file copy is enough; Django reads the current file at each request. Keep local uncommitted report changes separate from Git updates or commit them first.
+Changes made through team editors appear on the next public page load without a code deployment. Re-export any separately hosted HTML snapshot after updates. Replacing the historical source HTML does not update the live report. See [Public site](PUBLIC_SITE.md).
 
 For site conditions, BADM, protocols, videos and read-only tower polling, see
 [Resources and monitoring](RESOURCES_AND_MONITORING.md). The private monitor
@@ -89,16 +89,17 @@ the analyzers. The supplied nginx template allows 100 MiB tower media uploads.
 
 ## Public and private views
 
-- `/fieldnotes/`: public original report, available by default. Replacing its HTML updates only that public snapshot.
-- `/reference/`: optional database-generated selected site/caveat reference, disabled by default. It excludes private team operations.
+- `/fieldnotes/`: current public sites, visits and caveats, available by default.
+- `/fieldnotes/download/`: self-contained public HTML snapshot.
+- `/reference/`: redirect to the same live report.
 - `/`: authenticated team application.
 - `/admin/`: Django staff/superuser administration.
 - `/health/`: database connectivity healthcheck; no research records.
 
-The public HTML is sandboxed without same-origin privileges. Do not add external scripts or separate relative files to it; use a self-contained report as in the original repository.
+The public report is sandboxed without same-origin privileges. All assets are embedded; no private APIs are called. Disable all public report routes with `PUBLIC_FIELDNOTES_ENABLED=False`. GitHub Pages may serve an exported snapshot; live updates require the Django server.
 
 ## Backups and restore
 
 Use `pg_dump` or your database's normal tooling plus the media directory for live production backups. The portable `backup_hub` command includes Django fixture data and media; pause writers while it runs to keep database and files consistent. Store backups off-server and outside the repository. Secrets such as SECRET_KEY and SMTP credentials are not included and need their own secure configuration backup.
 
-Restore portable backups only into an empty, migrated database and empty media directory. `restore_hub` refuses to overwrite an existing workspace and validates archive paths. Verify file counts and open representative attachments after restore. Keep the public HTML under Git version control.
+Restore portable backups only into an empty, migrated database and empty media directory. `restore_hub` refuses to overwrite an existing workspace and validates archive paths. Verify file counts and open representative attachments after restore. Back up protected INI revisions and attachments with the database; keep source archives under Git.

@@ -38,8 +38,8 @@ does not automatically declare the site open or safe.
 
 Site reference describes the installed arrangement. Inventory tracks individual
 equipment identities and service history. Field work records what happened on a
-visit; Data & processing records its scientific consequences. A public report is
-an editorial snapshot and is maintained separately from the editable workspace.
+visit; Data & processing records its scientific consequences. The public report
+reads sites, visits and caveats directly from these records on each page load.
 
 ### Plan, record and finish field work
 
@@ -52,7 +52,14 @@ an editorial snapshot and is maintained separately from the editable workspace.
 4. Close the visit after reviewing its contents. Closing creates a frozen report.
    Later task changes do not rewrite that report. Reopening and reclosing a visit
    creates another report revision.
-5. Use History to retrieve the visit, its reports and task activity.
+5. Use History to retrieve the visit, its reports and task activity. Expand
+   **Individual notes & attachments** to read or add files to a particular note.
+
+Planning notes, on-site observations and task activity each accept documents,
+images, audio and video, both when recorded and later. Note files stay associated
+with that individual entry. Files added after closure do not rewrite a frozen
+report. Files are queued with their notes offline; the default limit is 25 MiB
+per file. Audio/video support protected range requests for playback and seeking.
 
 ### Prepare for disconnected work
 
@@ -80,9 +87,8 @@ download installed protocols and BADM exports.
   ICOS ETC review is still required. A site ZIP contains grouped CSV files, full
   JSON records, definitions, provenance and validation results.
 - **Protocols:** open a document to read it or download the PDF. Managers can
-  upload documents, replace revisions and archive entries. The data-download
-  protocol requires private installation because its original contains device
-  login details; an uninstalled entry is labeled accordingly.
+  upload documents, replace revisions and archive entries. Seven protocols are
+  bundled; the retired data-download procedure is removed on upgrade.
 - **Tower media:** upload MP4, WebM, GIF, WebP, JPEG or PNG under the site's
   resource controls. Files remain protected by site access. The default limit
   is 100 MiB per item.
@@ -111,11 +117,22 @@ scientific records and inventory. Managers additionally maintain site resources;
 administrators manage accounts and sites. Site restrictions apply on the server,
 not just to visible buttons. See the role table in the [README](../README.md).
 
-`/fieldnotes/` serves the public report. Replacing
-`public/fieldnotes/index.html` updates that report without importing data or
-restarting the server. It does not publish private team edits automatically.
-`/reference/` is a separate optional public view of explicitly selected database
-records, disabled by default.
+`/fieldnotes/` is the public read-only report. Site descriptions/conditions,
+visits and caveats update on its next load after a team edit. Drafts are labeled
+awaiting review; resolved caveats remain visible. Inventory, BADM, protocols,
+monitoring and uploaded note files require team access. **Download HTML** saves
+a self-contained public snapshot; `/reference/` redirects to the same live report.
+See [Public site](PUBLIC_SITE.md).
+
+### Update processing INIs
+
+Open **Data & processing → TraceAnalysis INI library** to read/download current files,
+inspect versions or upload multiple files/a folder. Researchers, managers and
+admins with the appropriate site access may upload. Changed files add revisions;
+identical current bytes are skipped. Twenty source copies initialize this library.
+The eight original configuration evidence files remain under Scientific
+configuration history. The source directory is never modified or executed.
+See [Processing files](PROCESSING_FILES.md).
 
 ## 2. Technical aspects and how it works
 
@@ -136,11 +153,13 @@ alternative deployment package.
 | `hub/services.py` | Ordered field operations and retry/conflict handling |
 | `hub/resources_api.py`, `hub/badm.py` | Conditions, protocols, media, BADM validation and exports |
 | `hub/monitor.py`, `hub/licor.py` | Server-side tower queries, allowlist, cooldowns, snapshots and response redaction |
-| `hub/views.py`, `templates/` | Page rendering, public report isolation and protected downloads |
+| `hub/views.py`, `hub/public_report.py`, `templates/` | Live public projection, page rendering and report export |
+| `hub/processing_files.py`, `static/hub/processing-files.js` | Versioned INI validation, permissions, downloads and interface |
+| `hub/media.py` | Protected attachment/site-media range streaming |
 | `static/hub/app.js` | Navigation, workspace state and field/scientific forms |
 | `static/hub/resources.js`, `monitor.js`, `pdf-viewer.js` | Resource editors, monitor interface and local PDF reader |
 | `static/hub/storage.js`, `sw.js` | IndexedDB, outbox, prepared files and offline app shell |
-| `seed/`, `public/fieldnotes/` | Bundled reference import sources and public editorial report |
+| `seed/`, `public/fieldnotes/` | Bundled reference, current INI source copies and historical report archive |
 | `hub/management/commands/`, `scripts/` | Setup, imports, backup/restore, polling and source extraction |
 | `deploy/`, `Dockerfile`, `compose.yaml` | VM service, reverse proxy and container examples |
 | `hub/tests.py`, `hub/test_resources.py`, `hub/test_monitor.py` | Backend workflow, resource and monitoring regression coverage |
@@ -192,8 +211,8 @@ reads the JSON directly. Regeneration uses the development script and openpyxl.
 Protocol originals live in protected storage or the bundled protocol directory.
 PDF.js is bundled locally, so reading does not send documents to an external
 viewer. Site video supports range requests for playback while retaining access
-checks. `Data_download.pdf` is excluded from Git and Docker; install its private
-original through `import_resources --protocol-directory` or an authorized upload.
+checks. Seven protocol PDFs are bundled; the retired data-download procedure
+is no longer catalogued or reimported.
 
 Tower checks read a private server file named by `MONITOR_STATIONS_FILE`. The
 server sends only fixed, allowlisted read queries over TCP 7200 and returns
@@ -230,8 +249,8 @@ routing, TLS, persistence and backups before use.
 | Login succeeds but no sites/actions appear | User is active, has a TeamMember role, and has access to the site; a superuser has admin access |
 | A write returns 403 | Role/site permissions, archived site, current session and CSRF configuration; do not remove authorization checks |
 | Sync stops or returns 409 | Inspect the first failed queue operation, current server version and account; preserve/export pending records before clearing storage |
-| Public report differs from team records | These are separate data sources; check `FIELDNOTES_HTML` and import/review updates deliberately |
-| Protocol is awaiting installation | Install the private source or upload it with manager/admin access; check file ownership and media permissions |
+| Public report differs from team records | Reload the live `/fieldnotes/`; exported HTML is a snapshot. Confirm database/media and the named public-field projection |
+| Protocol file is missing | Check deployed seed files, protected storage and file ownership; upload a replacement with manager/admin access |
 | Tower says not configured | Confirm its exact site code in the private station JSON and the service's `MONITOR_STATIONS_FILE` environment |
 | Tower is unreachable or stale | VM route/VPN, firewall, TCP 7200 reachability, service logs, last check time, collector and fixed timestamp offset |
 | BADM remains incomplete | Station class/identifier, required/applicable groups, record formats and outstanding scientific review |
@@ -246,5 +265,6 @@ the matching route in `carbonique/urls.py` and its handler. On a Linux VM, inspe
 Keep logs, screenshots and issue reports free of private records and credentials.
 
 Detailed references: [Architecture](ARCHITECTURE.md), [Imports](IMPORTS.md),
-[Resources and monitoring](RESOURCES_AND_MONITORING.md),
+[Resources and monitoring](RESOURCES_AND_MONITORING.md), [Public site](PUBLIC_SITE.md),
+[Processing files](PROCESSING_FILES.md),
 [Deployment](DEPLOYMENT.md) and [Source provenance](../UPSTREAM.md).

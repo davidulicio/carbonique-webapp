@@ -17,3 +17,7 @@
 @media(prefers-color-scheme:dark){:root{--ink:#dce8da;--muted:#96a391;--line:#354335;--paper:#1b251e;--white:#263329;--shadow:none}input,select,textarea,.button{background:var(--white);color:var(--ink)}.topbar{background:var(--white)}.task-card,.visit-card,.caveat-card{background:var(--white)}th{background:#223026}.task-top .check{background:#253b29}.task-card p{color:#adbda5}.stat .label{color:var(--muted)}.site-tile .code{color:#a4c28e}.pill{background:#344a2b;color:#bad5a2}.button.primary{background:#527748;border-color:#527748}.segmented{background:#283b2c}.segmented button.active{background:#40543b;color:#e6f0df}.visit-banner{background:#2b432e;border-color:#486447}.notice{background:#463d20;border-color:#6e6136;color:#e3ca88}.error{background:#4f312b;color:#ffb6a4}.user-badge{background:#354835;color:#c1ddb3}.metadata-row{border-color:var(--line)}}
 
 @media(prefers-color-scheme:dark){.topbar{background-image:linear-gradient(#263329ed,#263329ed),url('./ecoflux-winter.png')}.related-tabs [aria-selected=true]{color:#c1ddb3}}
+
+.note-entry{padding:12px 0;border-top:1px solid var(--line,#dce1d5)}.note-media{margin:12px 0}.note-media video{display:block;max-width:100%;max-height:360px}.note-media audio{display:block;width:100%;max-width:500px}
+
+.ini-drop-zone{padding:22px;margin:16px 0;text-align:center;border:2px dashed #a6b99b;border-radius:10px}.ini-drop-zone.dragging{background:#edf5e7;border-color:#327923}

@@ -8,13 +8,14 @@ For a guided user/developer introduction, see [Application overview](OVERVIEW.md
 - **hub** adds field workflows, deployments, dated settings, caveats, attachments, roles, audit events and import mappings.
 - **carbonique** contains portable settings, routes and ASGI/WSGI entry points.
 - **static/hub** is a dependency-free JavaScript interface. Assets are local; no frontend CDN is required during fieldwork.
-- **public/fieldnotes/index.html** is an independently replaceable public editorial snapshot.
+- **hub/public_report.py** builds the live, read-only public report from current records.
+- **public/fieldnotes/index.html** retains the original source archive only.
 
 ## Data relationships
 
 | Record | Relationships / purpose |
 |---|---|
-| Site | Existing canonical site row; metadata, archive status, publication flag |
+| Site | Canonical site row; metadata and archive status; legacy publication flag retained but unused by the public projection |
 | Visit | Site; optional one-to-one original EcoFlux FieldNote; crew, narrative and classification |
 | Task | Site; optional equipment; current state and optimistic version |
 | TaskActivity | Task; optional visit; immutable action and recorded title/author |
@@ -24,7 +25,8 @@ For a guided user/developer introduction, see [Application overview](OVERVIEW.md
 | Deployment | Instrument + site + nonoverlapping active interval; height/depth and variables |
 | ConfigurationVersion | Site; optional deployment; settings and explicit effective interval; correction may supersede another version |
 | DataCaveat | One or more sites; optional visit/equipment/configurations; affected period, treatment and review status |
-| Attachment | Permission-checked site; optional visit/equipment/caveat/configuration; hash and original filename |
+| Attachment | Permission-checked site; optional visit/task/activity/observation/equipment/caveat/configuration; hash and original filename |
+| ProcessingFile / ProcessingFileVersion | Relative INI path/site and immutable protected byte revisions, hashes and source timestamps |
 | SiteCondition | Site; access statement, review date, editor and optimistic version |
 | BadmProfile / BadmRecord | Site; station class/identifier, applicable groups and repeatable metadata observations |
 | Protocol / SiteMedia | Protected PDF library and site-specific video/image records |
@@ -53,7 +55,9 @@ Authenticated APIs use Django session authentication and CSRF validation. They a
 | `/api/sites/ID/media/`, `/site-media/ID/file/` | Site media metadata and protected range streaming |
 | POST `/api/sync/` | Ordered, idempotent field operations |
 | `/api/sites/`, `/api/equipment/`, `/api/deployments/`, `/api/caveats/` | Role-scoped CRUD without destructive delete endpoints |
-| `/api/configurations/` | Read/create immutable configuration versions |
+| `/api/configurations/` | Read/create immutable scientific configuration versions |
+| `/api/processing-files/`, `/processing-files/ID/` | INI library, bulk revision upload and protected original-byte downloads |
+| `/fieldnotes/`, `/fieldnotes/content/`, `/fieldnotes/download/` | Public current report and self-contained export; GET only |
 | `/api/dois/`, `/api/equipment-history/`, `/api/checklists/` | Related reference and maintenance records |
 | `/api/team/` | Admin-only team management |
 | POST `/api/attachments/` | Retry-safe multipart uploads |
@@ -69,13 +73,21 @@ Each operation has a unique ID, account namespace, target site, client-generated
 
 The outbox is synchronized while the app is open. It verifies the signed-in account before sending another account's records. Notes are append-only; task state changes use optimistic concurrency. Closed visits reject new field observations until explicitly reopened. Attachments can be added later without altering a frozen report.
 
-Uploaded files remain in IndexedDB until the upload is acknowledged, then are removed from the outbox. The report and data snapshot are refreshed after syncing. A queued conflict retains its local payload until reviewed, retried, exported or discarded.
+A note operation and its dependent files are enqueued in one IndexedDB transaction. Task activity has a stable client UUID so attachments can target an individual event before sync. Upload retries compare all association IDs and cannot silently relink files. Uploaded files remain in IndexedDB until acknowledged, then are removed from the outbox. The report and data snapshot are refreshed after syncing. A queued conflict retains its local payload until reviewed, retried, exported or discarded.
 
 ## Public reference
 
-`/fieldnotes/` embeds the report in a sandboxed iframe; `/fieldnotes/content/` also applies a response-level sandbox so direct access remains isolated. Inline scripts and styles and embedded image data are allowed, but same-origin privileges and authenticated API access are not. Every request reads the configured file, with caching disabled.
+`/fieldnotes/` embeds the current database report in a sandboxed iframe;
+`/fieldnotes/content/` also applies a response sandbox for direct access. The
+named projection includes sites, visits and all caveat statuses, known scientific
+images, tower diagrams and latest eligible INIs. Other resources and operational
+uploads stay authenticated. `/reference/` redirects to this report.
 
-The optional `/reference/` renders explicitly publishable database records. It is intentionally a smaller view and does not include crews, private visit logs, uploaded operational documents or equipment serial numbers.
+Inline scripts/styles and embedded image/font data are permitted; same-origin
+privileges, external requests and private API access are blocked. Responses use
+no-store. `/fieldnotes/download/` returns a self-contained snapshot. See
+[Public site](PUBLIC_SITE.md) for field scope and [Processing files](PROCESSING_FILES.md)
+for version storage. The source HTML archive is not a live input.
 
 ## Boundaries
 

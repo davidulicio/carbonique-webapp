@@ -25,19 +25,23 @@ against staging data with explicit source mappings.
 ## Reference sources and editable records
 
 The bundled snapshot contains six sites, 127 classified visit summaries,
-19 data caveats, photographs, plots and eight TraceAnalysis INI files.
+19 data caveats, photographs, plots and eight historical TraceAnalysis INI files.
+Twenty current INI source copies initialize a separate immutable revision library.
 Imports retain source IDs and preserve later edits. Classified summaries are
 not verbatim source field notes. Unknown equipment identities and historical
 period boundaries remain unspecified for review.
 
-The public report is maintained separately from team database records. Replacing
-the HTML does not overwrite edited caveats, site conditions, BADM or inventory,
-and private edits are not automatically published in the report.
+The public report now reads current sites, visits and caveats directly. Draft,
+reviewed and resolved statuses remain visible. Unknown imported authors are valid;
+review timestamps are recorded on later transitions. The original HTML remains
+a source archive; downloaded HTML is a standalone snapshot.
 
-Original protocol PDFs remain unchanged. Seven are bundled; the data-download
-protocol is installed privately because it contains device login details.
-Runtime uploads, local databases, credentials and backups stay outside Git.
-`seed/media` and the inventory reference export are intentionally tracked.
+Original retained protocol PDFs remain unchanged. Seven are bundled; the retired
+data-download procedure and its installed protected copy are removed by migration.
+Runtime uploads, databases, credentials and backups stay outside Git. The source
+reference media and processing-file copies are intentionally tracked. The supplied
+TraceAnalysis source directory is read only; uploads create protected revisions.
+See [Public site](PUBLIC_SITE.md) and [Processing files](PROCESSING_FILES.md).
 
 ## Application boundaries
 

@@ -280,48 +280,8 @@ def media_file(request, pk):
     if not obj:
         raise Http404()
     require_site(request.user, obj.site_id)
-    from .views import file_response
-    try:
-        size = obj.file.size
-    except (OSError, ValueError):
-        raise Http404("The media file is missing from storage.")
-    requested_range = request.headers.get("Range")
-    if requested_range:
-        match = re.fullmatch(r"bytes=(\d*)-(\d*)", requested_range)
-        if not match or not any(match.groups()):
-            response = HttpResponse(status=416)
-            response["Content-Range"] = f"bytes */{size}"
-            return response
-        first, last = match.groups()
-        start = int(first) if first else max(0, size - int(last))
-        end = min(int(last), size - 1) if first and last else size - 1
-        if start > end or start >= size:
-            response = HttpResponse(status=416)
-            response["Content-Range"] = f"bytes */{size}"
-            return response
-        def chunks():
-            with obj.file.open("rb") as stream:
-                stream.seek(start)
-                remaining = end - start + 1
-                while remaining:
-                    chunk = stream.read(min(65536, remaining))
-                    if not chunk:
-                        break
-                    remaining -= len(chunk)
-                    yield chunk
-        response = StreamingHttpResponse(chunks() if request.method != "HEAD" else (), status=206, content_type=obj.content_type)
-        response["Content-Range"] = f"bytes {start}-{end}/{size}"
-        response["Content-Length"] = end - start + 1
-        response["Cache-Control"] = "private, no-store"
-        response["X-Content-Type-Options"] = "nosniff"
-    elif request.method == "HEAD":
-        response = HttpResponse(content_type=obj.content_type)
-        response["Content-Length"] = size
-        response["Cache-Control"] = "private, no-store"
-    else:
-        response = file_response(obj.file, obj.filename, obj.content_type, inline=request.GET.get("download") != "1")
-    response["Accept-Ranges"] = "bytes"
-    return response
+    from .media import stream_file
+    return stream_file(request,obj.file,obj.filename,obj.content_type,download=request.GET.get("download")=="1")
 
 
 @api_view(["GET"])

@@ -152,7 +152,9 @@ class DataCaveat(models.Model):
     status = models.CharField(max_length=15, choices=[("draft", "Draft"), ("reviewed", "Reviewed"), ("resolved", "Resolved")], default="draft")
     public_reference = models.BooleanField(default=False)
     evidence = models.JSONField(default=dict, blank=True)
-    created_by = models.ForeignKey(django_settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
+    created_by = models.ForeignKey(django_settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.SET_NULL)
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
     version = models.PositiveIntegerField(default=1)
     updated_at = models.DateTimeField(auto_now=True)
     def clean(self):
@@ -168,6 +170,9 @@ class Attachment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     site = models.ForeignKey(Site, on_delete=models.PROTECT, related_name="attachments")
     visit = models.ForeignKey(Visit, null=True, blank=True, on_delete=models.PROTECT, related_name="attachments")
+    task = models.ForeignKey(Task, null=True, blank=True, on_delete=models.PROTECT, related_name="attachments")
+    activity = models.ForeignKey(TaskActivity, null=True, blank=True, on_delete=models.PROTECT, related_name="attachments")
+    observation = models.ForeignKey(VisitObservation, null=True, blank=True, on_delete=models.PROTECT, related_name="attachments")
     equipment = models.ForeignKey(Equipment, null=True, blank=True, on_delete=models.PROTECT, related_name="attachments")
     caveat = models.ForeignKey(DataCaveat, null=True, blank=True, on_delete=models.PROTECT, related_name="attachments")
     configuration = models.ForeignKey(ConfigurationVersion, null=True, blank=True, on_delete=models.PROTECT, related_name="attachments")
@@ -218,4 +223,4 @@ class ImportRecord(models.Model):
     class Meta:
         constraints = [models.UniqueConstraint(fields=["source", "source_id"], name="unique_import_source")]
 
-from .resources_models import SiteCondition, BADMProfile, BADMRecord, Protocol, SiteMedia, TowerStatus, TowerReading
+from .resources_models import SiteCondition, BADMProfile, BADMRecord, Protocol, SiteMedia, TowerStatus, TowerReading, ProcessingFile, ProcessingFileVersion
