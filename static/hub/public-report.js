@@ -18,6 +18,7 @@
   }
   const records = [...document.querySelectorAll('.record')];
   const site = document.getElementById('site-filter'), type = document.getElementById('type-filter'), search = document.getElementById('search');
+  const timeline = setupTimeline();
   function filter() {
     const query = search.value.trim().toLocaleLowerCase();
     let count = 0;
@@ -33,14 +34,154 @@
       const children = [...group.querySelectorAll('.record')];
       group.hidden = children.length > 0 && children.every(record => record.hidden);
     }
+    timeline?.update();
   }
   [site,type,search].forEach(control => control.addEventListener('input',filter)); filter();
-  const markers = [...document.querySelectorAll('.marker')];
-  if (markers.length) {
-    const dates = markers.map(marker => Date.parse(marker.dataset.date+'T12:00:00Z'));
-    const start = Math.min(...dates), end = Math.max(...dates), span = end-start || 86400000;
-    markers.forEach((marker,index) => marker.style.left = (2+96*(dates[index]-start)/span)+'%');
-    document.getElementById('timeline-range').textContent = `${new Date(start).toISOString().slice(0,10)} → ${new Date(end).toISOString().slice(0,10)}`;
+
+  function setupTimeline() {
+    const panel = document.getElementById('visit-timeline');
+    if (!panel) return null;
+    const plot = panel.querySelector('.timeline-plot');
+    const rows = [...panel.querySelectorAll('.timeline-row')];
+    const markers = [...panel.querySelectorAll('.marker')];
+    const tooltip = document.getElementById('timeline-tooltip');
+    const dateOf = marker => Date.parse(marker.dataset.date+'T12:00:00Z');
+    const dates = markers.map(dateOf);
+    const first = new Date(Math.min(...dates)), last = new Date(Math.max(...dates));
+    const start = Date.UTC(first.getUTCFullYear(), Math.floor(first.getUTCMonth()/3)*3, 1);
+    const end = Date.UTC(last.getUTCFullYear(), Math.floor(last.getUTCMonth()/3)*3+3, 1);
+    const position = date => 2+96*(date-start)/(end-start);
+    const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    const ticks = [];
+    for (let date = new Date(start); date.getTime() <= end; date.setUTCMonth(date.getUTCMonth()+3)) {
+      const tick = document.createElement('span');
+      tick.className = 'timeline-tick';
+      tick.style.left = position(date.getTime())+'%';
+      tick.textContent = `${months[date.getUTCMonth()]} ${date.getUTCFullYear()}`;
+      panel.querySelector('.timeline-ticks').append(tick);
+      ticks.push(tick);
+    }
+    document.getElementById('timeline-range').textContent = `${first.toISOString().slice(0,10)} → ${last.toISOString().slice(0,10)}`;
+    for (const marker of markers) {
+      marker.style.left = position(dateOf(marker))+'%';
+      // The native title is a fallback when scripting is unavailable.
+      marker.removeAttribute('title');
+    }
+    for (const row of rows) {
+      const grid = document.createElement('span');
+      grid.className = 'timeline-grid'; grid.setAttribute('aria-hidden','true');
+      for (const tick of ticks) {
+        const line = document.createElement('i');
+        line.style.left = tick.style.left; grid.append(line);
+      }
+      row.querySelector('.track').prepend(grid);
+    }
+    let activeMarker = null;
+    function hideTooltip() {
+      activeMarker?.removeAttribute('aria-describedby');
+      activeMarker = null; tooltip.hidden = true;
+    }
+    function showTooltip(marker) {
+      if (marker === activeMarker) return;
+      hideTooltip(); activeMarker = marker;
+      tooltip.dataset.kind = marker.dataset.kind;
+      tooltip.querySelector('.timeline-tooltip-date').textContent = marker.dataset.date;
+      tooltip.querySelector('.timeline-tooltip-kind').textContent = `${marker.dataset.site} · ${marker.dataset.label}`;
+      tooltip.querySelector('.timeline-tooltip-title').textContent = marker.dataset.title;
+      const crew = tooltip.querySelector('.timeline-tooltip-crew');
+      crew.textContent = marker.dataset.crew; crew.hidden = !marker.dataset.crew;
+      tooltip.hidden = false; marker.setAttribute('aria-describedby',tooltip.id);
+      const rect = marker.getBoundingClientRect(), tip = tooltip.getBoundingClientRect();
+      const left = Math.max(12, Math.min(rect.left+rect.width/2-tip.width/2, innerWidth-tip.width-12));
+      let top = rect.bottom+10;
+      if (top+tip.height > innerHeight-12) top = Math.max(12, rect.top-tip.height-10);
+      tooltip.style.left = left+'px'; tooltip.style.top = top+'px';
+    }
+    panel.addEventListener('pointerover',event => {
+      const marker = event.target.closest('.marker');
+      if (marker) showTooltip(marker);
+    });
+    panel.addEventListener('pointerout',event => {
+      const marker = event.target.closest('.marker');
+      if (marker && !marker.contains(event.relatedTarget) && document.activeElement !== marker) hideTooltip();
+    });
+    panel.addEventListener('focusin',event => {
+      const marker = event.target.closest('.marker');
+      if (!marker) return;
+      for (const sibling of marker.closest('.track').querySelectorAll('.marker')) sibling.tabIndex = sibling === marker ? 0 : -1;
+      showTooltip(marker);
+    });
+    panel.addEventListener('focusout',event => {
+      if (event.target === activeMarker) hideTooltip();
+    });
+    panel.addEventListener('keydown',event => {
+      if (event.key === 'Escape') { hideTooltip(); return; }
+      const marker = event.target.closest('.marker');
+      if (!marker || !['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+      const choices = [...marker.closest('.track').querySelectorAll('.marker')].filter(item => !item.hidden).sort((a,b) => dateOf(a)-dateOf(b));
+      const current = choices.indexOf(marker);
+      const next = {ArrowLeft:Math.max(0,current-1), ArrowRight:Math.min(choices.length-1,current+1), Home:0, End:choices.length-1}[event.key];
+      event.preventDefault(); choices[next].focus();
+    });
+    panel.addEventListener('click',event => {
+      const marker = event.target.closest('.marker');
+      if (!marker || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const target = document.getElementById(marker.getAttribute('href').slice(1));
+      if (!target) return;
+      hideTooltip();
+      target.classList.remove('timeline-highlight');
+      requestAnimationFrame(() => target.classList.add('timeline-highlight'));
+      setTimeout(() => target.classList.remove('timeline-highlight'),1800);
+    });
+    panel.addEventListener('toggle',() => { hideTooltip(); layout(); });
+    window.addEventListener('scroll',hideTooltip,{passive:true});
+    window.addEventListener('resize',hideTooltip);
+    for (const tab of tabs) tab.addEventListener('click',hideTooltip);
+    function layout() {
+      const width = panel.querySelector('.timeline-ticks').clientWidth;
+      if (!width) return;
+      const stride = Math.max(1,Math.ceil(72*(ticks.length-1)/(width*.96)));
+      let previous = -Infinity;
+      ticks.forEach((tick,index) => {
+        const x = parseFloat(tick.style.left)*width/100;
+        const last = index === ticks.length-1;
+        tick.hidden = !last && (index%stride !== 0 || (ticks.length-1-index)*width*.96/(ticks.length-1) < 72);
+        if (!tick.hidden && x-previous < 60) tick.hidden = true;
+        if (!tick.hidden) previous = x;
+      });
+      for (const row of rows) {
+        const track = row.querySelector('.track');
+        const laneEnds = [];
+        const visible = [...track.querySelectorAll('.marker')].filter(marker => !marker.hidden).sort((a,b) => dateOf(a)-dateOf(b));
+        for (const marker of visible) {
+          const x = parseFloat(marker.style.left)*track.clientWidth/100;
+          let lane = laneEnds.findIndex(last => x-last >= 18);
+          if (lane < 0) lane = laneEnds.length;
+          laneEnds[lane] = x; marker.style.top = (12+lane*12)+'px';
+        }
+        track.style.height = (Math.max(3,laneEnds.length)*12+8)+'px';
+      }
+    }
+    new ResizeObserver(() => { hideTooltip(); layout(); }).observe(plot);
+    function update() {
+      hideTooltip();
+      let count = 0;
+      for (const marker of markers) {
+        marker.hidden = !!document.getElementById(marker.getAttribute('href').slice(1))?.hidden;
+        if (!marker.hidden) count++;
+      }
+      for (const row of rows) {
+        row.hidden = !!site.value && row.dataset.site !== site.value;
+        const visible = [...row.querySelectorAll('.marker')].filter(marker => !marker.hidden).sort((a,b) => dateOf(a)-dateOf(b));
+        const selected = visible.find(marker => marker.tabIndex === 0) || visible[0];
+        for (const marker of row.querySelectorAll('.marker')) marker.tabIndex = marker === selected ? 0 : -1;
+      }
+      plot.hidden = count === 0;
+      panel.querySelector('.timeline-empty').hidden = count > 0;
+      document.getElementById('timeline-count').textContent = `${count} ${count === 1 ? 'visit' : 'visits'}`;
+      layout();
+    }
+    return {update};
   }
   const lightbox = document.getElementById('lightbox');
   document.querySelectorAll('figure img').forEach(img => img.addEventListener('click', () => {

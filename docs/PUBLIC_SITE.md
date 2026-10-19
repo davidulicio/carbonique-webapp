@@ -32,6 +32,12 @@ to operational notes require authentication and site access. Only the known
 imported scientific images are embedded publicly. Do not put confidential content
 in site/visit/caveat text, since those records are public.
 
+The visit timeline uses teal circles for routine maintenance, yellow squares
+for major work and red diamonds for faults, with a shared date axis and legend.
+Hover or focus a marker to see its date, title and crew; select it to jump to
+the visit. Left/right arrows move through visits within a site. Timeline markers
+follow the site, record-type and search filters.
+
 ## Export and hosting
 
 **Download HTML** (`/fieldnotes/download/`) produces a self-contained report with
