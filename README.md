@@ -59,6 +59,31 @@ Open **http://127.0.0.1:8000/** for the team workspace and **http://127.0.0.1:80
 
 To start without the bundled records, use `python manage.py setup_hub` without `--with-reference` and create sites under Administration.
 
+## Calibration logs and technical references
+
+Each site has a **Calibration log** tab under **Sites & instruments**. Record a
+sensor swap, on-site calibration or lab calibration, including removed and
+replacement serials, preparation, dates, comments and supporting files. The
+on-site Field work panel also opens this form with the active visit selected.
+Calibration records and their files can be queued offline on a prepared device.
+
+**Reference library** holds site-specific and shared hardware documents, wiring,
+troubleshooting, repair notes and OneNote web sharing links. Upload originals,
+preview PDFs and images, search by category/site, and archive or restore entries
+and files. These library changes require a connection. Members and higher roles
+can contribute; viewers can read and download. Shared entries require
+network-wide access to edit. These new sections remain internal.
+
+The supplied historical notes include **18 completed sensor/analyzer swaps**.
+`setup_hub --with-reference` installs these records, with source-visit links and
+cleaned/calibrated replacement preparation reflecting project practice, including
+malfunction replacements. Unknown serials and lab dates remain blank. Existing
+installations can run `python manage.py import_calibrations`; rerunning preserves
+edits and archived records. Use `--dry-run` to inspect matches first.
+
+See [Calibration and reference workflows](docs/CALIBRATIONS_AND_REFERENCES.md)
+for details, limits and upgrade instructions.
+
 ## Public Field Notes: current records, read only
 
 Open **/fieldnotes/** without signing in. The server builds this report from the

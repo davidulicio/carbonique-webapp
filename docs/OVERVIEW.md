@@ -28,10 +28,11 @@ does not automatically declare the site open or safe.
 | Overview | Scan the network and site conditions; choose where to work |
 | Field work | Plan tasks, start a visit, record observations and work, and close the visit |
 | History | Find previous visits, task activity, frozen reports and exports |
-| Sites & instruments | Read site descriptions, sensor arrangements, deployments, assigned equipment, files and data identifiers; view tower media |
+| Sites & instruments | Read site descriptions, sensor arrangements, deployments, assigned equipment, calibration logs, files and data identifiers; view tower media |
 | BADM | Enter or review site metadata, inspect missing information and download a site export |
 | Data & processing | Record affected data periods, caveats, evidence and versioned processing configurations |
 | Inventory | Track individual instruments, serial numbers, locations and service history across the network |
+| Reference library | Keep hardware manuals, wiring, troubleshooting, repair notes, OneNote links and supporting files, per site or shared across the network |
 | Protocols | Read maintenance/safety PDFs in the app and download originals |
 | Tower status | Check all accessible towers or open one tower's measurements and diagnostics |
 | Administration | Manage sites, accounts, roles, site access and maintenance checklists |
@@ -40,6 +41,31 @@ Site reference describes the installed arrangement. Inventory tracks individual
 equipment identities and service history. Field work records what happened on a
 visit; Data & processing records its scientific consequences. The public report
 reads sites, visits and caveats directly from these records on each page load.
+
+### Record calibrations and sensor swaps
+
+Open **Sites & instruments → Calibration log**, or use **Calibration / sensor
+swap** during an on-site visit. Record the work type and date, identify the
+serviced or removed sensor, and enter the replacement identity and preparation
+for a swap. Add lab dates and certificate references when known, comments, and
+supporting files. The record is saved on the device before uploading, so it can
+also be recorded offline after preparing the site. Update deployment intervals
+separately when the installation changes.
+
+The historical log includes 18 confirmed swaps from the supplied visit notes.
+Each links back to its source visit. Replacements follow the project's cleaned
+and calibrated sensor practice, including malfunction replacements. Unknown
+serial numbers, lab dates and certificates are left unspecified.
+
+### Keep technical information together
+
+Use **Reference library** for manuals, wiring diagrams, repair histories and
+troubleshooting notes. An entry can apply to one site or the whole network.
+Attach files, preview PDFs/images, or paste a OneNote HTTP(S) web sharing link.
+The notebook remains hosted by its original provider and keeps that provider's
+access controls. Use **Protocols** for approved operating procedures. Library
+writes and file access require a connection; prepared snapshots retain the notes
+for reading. Archived entries and files can be restored.
 
 ### Plan, record and finish field work
 
@@ -270,3 +296,5 @@ Detailed references: [Architecture](ARCHITECTURE.md), [Imports](IMPORTS.md),
 [Resources and monitoring](RESOURCES_AND_MONITORING.md), [Public site](PUBLIC_SITE.md),
 [Processing files](PROCESSING_FILES.md),
 [Deployment](DEPLOYMENT.md) and [Source provenance](../UPSTREAM.md).
+
+Detailed calibration and library setup: [Calibration and reference workflows](CALIBRATIONS_AND_REFERENCES.md).

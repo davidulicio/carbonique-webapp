@@ -43,7 +43,7 @@ def bootstrap(request):
     sites = accessible_sites(request.user).order_by("code")
     from .resources_api import ProtocolSerializer
     from .models import Protocol
-    return Response({"me": {"id": request.user.pk, "username": request.user.username, "name": display_name(request.user), "email": request.user.email, "role": role_for(request.user)}, "sites": SiteSerializer(sites, many=True).data, "protocols": ProtocolSerializer(Protocol.objects.filter(is_archived=False), many=True).data, "checklists": ChecklistSerializer(ChecklistTemplate.objects.filter(is_active=True), many=True).data, "server_time": timezone.now(), "public_reference_enabled": settings.PUBLIC_FIELDNOTES_ENABLED})
+    return Response({"me": {"id": request.user.pk, "username": request.user.username, "name": display_name(request.user), "email": request.user.email, "role": role_for(request.user), "can_edit_shared_references": request.user.is_superuser or not request.user.team_member.sites.exists()}, "sites": SiteSerializer(sites, many=True).data, "protocols": ProtocolSerializer(Protocol.objects.filter(is_archived=False), many=True).data, "checklists": ChecklistSerializer(ChecklistTemplate.objects.filter(is_active=True), many=True).data, "server_time": timezone.now(), "public_reference_enabled": settings.PUBLIC_FIELDNOTES_ENABLED})
 
 @api_view(["GET"])
 def snapshot(request):
@@ -54,8 +54,9 @@ def snapshot(request):
     attachments = Attachment.objects.filter(Q(site=site) | Q(equipment__in=equipment, site__in=accessible_sites(request.user))).distinct()
     caveats = DataCaveat.objects.filter(sites=site).prefetch_related("sites", "configurations").distinct()
     from .processing_files import library_state
+    from .record_resources import CalibrationSerializer, knowledge_state
     from .resources_api import resource_state
-    return Response({"processing_files": library_state(request.user), "resources": resource_state(site), "site": SiteSerializer(site).data, "tasks": TaskSerializer(site.tasks.all(), many=True).data, "visits": VisitSerializer(visits, many=True).data, "activities": TaskActivitySerializer(TaskActivity.objects.filter(task__site=site), many=True).data, "observations": VisitObservationSerializer(VisitObservation.objects.filter(visit__site=site), many=True).data, "equipment": EquipmentSerializer(equipment, many=True).data, "equipment_history": HistorySerializer(History.objects.filter(item__in=equipment), many=True).data, "deployments": DeploymentSerializer(site.deployments.all(), many=True).data, "configurations": ConfigurationSerializer(site.configurations.all(), many=True).data, "caveats": CaveatSerializer(caveats, many=True).data, "attachments": AttachmentSerializer(attachments, many=True).data + legacy_attachments(site, equipment), "dois": DOISerializer(site.doi_records.all(), many=True).data, "server_time": timezone.now()})
+    return Response({"calibrations": CalibrationSerializer(site.calibrations.all(), many=True).data, "knowledge": knowledge_state(request.user), "processing_files": library_state(request.user), "resources": resource_state(site), "site": SiteSerializer(site).data, "tasks": TaskSerializer(site.tasks.all(), many=True).data, "visits": VisitSerializer(visits, many=True).data, "activities": TaskActivitySerializer(TaskActivity.objects.filter(task__site=site), many=True).data, "observations": VisitObservationSerializer(VisitObservation.objects.filter(visit__site=site), many=True).data, "equipment": EquipmentSerializer(equipment, many=True).data, "equipment_history": HistorySerializer(History.objects.filter(item__in=equipment), many=True).data, "deployments": DeploymentSerializer(site.deployments.all(), many=True).data, "configurations": ConfigurationSerializer(site.configurations.all(), many=True).data, "caveats": CaveatSerializer(caveats, many=True).data, "attachments": AttachmentSerializer(attachments, many=True).data + legacy_attachments(site, equipment), "dois": DOISerializer(site.doi_records.all(), many=True).data, "server_time": timezone.now()})
 
 @api_view(["POST"])
 def sync(request):
@@ -330,7 +331,8 @@ def upload_attachment(request):
     file.seek(0)
     sha = digest.hexdigest()
     linked = {}
-    targets = [("visit", Visit), ("task", Task), ("activity", TaskActivity), ("observation", VisitObservation), ("equipment", Equipment), ("caveat", DataCaveat), ("configuration", ConfigurationVersion)]
+    from .models import CalibrationLog
+    targets = [("calibration", CalibrationLog), ("visit", Visit), ("task", Task), ("activity", TaskActivity), ("observation", VisitObservation), ("equipment", Equipment), ("caveat", DataCaveat), ("configuration", ConfigurationVersion)]
     for field, model in targets:
         value = request.data.get(field)
         if not value:
@@ -364,6 +366,11 @@ def upload_attachment(request):
         associate("visit", linked["observation"].visit)
     if "activity" in linked and "observation" in linked:
         raise ValidationError("Attach a file to one individual note at a time.")
+    if 'calibration' in linked:
+        if set(linked) != {'calibration'}:
+            raise ValidationError('Attach a calibration file to its calibration log entry only.')
+        if linked['calibration'].is_archived:
+            raise ValidationError('Restore the calibration log before adding files.')
     content_type = "application/octet-stream"
     if file.name.lower().endswith((".jpg", ".jpeg", ".png", ".gif", ".webp")):
         try:

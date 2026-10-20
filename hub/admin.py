@@ -24,3 +24,8 @@ for model in [Deployment, DataCaveat, Attachment, ChecklistTemplate]:
     admin.site.register(model, ArchiveOnlyAdmin)
 admin.site.site_header = "Carbonique administration"
 admin.site.site_title = "Carbonique Hub"
+
+from .models import CalibrationLog, KnowledgeEntry, KnowledgeFile
+admin.site.register(CalibrationLog, ImmutableAdmin)
+admin.site.register(KnowledgeEntry, ImmutableAdmin)
+admin.site.register(KnowledgeFile, ImmutableAdmin)

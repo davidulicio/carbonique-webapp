@@ -48,7 +48,7 @@ def record_issues(record):
         for option in re.findall(r"[ra]\((\d+)\)", rule):
             alternatives.setdefault(option, []).append(name)
         if rule.startswith("c") or (rule and rule not in {"r"} and not re.fullmatch(r"[ra]\(\d+\)", rule)):
-            review.append(f"{name}: {rule} — check the official explanation.")
+            review.append(f"{name}: {rule}; check the official explanation.")
         if not present(value):
             continue
         if not isinstance(value, (str, int, float)) or isinstance(value, bool):

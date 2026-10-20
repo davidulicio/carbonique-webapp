@@ -1,7 +1,7 @@
 # Validation and release checks
 
 The standalone application was checked on Windows with Python 3.12 and
-Django 5.2.18. Its 118 backend tests cover field workflows, role/site restrictions,
+Django 5.2.18. Its 146 backend tests cover field workflows, role/site restrictions,
 retry-safe operations, version conflicts, frozen reports, imports, resource
 permissions, BADM checks/exports, protected media, live public reports, imported
 caveat review, per-note uploads, INI revisioning, synchronized caveat timelines,
@@ -22,6 +22,7 @@ JavaScript modules can be checked without a build step, using Node.js:
 
 ```bash
 node --check static/hub/app.js
+node --check static/hub/record-resources.js
 node --check static/hub/resources.js
 node --check static/hub/monitor.js
 node --check static/hub/pdf-viewer.js
@@ -64,3 +65,21 @@ reconcile counts, inspect representative attachments and test the team's roles.
 For later upgrades, validate against a staging database/media copy first. Verify private routing to analyzers, service startup, timestamps,
 file limits and persistence across restarts. Test a backup restore before relying
 on it. See [DEPLOYMENT.md](DEPLOYMENT.md) and [IMPORTS.md](IMPORTS.md).
+
+## Calibration and reference update
+
+The update adds 28 backend checks covering sensor swap validation, on-site/lab
+records, linked visits, role and site restrictions, archive/restore, stale edits,
+offline operation retries, calibration file association and protected downloads.
+Library checks cover shared access, credential-free HTTP(S) links, exact file
+bytes, image/PDF validation, batch size, duplicate retries, rollback cleanup and
+public exclusion. Historical-import checks verify repeat runs preserve edits,
+dry runs and missing visits do not write, and planned/cancelled swaps are omitted.
+
+Browser verification used a separate SQLite database and harmless documents,
+with a member and viewer account. The checks included a sensor swap with serials,
+lab dates, comments, a linked visit and a queued file; an on-site calibration;
+reference notes and OneNote link; search and shared filters; PDF rendering;
+file archive/restore; and unavailable-server calibration recording, reload and
+reconnection with an empty queue after synchronization. Test accounts, documents
+and records are kept outside the application repository and live database.

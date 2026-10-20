@@ -15,7 +15,7 @@ jobs:
           node-version: '24'
       - name: Check browser modules
         run: |
-          for source in static/hub/app.js static/hub/processing-files.js static/hub/public-report.js static/hub/resources.js static/hub/monitor.js static/hub/pdf-viewer.js static/hub/storage.js static/hub/sw.js; do
+          for source in static/hub/app.js static/hub/record-resources.js static/hub/processing-files.js static/hub/public-report.js static/hub/resources.js static/hub/monitor.js static/hub/pdf-viewer.js static/hub/storage.js static/hub/sw.js; do
             node --check "$source"
           done
       - run: python -m pip install -r requirements.txt

@@ -25,7 +25,9 @@ For a guided user/developer introduction, see [Application overview](OVERVIEW.md
 | Deployment | Instrument + site + nonoverlapping active interval; height/depth and variables |
 | ConfigurationVersion | Site; optional deployment; settings and explicit effective interval; correction may supersede another version |
 | DataCaveat | One or more sites; optional visit/equipment/configurations; affected period, treatment and review status |
-| Attachment | Permission-checked site; optional visit/task/activity/observation/equipment/caveat/configuration; hash and original filename |
+| CalibrationLog | Site; work date/type, serviced and replacement sensors, preparation, lab dates, source visit, comments and optimistic version |
+| KnowledgeEntry / KnowledgeFile | Scoped or shared reference notes, HTTP(S) notebook links, protected files, hashes and recoverable archives |
+| Attachment | Permission-checked site; optional visit/task/activity/observation/equipment/caveat/configuration/calibration; hash and original filename |
 | ProcessingFile / ProcessingFileVersion | Relative INI path/site and immutable protected byte revisions, hashes and source timestamps |
 | SiteCondition | Site; access statement, review date, editor and optimistic version |
 | BadmProfile / BadmRecord | Site; station class/identifier, applicable groups and repeatable metadata observations |
@@ -53,6 +55,9 @@ Authenticated APIs use Django session authentication and CSRF validation. They a
 | GET `/sites/ID/badm.zip` | Site BADM export for all permitted team roles |
 | `/api/protocols/`, `/protocols/ID/file/` | PDF metadata, manager/admin maintenance and protected original files |
 | `/api/sites/ID/media/`, `/site-media/ID/file/` | Site media metadata and protected range streaming |
+| `/api/sites/ID/calibrations/`, `/api/sites/ID/calibrations/UUID/` | Read/create/edit site calibration logs; the same mutations are supported by the offline sync API |
+| `/api/knowledge/`, `/api/knowledge/UUID/` | Shared and site-scoped technical references, versioned edits and soft archives |
+| `/api/knowledge/UUID/files/`, `/api/knowledge/UUID/files/FILE_ID/`, `/knowledge-files/FILE_ID/` | Atomic multi-file upload, file archive/restore and protected download |
 | POST `/api/sync/` | Ordered, idempotent field operations |
 | `/api/sites/`, `/api/equipment/`, `/api/deployments/`, `/api/caveats/` | Role-scoped CRUD without destructive delete endpoints |
 | `/api/configurations/` | Read/create immutable scientific configuration versions |
@@ -95,3 +100,30 @@ for version storage. The source HTML archive is not a live input.
 - Repository reference data is included. Unseen live database and Firebase data require imports.
 - Polling provides collaboration without a WebSocket server. Source snapshots are not automatically reconciled with later manual Word/HTML edits.
 - Database migrations preserve the supplied upstream schema, but deployment-specific migrations must be checked in staging.
+
+## Calibration and reference implementation
+
+`hub/record_models.py` defines calibration and library entities;
+`hub/record_resources.py` validates mutations and enforces roles, site access,
+expected versions and file validation. `static/hub/record-resources.js` provides
+the site tab, on-site form and reference library using the existing dialogs.
+Calibration operations and dependent files are committed to IndexedDB together
+and replayed in order. No automatic equipment moves or deployment changes occur.
+
+Shared reference files use a separate model because shared entries have no site.
+Uploads lock the parent, validate the complete batch before saving, suppress
+active content duplicates by hash and clean storage after a failed write. Links
+are HTTP(S), cannot embed credentials, and are never fetched by the server.
+Downloads recheck current entry/site access. Archived records remain readable
+history; archiving is not an access-revocation mechanism. Django admin treats
+these records as read only to preserve application version checks.
+
+`seed/calibration_swaps.json` is a reviewed manifest of completed swaps in the
+supplied notes. `import_calibrations` uses stable UUIDs and import receipts;
+missing source visits are skipped and existing imported records are preserved.
+The preparation reflects the project's stated swap practice. It does not imply
+an individual certificate or lab date is available. The manifest excludes
+planned/cancelled work, consumables and logger/media exchanges.
+
+The UI normalizes em dashes in displayed prose, while saved notes, code blocks,
+source archives and downloadable file bytes remain intact.

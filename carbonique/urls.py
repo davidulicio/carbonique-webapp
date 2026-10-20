@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from hub import api, views
 from hub import resources_api as resources
-from hub import monitor, processing_files
+from hub import monitor, processing_files, record_resources
 
 router = DefaultRouter()
 for prefix, cls in [("sites", api.SiteViewSet), ("equipment", api.EquipmentViewSet), ("deployments", api.DeploymentViewSet), ("configurations", api.ConfigurationViewSet), ("caveats", api.CaveatViewSet), ("dois", api.DOIViewSet), ("equipment-history", api.HistoryViewSet), ("checklists", api.ChecklistViewSet)]:
@@ -16,6 +16,13 @@ urlpatterns = [
     path("api/bootstrap/", api.bootstrap), path("api/snapshot/", api.snapshot),
     path("api/processing-files/", processing_files.library),
     path("processing-files/<uuid:pk>/", processing_files.version_file),
+    path('api/sites/<int:site_id>/calibrations/', record_resources.calibrations),
+    path('api/sites/<int:site_id>/calibrations/<uuid:pk>/', record_resources.calibrations),
+    path('api/knowledge/', record_resources.knowledge),
+    path('api/knowledge/<uuid:pk>/', record_resources.knowledge),
+    path('api/knowledge/<uuid:pk>/files/', record_resources.knowledge_files),
+    path('api/knowledge/<uuid:pk>/files/<uuid:file_id>/', record_resources.knowledge_files),
+    path('knowledge-files/<uuid:pk>/', record_resources.knowledge_download),
     path("api/monitor/", monitor.tower_status),
     path("api/badm/schema/", resources.badm_schema),
     path("api/sites/<int:site_id>/condition/", resources.condition),

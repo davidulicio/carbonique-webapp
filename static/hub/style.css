@@ -13,7 +13,7 @@
 .related-panel:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
 .topbar{background-image:linear-gradient(#ffffffed,#ffffffed),url('./ecoflux-winter.png');background-size:cover;background-position:center 50%}
 @media(max-width:1200px){.sidebar{width:210px;padding:25px 16px}.workspace{margin-left:210px}.brand img{width:155px}.topbar{padding:0 25px}main#main{padding:28px 25px}.site-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-two{grid-template-columns:1fr}.site-picker select{max-width:290px}.stats{gap:12px}.stat{padding:17px}.nav-button.active:before{left:17px}}
-@media(max-width:760px){.sidebar{transform:translateX(-100%);transition:transform .2s}.sidebar.visible{transform:translateX(0)}.workspace{margin-left:0}.topbar{height:70px;padding:0 15px;gap:7px}.mobile-menu{display:block}.site-picker{gap:5px;font-size:0}.site-picker select{min-width:120px;max-width:210px;font-size:11px;padding:8px 0}.topbar-actions{gap:5px}#prepare-button{font-size:0;padding:9px}#prepare-button:after{content:"↓ Offline";font-size:11px}.user-badge{display:none}main#main{padding:24px 16px}.page-header{align-items:flex-start;flex-direction:column;gap:14px}h1{font-size:28px}.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{padding:14px 17px}.stat strong{font-size:29px}.site-grid,.data-grid{grid-template-columns:1fr}.panel{padding:18px}.grid-two{gap:0}.visit-banner{align-items:flex-start;flex-direction:column}.task-top{gap:10px}.task-title h3{font-size:14px}.page-footer{padding:18px 16px}.page-footer span{display:none}.form-grid{grid-template-columns:1fr}.form-grid .wide{grid-column:auto}.metadata-list{grid-template-columns:1fr}.mast-wrap{grid-template-columns:160px 1fr;gap:10px}.mast-wrap svg{height:250px}.login-page{grid-template-columns:1fr}.login-intro{padding:35px 30px;gap:30px;min-height:230px}.login-intro h1{font-size:32px}.login-intro img{width:170px}.login-intro small{display:none}.login-intro p{display:none}.login-intro .eyebrow{margin-bottom:10px}.login-main{padding:40px 25px}.login-card{width:min(400px,100%)}#toast{left:50%;width:max-content;max-width:90vw}.row-actions .button{padding:7px 10px}dialog{max-height:94vh}#dialog-form{padding:19px}.page-actions{width:100%}.timeline{gap:10px}.toolbar{gap:8px}.toolbar input{min-width:140px}}
+@media(max-width:760px){.sidebar{transform:translateX(-100%);transition:transform .2s}.sidebar.visible{transform:translateX(0)}.workspace{margin-left:0}.topbar{height:70px;padding:0 15px;gap:7px}.mobile-menu{display:block}.site-picker{gap:5px;font-size:0}.site-picker select{min-width:120px;max-width:210px;font-size:11px;padding:8px 0}.topbar-actions{gap:5px}#prepare-button{font-size:0;padding:9px}#prepare-button:after{content:"â†“ Offline";font-size:11px}.user-badge{display:none}main#main{padding:24px 16px}.page-header{align-items:flex-start;flex-direction:column;gap:14px}h1{font-size:28px}.stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.stat{padding:14px 17px}.stat strong{font-size:29px}.site-grid,.data-grid{grid-template-columns:1fr}.panel{padding:18px}.grid-two{gap:0}.visit-banner{align-items:flex-start;flex-direction:column}.task-top{gap:10px}.task-title h3{font-size:14px}.page-footer{padding:18px 16px}.page-footer span{display:none}.form-grid{grid-template-columns:1fr}.form-grid .wide{grid-column:auto}.metadata-list{grid-template-columns:1fr}.mast-wrap{grid-template-columns:160px 1fr;gap:10px}.mast-wrap svg{height:250px}.login-page{grid-template-columns:1fr}.login-intro{padding:35px 30px;gap:30px;min-height:230px}.login-intro h1{font-size:32px}.login-intro img{width:170px}.login-intro small{display:none}.login-intro p{display:none}.login-intro .eyebrow{margin-bottom:10px}.login-main{padding:40px 25px}.login-card{width:min(400px,100%)}#toast{left:50%;width:max-content;max-width:90vw}.row-actions .button{padding:7px 10px}dialog{max-height:94vh}#dialog-form{padding:19px}.page-actions{width:100%}.timeline{gap:10px}.toolbar{gap:8px}.toolbar input{min-width:140px}}
 @media(prefers-color-scheme:dark){:root{--ink:#dce8da;--muted:#96a391;--line:#354335;--paper:#1b251e;--white:#263329;--shadow:none}input,select,textarea,.button{background:var(--white);color:var(--ink)}.topbar{background:var(--white)}.task-card,.visit-card,.caveat-card{background:var(--white)}th{background:#223026}.task-top .check{background:#253b29}.task-card p{color:#adbda5}.stat .label{color:var(--muted)}.site-tile .code{color:#a4c28e}.pill{background:#344a2b;color:#bad5a2}.button.primary{background:#527748;border-color:#527748}.segmented{background:#283b2c}.segmented button.active{background:#40543b;color:#e6f0df}.visit-banner{background:#2b432e;border-color:#486447}.notice{background:#463d20;border-color:#6e6136;color:#e3ca88}.error{background:#4f312b;color:#ffb6a4}.user-badge{background:#354835;color:#c1ddb3}.metadata-row{border-color:var(--line)}}
 
 @media(prefers-color-scheme:dark){.topbar{background-image:linear-gradient(#263329ed,#263329ed),url('./ecoflux-winter.png')}.related-tabs [aria-selected=true]{color:#c1ddb3}}
@@ -21,3 +21,26 @@
 .note-entry{padding:12px 0;border-top:1px solid var(--line,#dce1d5)}.note-media{margin:12px 0}.note-media video{display:block;max-width:100%;max-height:360px}.note-media audio{display:block;width:100%;max-width:500px}
 
 .ini-drop-zone{padding:22px;margin:16px 0;text-align:center;border:2px dashed #a6b99b;border-radius:10px}.ini-drop-zone.dragging{background:#edf5e7;border-color:#327923}
+
+/* Calibration history and technical reference documents. */
+.record-list {display:grid;gap:18px}
+.record-facts {display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:16px;margin:20px 0}
+.record-facts dt {font-size:.78rem;color:var(--muted);margin-bottom:5px}
+.record-facts dd {margin:0;overflow-wrap:anywhere}
+.record-text {white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.65;margin:16px 0}
+.calibration-replacement {border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
+.calibration-replacement legend {font-weight:600;padding:0 8px}
+.calibration-replacement[hidden] {display:none}
+.calibration-swap {background:#e6f0e1;color:#316c26}
+.calibration-onsite {background:#e6eef7;color:#27597e}
+.calibration-lab {background:#f5ecd9;color:#785b21}
+.reference-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,390px),1fr));gap:22px;align-items:start}
+.reference-card h2 {font-size:1.25rem;overflow-wrap:anywhere}
+.knowledge-files {display:grid;gap:12px;margin:18px 0}
+.knowledge-file {display:flex;gap:14px;border-top:1px solid var(--line);padding-top:14px;align-items:start;min-width:0}
+.knowledge-file img {width:82px;height:82px;object-fit:contain;border-radius:8px;background:#f3f5ef}
+.knowledge-file>div {min-width:0}
+.knowledge-file strong {display:block;overflow-wrap:anywhere}
+.knowledge-file .muted {display:block;margin:5px 0}
+.notebook-link {margin-bottom:8px}
+@media(max-width:600px){.record-facts{grid-template-columns:1fr}.knowledge-file{flex-wrap:wrap}.calibration-replacement{padding:12px}.reference-grid{grid-template-columns:1fr}}

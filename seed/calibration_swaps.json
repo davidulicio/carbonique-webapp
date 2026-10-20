@@ -1,0 +1,182 @@
+[
+  {
+    "site": "MCGILL_1",
+    "event_date": "2025-08-21",
+    "sensor_model": "LI-7200",
+    "serial_number": "",
+    "replacement_serial_number": "",
+    "source_visit": "716de980cc165d98aea02b205054d0e6",
+    "source_title": "Whole LI-7200 system replaced",
+    "summary": "Complete analyzer system replacement; head, intake and control system exchanged."
+  },
+  {
+    "site": "MCGILL_1",
+    "event_date": "2025-08-21",
+    "sensor_model": "LI-7550",
+    "serial_number": "",
+    "replacement_serial_number": "",
+    "source_visit": "716de980cc165d98aea02b205054d0e6",
+    "source_title": "Whole LI-7200 system replaced",
+    "summary": "Analyzer control unit exchanged with the LI-7200 system."
+  },
+  {
+    "site": "MCGILL_1",
+    "event_date": "2026-04-23",
+    "sensor_model": "LI-7550",
+    "serial_number": "2497",
+    "replacement_serial_number": "2495",
+    "source_visit": "163ea94ed07a5854befe1e3c465d9775",
+    "source_title": "Eddy system failure: emergency visit after winter",
+    "summary": "Damaged analog board; replacement calibration coefficients updated to match the IRGA."
+  },
+  {
+    "site": "MCGILL_1",
+    "event_date": "2026-07-08",
+    "sensor_model": "LI-7200",
+    "serial_number": "",
+    "replacement_serial_number": "72H-1201",
+    "source_visit": "87e3922791295c12bc1065e0aae0fa77",
+    "source_title": "Maintenance and LI-7700 troubleshooting",
+    "summary": "Swapped for a calibrated unit."
+  },
+  {
+    "site": "MCGILL_1",
+    "event_date": "2026-07-08",
+    "sensor_model": "LI-7550",
+    "serial_number": "",
+    "replacement_serial_number": "AIU-2491",
+    "source_visit": "87e3922791295c12bc1065e0aae0fa77",
+    "source_title": "Maintenance and LI-7700 troubleshooting",
+    "summary": "Swapped for a calibrated unit."
+  },
+  {
+    "site": "MCGILL_1",
+    "event_date": "2026-09-04",
+    "sensor_model": "LI-7700",
+    "serial_number": "",
+    "replacement_serial_number": "",
+    "source_visit": "b6b011dd1b365e0daeff54765402653a",
+    "source_title": "LI-7700 swap and solar panel structure destroyed by wind",
+    "summary": "Methane analyzer replaced; note reports improved pressure and methane concentrations."
+  },
+  {
+    "site": "UQAM_1",
+    "event_date": "2026-05-01",
+    "sensor_model": "LI-7200",
+    "serial_number": "72H-1201",
+    "replacement_serial_number": "72H-1210",
+    "source_visit": "a318d97167265e11bfe682930305bacc",
+    "source_title": "Power failure and summer preparation",
+    "summary": "Swapped for a cleaned and calibrated analyzer."
+  },
+  {
+    "site": "UQAM_1",
+    "event_date": "2026-05-01",
+    "sensor_model": "LI-7550",
+    "serial_number": "AIU-2491",
+    "replacement_serial_number": "AIU-2499",
+    "source_visit": "a318d97167265e11bfe682930305bacc",
+    "source_title": "Power failure and summer preparation",
+    "summary": "Swapped for a cleaned and calibrated analyzer control unit."
+  },
+  {
+    "site": "UQAM_1",
+    "event_date": "2026-05-07",
+    "sensor_model": "SQ-521",
+    "serial_number": "5747",
+    "replacement_serial_number": "5757",
+    "source_visit": "fcfc7185571a55d186a0da0a4d1c846c",
+    "source_title": "Repairs",
+    "summary": "Outgoing PPFD sensor replaced."
+  },
+  {
+    "site": "UQAM_2",
+    "event_date": "2025-12-17",
+    "sensor_model": "LI-7200",
+    "serial_number": "72H-1206",
+    "replacement_serial_number": "72H-1207",
+    "source_visit": "f8503cf185f8550d8609046850fccff5",
+    "source_title": "LI-7200 and LI-7550 replaced",
+    "summary": "Analyzer replacement following sensor faults and movement of the eddy boom."
+  },
+  {
+    "site": "UQAM_2",
+    "event_date": "2025-12-17",
+    "sensor_model": "LI-7550",
+    "serial_number": "AIU-2495",
+    "replacement_serial_number": "AIU-2496",
+    "source_visit": "f8503cf185f8550d8609046850fccff5",
+    "source_title": "LI-7200 and LI-7550 replaced",
+    "summary": "Corroded connections; removed unit returned for lab diagnosis."
+  },
+  {
+    "site": "UQAM_3",
+    "event_date": "2025-07-22",
+    "sensor_model": "LI-7700",
+    "serial_number": "",
+    "replacement_serial_number": "",
+    "source_visit": "9a9accc947fd5d15a14b91085f993b7e",
+    "source_title": "LI-7700 replaced",
+    "summary": "Damaged methane analyzer replaced and reconnected through Ethernet surge protectors."
+  },
+  {
+    "site": "UQAM_3",
+    "event_date": "2026-01-19",
+    "sensor_model": "BaroVUE10",
+    "serial_number": "2801",
+    "replacement_serial_number": "2896",
+    "source_visit": "d0968b23dbf159f5bce0ad654f6f469f",
+    "source_title": "SDI-12 sensors not working",
+    "summary": "Failed pressure sensor replaced; removed unit to be assessed in the lab."
+  },
+  {
+    "site": "UQAM_3",
+    "event_date": "2026-01-30",
+    "sensor_model": "BaroVUE10",
+    "serial_number": "",
+    "replacement_serial_number": "",
+    "source_visit": "09e12f94f1c050aa83b44d63f32b567a",
+    "source_title": "Maintenance: filters and BaroVUE10",
+    "summary": "A further exchange is recorded, but serial pairs 2801/2728 and 2896/2820 are ambiguous. Verify instrument identities against the original field record; serial fields are left blank."
+  },
+  {
+    "site": "UQAM_3",
+    "event_date": "2026-04-15",
+    "sensor_model": "LI-7200",
+    "serial_number": "72H-1205",
+    "replacement_serial_number": "72H-1203",
+    "source_visit": "b8e7a0278da6526a9d3cc77af7a0e974",
+    "source_title": "Site preparation for summer season",
+    "summary": "Swapped for a recently cleaned and calibrated analyzer; removed unit returned for lab work."
+  },
+  {
+    "site": "UQAM_3",
+    "event_date": "2026-04-15",
+    "sensor_model": "LI-7550",
+    "serial_number": "AIU-2494",
+    "replacement_serial_number": "AIU-2492",
+    "source_visit": "b8e7a0278da6526a9d3cc77af7a0e974",
+    "source_title": "Site preparation for summer season",
+    "summary": "Swapped for a recently cleaned and calibrated analyzer control unit."
+  },
+  {
+    "site": "UQAM_4",
+    "event_date": "2026-07-07",
+    "sensor_model": "LI-7200",
+    "serial_number": "",
+    "replacement_serial_number": "72H-1205",
+    "source_visit": "143a6aa10dee51048f533f187b20cfa4",
+    "source_title": "Moving the trailer back",
+    "summary": "Swapped for a newly calibrated analyzer."
+  },
+  {
+    "site": "UQAM_4",
+    "event_date": "2026-07-07",
+    "sensor_model": "LI-7550",
+    "serial_number": "",
+    "replacement_serial_number": "AIU-2494",
+    "source_visit": "143a6aa10dee51048f533f187b20cfa4",
+    "source_title": "Moving the trailer back",
+    "summary": "Swapped for a newly calibrated analyzer control unit."
+  }
+]

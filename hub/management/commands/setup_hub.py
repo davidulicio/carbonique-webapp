@@ -27,4 +27,5 @@ class Command(BaseCommand):
         call_command("backfill_visits")
         if options["with_reference"]:
             call_command("import_resources")
+            call_command("import_calibrations")
         self.stdout.write(self.style.SUCCESS("Carbonique Hub setup complete. Create a superuser with createsuperuser if needed."))

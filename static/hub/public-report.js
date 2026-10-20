@@ -1,4 +1,18 @@
 (() => {
+// Apply the preferred punctuation to displayed prose; keep file bytes and saved text intact.
+function normalizeProse(root){
+  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
+  while(walker.nextNode()){
+    const node=walker.currentNode;
+    if(node.parentElement?.closest("script,style,code,pre,textarea"))continue;
+    if(node.nodeValue.includes("\u2014"))node.nodeValue=node.nodeValue.replace(/\s*\u2014\s*/g," - ");
+  }
+  for(const element of root.querySelectorAll("[title],[aria-label]"))for(const key of ["title","aria-label"]){
+    const value=element.getAttribute(key);if(value?.includes("\u2014"))element.setAttribute(key,value.replace(/\s*\u2014\s*/g," - "));
+  }
+}
+
+  normalizeProse(document.body);
   const tabs = [...document.querySelectorAll('[data-tab]')];
   function selectTab(tab) {
     for (const button of tabs) {

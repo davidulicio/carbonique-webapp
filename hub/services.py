@@ -220,6 +220,10 @@ def apply_operation(user, operation):
         result["activity_id"] = str(activity_id)
         result["record"] = TaskSerializer(task).data
         audit(user, kind, task, site, {"version": task.version})
+    elif kind in {'calibration.create', 'calibration.edit'}:
+        from .record_resources import save_calibration, CalibrationSerializer
+        obj = save_calibration(user, site, record_id, payload, create=kind == 'calibration.create', base_version=operation.get('base_version'))
+        result['record'] = json.loads(json.dumps(CalibrationSerializer(obj).data, default=str))
     elif kind == "caveat.draft":
         visit = same_site_visit(site, payload.get("visit_id"))
         if DataCaveat.objects.filter(pk=record_id).exists():

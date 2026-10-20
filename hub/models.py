@@ -175,6 +175,7 @@ class Attachment(models.Model):
     observation = models.ForeignKey(VisitObservation, null=True, blank=True, on_delete=models.PROTECT, related_name="attachments")
     equipment = models.ForeignKey(Equipment, null=True, blank=True, on_delete=models.PROTECT, related_name="attachments")
     caveat = models.ForeignKey(DataCaveat, null=True, blank=True, on_delete=models.PROTECT, related_name="attachments")
+    calibration = models.ForeignKey("hub.CalibrationLog", null=True, blank=True, on_delete=models.PROTECT, related_name="attachments")
     configuration = models.ForeignKey(ConfigurationVersion, null=True, blank=True, on_delete=models.PROTECT, related_name="attachments")
     file = models.FileField(upload_to=attachment_path)
     filename = models.CharField(max_length=250)
@@ -224,3 +225,5 @@ class ImportRecord(models.Model):
         constraints = [models.UniqueConstraint(fields=["source", "source_id"], name="unique_import_source")]
 
 from .resources_models import SiteCondition, BADMProfile, BADMRecord, Protocol, SiteMedia, TowerStatus, TowerReading, ProcessingFile, ProcessingFileVersion
+
+from .record_models import CalibrationLog, KnowledgeEntry, KnowledgeFile
