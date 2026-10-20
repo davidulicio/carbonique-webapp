@@ -127,3 +127,15 @@ planned/cancelled work, consumables and logger/media exchanges.
 
 The UI normalizes em dashes in displayed prose, while saved notes, code blocks,
 source archives and downloadable file bytes remain intact.
+
+## Security boundaries
+
+`hub/security.py` applies private-response cache rules and browser security
+headers. It also resolves the login client's IP, trusting X-Real-IP only from
+explicit proxy peers. Django Axes 8.3.1 uses its database handler, so failed-login
+counts are shared across workers and survive restarts. Both team/admin login use
+the guarded authentication backend, with a 15-minute pause after five failures
+for a username/address pair. The public report keeps its separate origin-isolating
+sandbox policy. The deployment proxy adds request and connection limits; HTTP
+429 does not turn queued field records into a permanent synchronization error.
+See [SECURITY.md](../SECURITY.md) for operator recovery and remaining server work.

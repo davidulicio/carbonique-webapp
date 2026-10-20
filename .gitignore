@@ -23,3 +23,7 @@ test-results/
 !monitor-stations.example.json
 # Retired procedure contains device login details; keep it outside the repository.
 /seed/protocols/Data_download.pdf
+
+# TLS private material belongs in protected server configuration.
+*.key
+*.pem

@@ -14,3 +14,10 @@ exports
 staticfiles
 test-results
 screenshots
+
+# Alternate environment files, DB sidecars and operational secrets stay outside images.
+.env.*
+*.sqlite3-*
+*.log
+*.pem
+*.key

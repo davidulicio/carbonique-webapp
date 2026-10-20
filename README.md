@@ -20,6 +20,19 @@ how to use the app and how the implementation works, including the main files,
 data flow and troubleshooting steps. Detailed deployment, import and resource
 guides are linked from there.
 
+## Security before publishing
+
+Read **[Security and deployment review](SECURITY.md)** before exposing the VM.
+The app limits failed logins, protects private responses and uses restrictive
+browser headers. The nginx example includes bot/request limits. New passwords
+require at least 12 characters; sessions last 12 hours. Prepared field records
+remain on the device if sign-in expires.
+
+The VM still needs HTTPS, DEBUG=False, a new secret, explicit hosts, private
+backend/database/tower ports, and restricted administrator access, preferably
+VPN or SSO with MFA. Apply migrations after installing requirements so login
+protection has its database tables. No default user accounts are supplied.
+
 ## Start locally
 
 Requires **Python 3.12 or newer** (tested with Python 3.12), a modern browser, and no Node build step. SQLite is included with Python. Windows runs the Django development server; Gunicorn is for Linux production servers.

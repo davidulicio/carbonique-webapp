@@ -1,7 +1,7 @@
 # Validation and release checks
 
 The standalone application was checked on Windows with Python 3.12 and
-Django 5.2.18. Its 146 backend tests cover field workflows, role/site restrictions,
+Django 5.2.18. Its 167 backend tests cover field workflows, role/site restrictions,
 retry-safe operations, version conflicts, frozen reports, imports, resource
 permissions, BADM checks/exports, protected media, live public reports, imported
 caveat review, per-note uploads, INI revisioning, synchronized caveat timelines,
@@ -83,3 +83,23 @@ reference notes and OneNote link; search and shared filters; PDF rendering;
 file archive/restore; and unavailable-server calibration recording, reload and
 reconnection with an empty queue after synchronization. Test accounts, documents
 and records are kept outside the application repository and live database.
+
+## Security update
+
+Twenty-one additional security tests cover persistent login lockouts, attempts
+through both login routes, forged forwarding headers, cooldown/reset behavior,
+password masking, CSRF, open redirects, host headers, private endpoints, CORS and
+public write rejection. The complete suite now contains 167 tests. Dependency
+and static-analysis results, triage, remaining VM checks and the point-in-time
+limits of this review are documented in [SECURITY.md](../SECURITY.md).
+
+The final installed-repository run passed all 167 tests after the security
+migration. Browser smoke checks opened every main section, including
+Administration, BADM, processing and the reference library. An imported caveat
+was resolved successfully and then displayed as Resolved in the public report;
+the public timeline remained present and displayed prose contained no em dashes.
+Protected PDFs rendered without browser errors. A controlled HTTP 429 retained
+a calibration as pending without a conflict, and a retry emptied the queue. A
+fifth failed sign-in for a nonexistent QA account displayed the 15-minute pause
+screen. These actions used an isolated database and cookie names; real user
+accounts and scientific records were preserved.

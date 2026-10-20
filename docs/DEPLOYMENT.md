@@ -1,6 +1,9 @@
 # Running Carbonique Hub in production
 
-The source is ready for a normal Django deployment. It has not been deployed to your live server. Use a dedicated hostname and serve at `/`; the browser API and service-worker paths assume the hostname root.
+Read [Security and deployment review](../SECURITY.md) before launch. Use
+`deploy/production.env.example` as the production configuration reference.
+
+The source supports a normal Django deployment. It has not been deployed to your live server. Use a dedicated hostname and serve at `/`; the browser API and service-worker paths assume the hostname root.
 
 ## Linux with Gunicorn
 
@@ -22,6 +25,8 @@ CSRF_TRUSTED_ORIGINS=https://carbonique.example.org
 DATABASE_URL=postgresql://carbonique:your-url-encoded-password@localhost:5432/carbonique
 MEDIA_ROOT=/srv/carbonique-media
 TRUST_PROXY_HEADERS=True
+TRUSTED_PROXY_NETWORKS=127.0.0.1/32,::1/128
+EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend
 PUBLIC_FIELDNOTES_ENABLED=True
 ```
 
@@ -76,6 +81,7 @@ git pull
 python -m pip install -r requirements.txt
 python manage.py migrate
 python manage.py import_resources
+python manage.py import_calibrations
 python manage.py collectstatic --noinput
 sudo systemctl restart carbonique
 ```
@@ -103,3 +109,26 @@ The public report is sandboxed without same-origin privileges. All assets are em
 Use `pg_dump` or your database's normal tooling plus the media directory for live production backups. The portable `backup_hub` command includes Django fixture data and media; pause writers while it runs to keep database and files consistent. Store backups off-server and outside the repository. Secrets such as SECRET_KEY and SMTP credentials are not included and need their own secure configuration backup.
 
 Restore portable backups only into an empty, migrated database and empty media directory. `restore_hub` refuses to overwrite an existing workspace and validates archive paths. Verify file counts and open representative attachments after restore. Back up protected INI revisions and attachments with the database; keep source archives under Git.
+
+## Login protection and proxy limits
+
+Install all requirements and run migrations before restarting an updated
+service. Django Axes stores failed logins in the database. Five failures for the
+same username/client address pause further attempts for 15 minutes. Both the
+team and admin login are covered; browser/session changes do not reset the
+counter. Recover an accidental lockout with
+`python manage.py axes_reset_username USERNAME` from the server console.
+
+nginx limits authentication POSTs and expensive public-report rendering
+separately from ordinary requests and static assets. Adapt the limits to shared
+campus/VPN traffic and run `nginx -t` before reload. Its access log format redacts
+reset paths and omits query/Referer values. Container Gunicorn access logging is
+left off to avoid duplicating unredacted reset URLs; retain nginx logs and server
+error logs with restricted access and rotation.
+
+`X-Real-IP` is accepted only from TRUSTED_PROXY_NETWORKS while proxy mode is
+on. nginx overwrites it with the client address. Docker deployments must list the
+actual proxy/bridge peer explicitly. Never expose Gunicorn directly. A reverse
+proxy or VPN with MFA should protect administrator access. No native MFA is
+included in the application. Default device passwords require separate tower
+network protection even though this app does not use those passwords.

@@ -21,6 +21,15 @@ hunting restrictions, access arrangements or other conditions, along with a
 review/restriction date. An overdue date means the statement needs review; it
 does not automatically declare the site open or safe.
 
+### Sign-in protection and access
+
+New and changed passwords require at least 12 characters. A session lasts 12
+hours. Five unsuccessful attempts for the same account/client address pause
+sign-in for 15 minutes; the team and administrator login share this protection.
+An administrator can recover a mistaken lockout from the server console. A
+paused or expired sign-in does not erase pending field records. Sign in with the
+same account to resume synchronization.
+
 ### Choose the section for your task
 
 | Section | Use it for |
@@ -30,7 +39,7 @@ does not automatically declare the site open or safe.
 | History | Find previous visits, task activity, frozen reports and exports |
 | Sites & instruments | Read site descriptions, sensor arrangements, deployments, assigned equipment, calibration logs, files and data identifiers; view tower media |
 | BADM | Enter or review site metadata, inspect missing information and download a site export |
-| Data & processing | Record affected data periods, caveats, evidence and versioned processing configurations |
+| Data & processing | Review caveats, affected periods and evidence; keep scientific configuration history and upload/download versioned TraceAnalysis INIs |
 | Inventory | Track individual instruments, serial numbers, locations and service history across the network |
 | Reference library | Keep hardware manuals, wiring, troubleshooting, repair notes, OneNote links and supporting files, per site or shared across the network |
 | Protocols | Read maintenance/safety PDFs in the app and download originals |
@@ -65,7 +74,9 @@ Attach files, preview PDFs/images, or paste a OneNote HTTP(S) web sharing link.
 The notebook remains hosted by its original provider and keeps that provider's
 access controls. Use **Protocols** for approved operating procedures. Library
 writes and file access require a connection; prepared snapshots retain the notes
-for reading. Archived entries and files can be restored.
+for reading. Members and higher roles can contribute to accessible active sites.
+Shared references require network-wide access to edit; viewers can read and
+download. Archived entries and files can be restored.
 
 ### Plan, record and finish field work
 
@@ -96,7 +107,9 @@ selected records on that device. HTTPS is required except for local development.
 Open the prepared site before leaving. Offline field records enter a local sync
 queue and remain visible as pending. Reopen the app after reconnecting and wait
 for the queue to empty. If a session expired, sign in with the same account. Use
-**Sync queue** to inspect a conflict, retry, or export a blocked record. Keep the
+**Sync queue** to inspect a conflict, retry, or export a blocked record. Temporary
+HTTP 429 throttling keeps the record queued for retry rather than treating it as
+a version conflict. Keep the
 app open while uploading. Synchronize before signing out, clearing browser
 storage or changing devices; pending records are held only on that device.
 
@@ -146,7 +159,8 @@ not just to visible buttons. See the role table in the [README](../README.md).
 `/fieldnotes/` is the public read-only report. Site descriptions/conditions,
 visits and caveats update on its next load after a team edit. Drafts are labeled
 awaiting review; resolved caveats remain visible. Inventory, BADM, protocols,
-monitoring and uploaded note files require team access. **Download HTML** saves
+monitoring, calibration logs, the reference library and uploaded note files
+require team access. **Download HTML** saves
 a self-contained public snapshot; `/reference/` redirects to the same live report.
 The timeline includes visits and caveats, with unknown affected dates kept in a
 separate area. Use **Refresh public site** to reload all current public records;
@@ -179,6 +193,8 @@ alternative deployment package.
 | `hub/models.py`, `hub/resources_models.py`, `hub/migrations/` | Visits, tasks, reports, deployments, caveats, roles, resources and monitoring snapshots |
 | `hub/api.py`, `hub/serializers.py`, `hub/permissions.py` | Main APIs, validation, roles and site access |
 | `hub/services.py` | Ordered field operations and retry/conflict handling |
+| `hub/record_models.py`, `hub/record_resources.py`, `static/hub/record-resources.js` | Per-site calibration logs, source-visit links, shared/site technical references and protected reference files |
+| `hub/security.py`, `carbonique/settings.py`, `templates/registration/login_locked.html` | Browser/cache policy, trusted proxy addresses, Django Axes login protection and the pause screen |
 | `hub/resources_api.py`, `hub/badm.py` | Conditions, protocols, media, BADM validation and exports |
 | `hub/monitor.py`, `hub/licor.py` | Server-side tower queries, allowlist, cooldowns, snapshots and response redaction |
 | `hub/views.py`, `hub/public_report.py`, `templates/` | Live public projection, page rendering and report export |
@@ -190,8 +206,8 @@ alternative deployment package.
 | `seed/`, `public/fieldnotes/` | Bundled reference, current INI source copies and historical report archive |
 | `hub/management/commands/`, `scripts/` | Setup, imports, backup/restore, polling and source extraction |
 | `deploy/`, `Dockerfile`, `compose.yaml` | VM service, reverse proxy and container examples |
-| `hub/tests.py`, `hub/test_resources.py`, `hub/test_monitor.py` | Backend workflow, resource and monitoring regression coverage |
-| `.github/workflows/checks.yml` | Automated Django, migration, static-file and JavaScript checks |
+| `hub/tests.py`, `hub/test_*.py` | Workflow, resource, public-sync, import, calibration, reference-library, monitoring and security regression coverage |
+| `.github/workflows/checks.yml` | Automated Django, migration, static-file, JavaScript and dependency vulnerability checks |
 
 ### Main data and request flow
 
@@ -207,6 +223,18 @@ versioned frozen reports. Deployments associate instruments with sites and
 nonoverlapping periods. Caveats link affected sites and evidence; configuration
 corrections create new immutable versions. Import mappings retain source IDs and
 prevent duplicate imports from overwriting later edits.
+
+CalibrationLog records one site's calibration or swap, including serviced and
+replacement instrument identities, preparation, date, comments, optional lab
+information and a source visit. Calibration files reuse protected Attachment
+storage. A swap does not silently change equipment locations or deployments.
+KnowledgeEntry records site-specific or shared technical notes and HTTP(S)
+links; KnowledgeFile holds protected originals and recoverable file archives.
+
+`seed/calibration_swaps.json` lists the 18 reviewed completed swaps. The
+`import_calibrations` command uses stable IDs and import receipts, preserves
+later edits and skips missing source visits. It does not infer new swaps from
+free text. New work should use the calibration form.
 
 Logger and measurement timestamps use fixed EST, UTC−05:00, without daylight
 saving time. The scientific editors convert those values to UTC for storage.
@@ -227,6 +255,29 @@ expected `base_version`; a stale edit returns a conflict instead of overwriting
 another user. Batch processing stops at the first failure to preserve dependency
 order. Inspect `results[].ok` and `results[].status` even when the batch response
 is HTTP 200. Conflicted operations remain in the queue for review.
+
+Calibration create/edit operations use the same ordered outbox as field notes.
+The record and its dependent files are enqueued atomically. Reference-library
+mutations require an online request and expected version; file batches validate
+before storage and duplicate active content is skipped by hash. External
+notebooks remain with their provider; the server never fetches a pasted link.
+
+### Security and production boundaries
+
+Django sessions, CSRF, role checks and site scope protect write APIs. Axes stores
+failed-login counts in the shared database so restarts or changing browser
+sessions do not reset them. `hub/security.py` trusts a forwarded client address
+only from configured proxy peers, and adds Content Security Policy, device
+permission restrictions and private/no-store response headers. The public report
+retains its own sandbox without same-origin privileges.
+
+nginx provides separate authentication, API/static and public-render limits;
+these require installing the production proxy configuration. Production also
+needs a private application/database port, valid HTTPS, a random secret and
+restricted administration, preferably VPN or SSO with MFA. The app does not
+include native MFA, antivirus scanning or volumetric DDoS protection. See
+[Security and deployment review](../SECURITY.md) for the checked protections,
+remaining VM tasks, recovery commands and review limits.
 
 ### BADM, PDFs and monitoring
 
@@ -257,7 +308,19 @@ from the repository root. After model changes, create and inspect migrations;
 keep existing upstream migration identities. After changing cached frontend
 assets, review the service worker's cache version/update behavior.
 
-Run the checks in [VALIDATION.md](VALIDATION.md) before committing. Add a focused
+Run the checks in [VALIDATION.md](VALIDATION.md) before committing. The current
+backend suite contains 167 tests. A typical local verification is:
+
+```bash
+python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py test hub
+python manage.py collectstatic --noinput
+```
+
+Run `python manage.py check --deploy` with the actual production environment,
+not the local DEBUG=True settings. CI also checks browser modules and audits
+requirements for known vulnerabilities. Add a focused
 regression for changed behavior, especially permissions, imports, conflicts or
 instrument query restrictions. For UI changes, verify the relevant flow in a
 browser, at a narrow viewport and offline when applicable.
@@ -275,9 +338,14 @@ routing, TLS, persistence and backups before use.
 | Symptom | First checks |
 |---|---|
 | Login succeeds but no sites/actions appear | User is active, has a TeamMember role, and has access to the site; a superuser has admin access |
+| Sign-in returns 429 | Wait for the 15-minute pause, confirm the account/client address, or use server-side recovery; inspect trusted-proxy configuration before changing security limits |
+| Queued work receives HTTP 429 | Keep the record on the device and retry after the limit clears; inspect nginx traffic budgets and avoid clearing browser storage |
+| Session expires during fieldwork | Sign in again with the same account; prepared snapshots and pending operations remain in IndexedDB |
 | A write returns 403 | Role/site permissions, archived site, current session and CSRF configuration; do not remove authorization checks |
 | Sync stops or returns 409 | Inspect the first failed queue operation, current server version and account; preserve/export pending records before clearing storage |
 | Public report differs from team records | Reload the live `/fieldnotes/`; exported HTML is a snapshot. Confirm database/media and the named public-field projection |
+| Calibration history is empty | Apply migrations and run import_calibrations after installing the bundled source visits; review site/filter/archive selections |
+| A shared reference cannot be edited | Confirm write role and network-wide site access; scoped accounts can edit their own permitted site entries |
 | Protocol file is missing | Check deployed seed files, protected storage and file ownership; upload a replacement with manager/admin access |
 | Tower says not configured | Confirm its exact site code in the private station JSON and the service's `MONITOR_STATIONS_FILE` environment |
 | Tower is unreachable or stale | VM route/VPN, firewall, TCP 7200 reachability, service logs, last check time, collector and fixed timestamp offset |
@@ -297,4 +365,5 @@ Detailed references: [Architecture](ARCHITECTURE.md), [Imports](IMPORTS.md),
 [Processing files](PROCESSING_FILES.md),
 [Deployment](DEPLOYMENT.md) and [Source provenance](../UPSTREAM.md).
 
-Detailed calibration and library setup: [Calibration and reference workflows](CALIBRATIONS_AND_REFERENCES.md).
+Additional references: [Calibration and reference workflows](CALIBRATIONS_AND_REFERENCES.md)
+and [Security and deployment review](../SECURITY.md).

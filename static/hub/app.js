@@ -54,7 +54,7 @@ async function api(path, {method="GET", data, form}={}) {
   try { response = await fetch(path, {method, headers, credentials:"same-origin", cache:"no-store", body:form || (data!==undefined ? JSON.stringify(data) : undefined)}); }
   catch { S.online=false; updateConnection(); throw new Error("No connection. Your queued field records remain on this device."); }
   S.online=true; updateConnection();
-  const body = await response.json().catch(()=>({detail:"Unexpected server response."}));
+  const body = await response.json().catch(()=>({detail:response.status===429?"Too many requests. Wait a moment and retry; queued records remain on this device.":"Unexpected server response."}));
   if (!response.ok) { const e=new Error(errorMessage(body)); e.status=response.status; e.body=body; throw e; }
   return body;
 }
@@ -124,7 +124,7 @@ async function synchronize() {
         if(item.kind==="upload") { const form=new FormData();form.append("id",item.id);form.append("site",item.siteId);form.append("file",item.file,item.file.name);for(const[k,v]of Object.entries(item.fields))if(v)form.append(k,v);await api("/api/attachments/",{method:"POST",form}); }
         else { const reply=await api("/api/sync/",{method:"POST",data:{operations:[item.operation]}});const result=reply.results[0];if(!result?.ok){const error=new Error(errorMessage(result?.error));error.status=result?.status;error.body=result?.error;throw error;} }
         await store.remove("outbox",item.id);
-      } catch(e) { if(e.status && e.status!==503){item.error={status:e.status,message:e.message,body:e.body};await store.put("outbox",item.id,item);await readQueue();}throw e; }
+      } catch(e) { if(e.status && ![429,503].includes(e.status)){item.error={status:e.status,message:e.message,body:e.body};await store.put("outbox",item.id,item);await readQueue();}throw e; }
     }
     await loadSite(S.siteId,false);await loadOverview();
     toast("All field records are synced.");
