@@ -1,0 +1,26 @@
+[Unit]
+Description=Carbonique Hub
+After=network.target postgresql.service
+
+[Service]
+User=carbonique
+Group=carbonique
+WorkingDirectory=/srv/carbonique-webapp
+EnvironmentFile=/etc/carbonique/app.env
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/srv/carbonique-webapp/.venv/bin/gunicorn carbonique.wsgi:application --bind 127.0.0.1:8010 --workers 2 --timeout 120 --worker-tmp-dir /tmp
+Restart=on-failure
+RestartSec=5
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+InaccessiblePaths=-/Data
+ReadWritePaths=/var/lib/carbonique/media
+MemoryMax=2G
+CPUQuota=200%
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

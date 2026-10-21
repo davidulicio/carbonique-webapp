@@ -39,7 +39,7 @@ same account to resume synchronization.
 | History | Find previous visits, task activity, frozen reports and exports |
 | Sites & instruments | Read site descriptions, sensor arrangements, deployments, assigned equipment, calibration logs, files and data identifiers; view tower media |
 | BADM | Enter or review site metadata, inspect missing information and download a site export |
-| Data & processing | Review caveats, affected periods and evidence; keep scientific configuration history and upload/download versioned TraceAnalysis INIs |
+| Data & processing | Review caveats, affected periods and evidence; keep scientific configuration history and open current TraceAnalysis INIs on GitHub |
 | Inventory | Track individual instruments, serial numbers, locations and service history across the network |
 | Reference library | Keep hardware manuals, wiring, troubleshooting, repair notes, OneNote links and supporting files, per site or shared across the network |
 | Protocols | Read maintenance/safety PDFs in the app and download originals |
@@ -166,15 +166,23 @@ The timeline includes visits and caveats, with unknown affected dates kept in a
 separate area. Use **Refresh public site** to reload all current public records;
 changes queued offline must upload first. See [Public site](PUBLIC_SITE.md).
 
-### Update processing INIs
+### Find current processing INIs
 
-Open **Data & processing → TraceAnalysis INI library** to read/download current files,
-inspect versions or upload multiple files/a folder. Researchers, managers and
-admins with the appropriate site access may upload. Changed files add revisions;
-identical current bytes are skipped. Twenty source copies initialize this library.
-The eight original configuration evidence files remain under Scientific
-configuration history. The source directory is never modified or executed.
+Open **Data & processing → TraceAnalysis INI files → Open INI files on GitHub**.
+The upstream Carbonique repository holds the current files and commit history.
+The public report links to the same folder. No app upload, synchronization or
+GitHub token is needed. This link requires an internet connection. Original
+scientific configuration evidence linked to caveats remains in the records.
 See [Processing files](PROCESSING_FILES.md).
+
+### Use the app on a phone
+
+Open the same HTTPS hostname in a modern phone browser. Use the menu button
+to open navigation, select a section, or close it with the close button or
+backdrop. The current site selector stays in the header. Forms become a single
+column and wide tables and tab rows scroll within their own area. Turn the
+phone sideways when a wide scientific table needs more space. Prepare fieldwork
+while online before leaving coverage; synchronize before clearing browser data.
 
 ## 2. Technical aspects and how it works
 
@@ -198,12 +206,12 @@ alternative deployment package.
 | `hub/resources_api.py`, `hub/badm.py` | Conditions, protocols, media, BADM validation and exports |
 | `hub/monitor.py`, `hub/licor.py` | Server-side tower queries, allowlist, cooldowns, snapshots and response redaction |
 | `hub/views.py`, `hub/public_report.py`, `templates/` | Live public projection, page rendering and report export |
-| `hub/processing_files.py`, `static/hub/processing-files.js` | Versioned INI validation, permissions, downloads and interface |
+| `static/hub/processing-files.js` | Current INI source link; legacy protected revision storage remains for archive recovery |
 | `hub/media.py` | Protected attachment/site-media range streaming |
 | `static/hub/app.js` | Navigation, workspace state and field/scientific forms |
 | `static/hub/resources.js`, `monitor.js`, `pdf-viewer.js` | Resource editors, monitor interface and local PDF reader |
 | `static/hub/storage.js`, `sw.js` | IndexedDB, outbox, prepared files and offline app shell |
-| `seed/`, `public/fieldnotes/` | Bundled reference, current INI source copies and historical report archive |
+| `seed/`, `public/fieldnotes/` | Bundled original reference evidence and historical report archive |
 | `hub/management/commands/`, `scripts/` | Setup, imports, backup/restore, polling and source extraction |
 | `deploy/`, `Dockerfile`, `compose.yaml` | VM service, reverse proxy and container examples |
 | `hub/tests.py`, `hub/test_*.py` | Workflow, resource, public-sync, import, calibration, reference-library, monitoring and security regression coverage |
@@ -367,3 +375,21 @@ Detailed references: [Architecture](ARCHITECTURE.md), [Imports](IMPORTS.md),
 
 Additional references: [Calibration and reference workflows](CALIBRATIONS_AND_REFERENCES.md)
 and [Security and deployment review](../SECURITY.md).
+
+
+The [Arbutus installation guide](ARBUTUS_INSTALLATION.md) explains the existing
+Ubuntu VM deployment, service permissions, PostgreSQL, coexistence with other
+websites, HTTPS, network controls and backup/restore. Raw tower data stays
+separate from application uploads. A future plotting API can read approved
+derived files with read-only permissions; it is not implemented in this release.
+
+
+Responsive layout rules are in `static/hub/style.css`, with identity accents in
+`resources.css` and the public report layout in `public-report.css`. The mobile
+drawer in `app.js` uses a backdrop, inert background content, an expanded state
+and keyboard focus handling. Opening a form closes the drawer; background
+refresh waits while the menu is open. Wide scientific tables scroll locally.
+Site naming defaults live in `inventory/site_names.py`; migration 0015 updates
+existing records once, and `update_site_names` provides an explicit recovery
+command after an older backup is restored. The original source metadata remains
+available for provenance while current site names are used in rendered views.

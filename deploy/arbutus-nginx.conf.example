@@ -1,0 +1,94 @@
+# Arbutus named-host example; preserves other sites and default servers.
+# Include this file inside nginx's http {} block (sites-enabled normally is).
+# Replace carbonique.example.org and the certificate paths before use.
+# If a CDN is added, configure real_ip with ONLY its trusted address ranges first.
+# Keep reset tokens, query strings and Referer values out of access logs.
+map $uri $arbutus_safe_request_path {
+    default $uri;
+    ~^/accounts/reset/ /accounts/reset/[redacted]/;
+}
+log_format carbonique_arbutus_security '$remote_addr [$time_local] "$request_method $arbutus_safe_request_path $server_protocol" $status $body_bytes_sent';
+
+map $request_method $arbutus_auth_limit_key {
+    default "";
+    POST $binary_remote_addr;
+}
+limit_req_zone $arbutus_auth_limit_key zone=carbonique_arbutus_auth:10m rate=10r/m;
+limit_req_zone $binary_remote_addr zone=carbonique_arbutus_general:10m rate=20r/s;
+limit_req_zone $binary_remote_addr zone=carbonique_arbutus_static:10m rate=100r/s;
+limit_req_zone $binary_remote_addr zone=carbonique_arbutus_public:10m rate=30r/m;
+limit_req_zone $server_name zone=carbonique_arbutus_report_total:1m rate=2r/s;
+limit_conn_zone $binary_remote_addr zone=carbonique_arbutus_connections:10m;
+
+server {
+    listen 80;
+    server_name carbonique.example.org;
+    access_log /var/log/nginx/carbonique-access.log carbonique_arbutus_security;
+    location ^~ /.well-known/acme-challenge/ {
+        root /var/www/carbonique-acme;
+        try_files $uri =404;
+    }
+    location / { return 301 https://carbonique.example.org$request_uri; }
+}
+server {
+    listen 443 ssl;
+    server_name carbonique.example.org;
+    ssl_certificate /etc/letsencrypt/live/carbonique.example.org/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/carbonique.example.org/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    server_tokens off;
+    access_log /var/log/nginx/carbonique-access.log carbonique_arbutus_security;
+    client_max_body_size 105m;
+    client_body_timeout 30s;
+    client_header_timeout 15s;
+    keepalive_timeout 30s;
+    limit_req_status 429;
+    limit_conn_status 429;
+    limit_conn carbonique_arbutus_connections 100;
+
+    # Overwrite client-supplied forwarding headers. The app port stays private.
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $remote_addr;
+    proxy_read_timeout 120s;
+    proxy_connect_timeout 5s;
+
+    # Replace this example network with the actual administrator VPN/CIDR.
+    location ^~ /admin/ {
+        allow 198.51.100.0/24;
+        deny all;
+        client_max_body_size 105m;
+        limit_req zone=carbonique_arbutus_general burst=40 nodelay;
+        limit_req zone=carbonique_arbutus_auth burst=10 nodelay;
+        proxy_pass http://127.0.0.1:8010;
+    }
+
+    # Authentication POSTs include team/admin login and password reset requests.
+    location ~ ^/(accounts/|admin/login/) {
+        client_max_body_size 64k;
+        limit_req zone=carbonique_arbutus_general burst=40 nodelay;
+        limit_req zone=carbonique_arbutus_auth burst=10 nodelay;
+        proxy_pass http://127.0.0.1:8010;
+    }
+    # Rendering embeds scientific figures and is more expensive than the shell.
+    location ~ ^/fieldnotes/(content|download)/ {
+        limit_req zone=carbonique_arbutus_public burst=10 nodelay;
+        limit_req zone=carbonique_arbutus_report_total burst=6 nodelay;
+        proxy_pass http://127.0.0.1:8010;
+    }
+    location ~ ^/(\.|private-media/|media/|backups/|exports/|credentials/|seed/|db\.sqlite3) {
+        return 404;
+    }
+    # Pre-caching the offline shell requests many small assets together.
+    location ^~ /static/ {
+        limit_req zone=carbonique_arbutus_static burst=150 nodelay;
+        proxy_pass http://127.0.0.1:8010;
+    }
+    location / {
+        limit_req zone=carbonique_arbutus_general burst=40 nodelay;
+        proxy_pass http://127.0.0.1:8010;
+    }
+    # Never create a public alias for MEDIA_ROOT or the repository directory.
+    # Protect /admin/ with a VPN or an identity proxy with MFA before launch.
+}

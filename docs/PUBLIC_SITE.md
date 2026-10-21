@@ -16,9 +16,8 @@ The report reads the current database on each request, with caching disabled:
 - Every caveat, including drafts labeled awaiting review, reviewed and resolved
   entries. Shared caveats appear once and can be filtered by affected site.
   A review or resolution changes its public status; reopening updates it again.
-- Supplied diagnostic plots, common setup and latest INI downloads for registered
-  sites and shared includes. Before the INI library is initialized, the original
-  configuration evidence remains available as a fallback.
+- Supplied diagnostic plots and common setup. Current TraceAnalysis INIs are
+  linked to their GitHub folder rather than embedded or downloaded from this app.
 
 Save changes using the appropriate team editor and reload the public report.
 Publication flags from earlier versions no longer filter this agreed content.
@@ -55,7 +54,7 @@ move through dated and undated markers. Site/type/search filters apply to both.
 ## Export and hosting
 
 **Download HTML** (`/fieldnotes/download/`) produces a self-contained report with
-embedded fonts, logo, images, styles, scripts and byte-preserving INI downloads.
+embedded fonts, logo, images, styles and scripts, plus the upstream GitHub INI link.
 Open it locally or host it on GitHub Pages. It is a snapshot: export and replace
 it again after changes. Exported snapshots do not offer a live refresh control.
 GitHub Pages cannot run the database or the live app.

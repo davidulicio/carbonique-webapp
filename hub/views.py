@@ -150,7 +150,7 @@ def fieldnotes_content(request):
     from .public_report import render_report
     response = HttpResponse(render_report(), content_type="text/html; charset=utf-8")
     response["Cache-Control"] = "no-store"
-    response["Content-Security-Policy"] = "sandbox allow-scripts allow-popups allow-downloads; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'"
+    response["Content-Security-Policy"] = "sandbox allow-scripts allow-popups allow-popups-to-escape-sandbox allow-downloads; default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data: blob:; font-src data:; base-uri 'none'; form-action 'none'; frame-ancestors 'self'"
     return response
 
 

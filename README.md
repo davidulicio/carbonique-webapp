@@ -18,7 +18,8 @@ the VM.
 Start with **[Application overview](docs/OVERVIEW.md)**. Its two sections explain
 how to use the app and how the implementation works, including the main files,
 data flow and troubleshooting steps. Detailed deployment, import and resource
-guides are linked from there.
+guides are linked from there. The workspace also adapts to phones with a
+collapsible menu, touch controls, single-column forms and contained table scrolling.
 
 ## Security before publishing
 
@@ -109,12 +110,12 @@ saved changes, including current site conditions. There is no separate
 publication checkbox; offline changes must finish synchronizing first.
 
 The report retains the supplied site photographs, diagnostic plots, tower
-diagrams, common setup and processing INI downloads. Inventory, BADM, protocols,
+diagrams, common setup and a link to current processing INIs on GitHub. Inventory, BADM, protocols,
 monitoring, accounts and newly uploaded operational attachments stay in the
 authenticated workspace. Public visitors have no editing controls or write API.
 
 **Download HTML** produces a self-contained snapshot with embedded assets and
-INI downloads. It can be shared or hosted on GitHub Pages, but must be exported
+the GitHub INI source link. It can be shared or hosted on GitHub Pages, but must be exported
 again after later changes. The live app requires a Django server. `/reference/`
 redirects to the same report. `public/fieldnotes/index.html` is retained only as
 the original source archive; replacing it does not change the live report.
@@ -128,7 +129,7 @@ See [Public site behavior](docs/PUBLIC_SITE.md).
 | Field work | Off-site planning; on-site visits; tasks; observations; checklists; documents, images, audio and video attached to individual notes |
 | History | Searchable visits and all task activity, classifications, frozen report revisions, CSV exports and attachments |
 | Sites & instruments | Tabs for reference metadata, sensor-height/deployment history, site equipment, visits, photos/documents and DOI records |
-| Data & processing | Draft/reviewed/resolved caveats, evidence, current INI file library with revision history, and scientific configuration history |
+| Data & processing | Draft/reviewed/resolved caveats, evidence, current GitHub INI source link, and scientific configuration history |
 | Inventory | Serial numbers, models, current locations, service-history/files tabs and archived equipment |
 | Site resources | ICOS BADM records, completeness checks and exports; tower photos, videos and GIFs |
 | Protocols | In-app PDF reading, downloads and manager/admin document uploads |
@@ -177,28 +178,43 @@ The app must be open to upload; it does not promise synchronization while a phon
 the bundled reference and maintenance checklists without requiring Hank's
 database. It includes the six sites, 127 classified visit summaries, 19 caveats,
 site/instrument descriptions, photos, diagnostic plots, eight historical processing
-INI files, twenty current INI source copies and seven protocol PDFs. The scientific records retain their source IDs
+INI evidence files and seven protocol PDFs. Current INIs are maintained on GitHub. The scientific records retain their source IDs
 and uncertainties. Site conditions, new field operations and additional BADM
 records are maintained in this app.
 
 See [docs/IMPORTS.md](docs/IMPORTS.md) for the source map and repeat imports, and
-[the INI library guide](docs/PROCESSING_FILES.md) for file updates and revisions. Create your own administrator account; old
+[the processing files guide](docs/PROCESSING_FILES.md) for the current GitHub source. Create your own administrator account; old
 accounts and passwords are not imported.
 
-## Updating INI files
+## Site display names
 
-In **Data & processing → TraceAnalysis INI library**, researchers, managers and admins
-can select multiple `.ini` files, drop files onto the panel or choose a folder.
-Changed files create immutable revisions; uploading identical current bytes
-does not create a duplicate. Read, download and inspect prior revisions there.
-All team roles can read files permitted by their site access. Shared/unassigned
-files require network-wide access to update. Uploads need a connection.
+| Site code | Name |
+|---|---|
+| UQAM_1 | Lac Saint-Pierre Transformed Marsh |
+| UQAM_2 | Lac-à-la-Tortue Natural Open Bog |
+| UQAM_3 | Lac-à-la-Tortue Natural Forested Bog |
+| UQAM_4 | Saint-Rémi Transformed Forested Peatland |
+| UQAM_5 | Baie Saint-François Natural Marsh |
+| MCGILL_1 | Lac Saint-Pierre Restored Marsh |
 
-Twenty files copied from the supplied TraceAnalysis directory initialize the
-library. Original files are never changed or executed. See
-[Processing files](docs/PROCESSING_FILES.md) for limits and repeat imports.
+The naming migration preserves existing codes, IDs and record links. Fresh
+reference imports use the same names. After restoring an older backup, run
+`python manage.py update_site_names` only when you intend to apply these six
+approved display names again. Later administrator edits are otherwise retained.
+
+## Current INI files
+
+**Data & processing** links directly to the
+[Carbonique TraceAnalysis folder](https://github.com/CARBONI-QUE/UQAM_Software_and_Settings/tree/main/Database/Calculation_Procedures/TraceAnalysis_ini).
+The public report uses the same link. View current files and commit history,
+and download originals there. The app does not mirror or synchronize current
+INIs. Historical configuration evidence linked to caveats stays in the records.
 
 ## Deployment
+
+For your existing Ubuntu VM, follow the detailed **[Arbutus installation guide](docs/ARBUTUS_INSTALLATION.md)**
+and its [printable PDF](docs/Carbonique_Arbutus_Installation_Guide.pdf). It covers existing web services,
+network access, migration, HTTPS, phones, backups and troubleshooting.
 
 See **[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)** for Linux/Gunicorn and Docker
 Compose with PostgreSQL. GitHub stores source; GitHub Pages can host an exported
@@ -212,7 +228,8 @@ The app rejects the development secret with `DEBUG=False`.
 For an existing installation: back up database/media, deploy source, run
 `python manage.py migrate`, `python manage.py import_resources` and
 `python manage.py collectstatic --noinput`, then restart the service. Imports
-preserve existing records and later INI uploads.
+preserve existing records and historical evidence. The approved six site display
+names are applied by the new migration; codes and record relationships remain stable.
 
 ## Checks and backups
 
@@ -230,7 +247,7 @@ python manage.py backup_hub --output backups/carbonique.zip
 python manage.py restore_hub --file /path/to/carbonique.zip
 ```
 
-The live public report is rebuilt from database records and stored scientific images/INIs. Back up database and media together; keep bundled source archives under Git.
+The live public report is rebuilt from database records and stored scientific images. Back up database and media together; keep bundled source archives under Git.
 
 ## Important information for GitHub users
 

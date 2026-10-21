@@ -26,7 +26,9 @@ against staging data with explicit source mappings.
 
 The bundled snapshot contains six sites, 127 classified visit summaries,
 19 data caveats, photographs, plots and eight historical TraceAnalysis INI files.
-Twenty current INI source copies initialize a separate immutable revision library.
+The original twenty-file INI snapshot remains archival material. The workspace
+and public report now link to the maintained GitHub folder instead of showing
+a current local revision library.
 Imports retain source IDs and preserve later edits. Classified summaries are
 not verbatim source field notes. Unknown equipment identities and historical
 period boundaries remain unspecified for review.

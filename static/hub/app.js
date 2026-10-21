@@ -225,7 +225,8 @@ function siteView(){
   ],S.siteTab);
 }
 function siteReferenceView(){
-  const site=S.data.site,reference=site.metadata.reference||{},sections=(reference.sections||[]).filter(section=>section.h!=="Processing settings");
+  const site=S.data.site,reference=site.metadata.reference||{},sections=clone(reference.sections||[]).filter(section=>section.h!=="Processing settings");
+  for(const section of sections)for(const item of section.items||[])if(item.k==="Site name")item.v=site.name;
   const deployments=S.data.deployments.sort((a,b)=>b.installed_at.localeCompare(a.installed_at));
   const active=deployments.filter(d=>!d.removed_at||new Date(d.removed_at)>new Date());
   const equip=id=>S.data.equipment.find(e=>e.id===id);
@@ -244,6 +245,7 @@ function field(name,label,value="",{type="text",required=false,help="",options,w
 }
 let dialogHandler;
 function openForm(title,body,save,label="Save"){
+  setNavigationOpen(false);
   S.dialogURLs.forEach(url=>URL.revokeObjectURL(url));S.dialogURLs=[];
   $("#dialog-title").textContent=title;$("#dialog-body").innerHTML=body;$("#dialog-error").hidden=true;$("#dialog-save").textContent=label;$("#dialog-save").hidden=!save;$("#dialog-save").disabled=false;dialogHandler=save;normalizeProse($("#dialog"));$("#dialog").showModal();void hydrateImages();
 }
@@ -290,7 +292,7 @@ async function prepareFieldwork(){
 }
 async function queueDialog(){await readQueue();openForm("Synchronization queue",`<p class="small muted">${S.queue.length} records remain on this device. A blocked item pauses later records so dependent work stays in order.</p>${S.queue.map(item=>`<div class="section-divider"><strong>${esc(item.kind==="upload"?item.file.name:item.operation.kind)}</strong><p class="small muted">${esc(S.sites.find(s=>s.id===item.siteId)?.code)} · ${time(new Date(item.order).toISOString())}</p>${item.error?`<div class="error">${esc(item.error.message)}</div><div class="row-actions">${button("Review & retry","review-queue",item.id)}${button("Export pending record","export-queue",item.id)}${button("Discard this record","discard-queue",item.id,"danger small")}</div>`:""}</div>`).join("")||empty("Everything is synced")}`,async()=>{closeDialog();S.blocked=null;void synchronize();},"Sync now");}
 async function reviewQueue(id){const item=S.queue.find(q=>q.id===id);onlineOnly();const latest=await api(`/api/snapshot/?site=${item.siteId}`);const record=item.kind==="operation"?[...latest.tasks,...latest.visits,...(latest.calibrations||[])].find(r=>r.id===item.operation.entity_id):null;closeDialog();openForm("Review the conflicting record",`<p>Compare your queued change with the current server record before retrying.</p><h3>Your change</h3><pre class="json-block">${esc(JSON.stringify(item.operation?.payload||item.fields,null,2))}</pre><h3>Current record</h3><pre class="json-block">${esc(JSON.stringify(record||item.error.body,null,2))}</pre><p class="small muted">Retry uses the current version. Your intended change will still be checked by the server.</p>`,async()=>{if(item.operation){item.operation.id=uuid();if(record)item.operation.base_version=record.version;}delete item.error;await store.put("outbox",item.id,item);await readQueue();void synchronize();},"Apply my change to current version");}
-async function navigate(view){S.view=view;S.filter="";S.typeFilter="all";location.hash=view;$(".sidebar").classList.remove("visible");if(view==="badm")await resources.loadSchema();if(view==="knowledge")await records.loadKnowledge();if(view==="monitor"){monitor.network();render();await monitor.load(true);return;}if(view==="admin"&&admin()&&navigator.onLine)S.team=await api("/api/team/");render();}
+async function navigate(view){S.view=view;S.filter="";S.typeFilter="all";location.hash=view;setNavigationOpen(false);if(view==="badm")await resources.loadSchema();if(view==="knowledge")await records.loadKnowledge();if(view==="monitor"){monitor.network();render();await monitor.load(true);return;}if(view==="admin"&&admin()&&navigator.onLine)S.team=await api("/api/team/");render();}
 document.addEventListener("click",async event=>{
   const target=event.target.closest("[data-action]");if(!target)return;event.preventDefault();const action=target.dataset.action,id=target.dataset.id;
   try{if(await records.action(action,id))return;if(await processingFiles.action(action,id))return;if(await resources.action(action,id))return;if(await monitor.action(action,id))return;const task=S.data?.tasks.find(t=>t.id===id),visit=S.data?.visits.find(v=>v.id===id);switch(action){
@@ -372,7 +374,46 @@ document.addEventListener("keydown",event=>{
 let searchTimer;document.addEventListener("input",event=>{if(!event.target.dataset.search)return;S.filter=event.target.value;clearTimeout(searchTimer);const start=event.target.selectionStart,end=event.target.selectionEnd,key=event.target.dataset.search;searchTimer=setTimeout(()=>{render();const input=document.querySelector(`[data-search="${key}"]`);input?.focus();input?.setSelectionRange(start,end);},180);});
 document.addEventListener("change",event=>{if(event.target.dataset.filter){S.typeFilter=event.target.value;render();}});
 $("#site-select").onchange=async event=>{S.visitId=null;await loadSite(Number(event.target.value));};
-$("#mobile-menu").onclick=()=>$(".sidebar").classList.toggle("visible");
+// Older prepared shells can still load the updated assets while offline.
+if(!$("#navigation-close"))$(".sidebar").insertAdjacentHTML("afterbegin",'<button id="navigation-close" class="icon-button navigation-close" aria-label="Close navigation">×</button>');
+if(!$("#navigation-backdrop"))document.body.insertAdjacentHTML("afterbegin",'<button id="navigation-backdrop" class="navigation-backdrop" aria-label="Close navigation" tabindex="-1" hidden></button>');
+$(".sidebar").id="workspace-navigation";
+$(".sidebar").setAttribute("aria-label","Workspace navigation");
+$("#mobile-menu").setAttribute("aria-controls","workspace-navigation");
+$("#mobile-menu").setAttribute("aria-label","Open navigation");
+// Keep a phone drawer accessible without allowing clicks behind it.
+const phoneNavigation=window.matchMedia("(max-width:760px)");
+function setNavigationOpen(open,{restoreFocus=true}={}){
+  const sidebar=$(".sidebar"),wasOpen=sidebar.classList.contains("visible");
+  const expanded=phoneNavigation.matches&&open;
+  sidebar.classList.toggle("visible",expanded);
+  sidebar.inert=phoneNavigation.matches&&!expanded;
+  $(".workspace").inert=expanded;
+  document.body.classList.toggle("navigation-open",expanded);
+  $("#navigation-backdrop").hidden=!expanded;
+  $("#mobile-menu").setAttribute("aria-expanded",String(expanded));
+  if(expanded){
+    sidebar.setAttribute("role","dialog");sidebar.setAttribute("aria-modal","true");
+    $("#navigation-close").focus();
+  }else{
+    sidebar.removeAttribute("role");sidebar.removeAttribute("aria-modal");
+    if(wasOpen&&restoreFocus&&phoneNavigation.matches)$("#mobile-menu").focus();
+  }
+}
+$("#mobile-menu").onclick=()=>setNavigationOpen(true);
+$("#navigation-close").onclick=()=>setNavigationOpen(false);
+$("#navigation-backdrop").onclick=()=>setNavigationOpen(false);
+phoneNavigation.addEventListener("change",()=>setNavigationOpen(false));
+document.addEventListener("keydown",event=>{
+  if(!phoneNavigation.matches||!$(".sidebar").classList.contains("visible"))return;
+  if(event.key==="Escape"){event.preventDefault();setNavigationOpen(false);return;}
+  if(event.key!=="Tab")return;
+  const controls=[...$(".sidebar").querySelectorAll("a[href],button:not(:disabled)")].filter(el=>el.getClientRects().length);
+  const first=controls[0],last=controls.at(-1);
+  if(event.shiftKey&&document.activeElement===first){event.preventDefault();last?.focus();}
+  else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first?.focus();}
+});
+setNavigationOpen(false,{restoreFocus:false});
 $("#prepare-button").onclick=()=>prepareFieldwork().catch(e=>toast(e.message,true));
 $("#queue-button").onclick=()=>queueDialog().catch(e=>toast(e.message,true));
 $("#refresh-button").onclick=async()=>{try{await synchronize();await refreshWorkspace();render();toast("Workspace refreshed.");}catch(e){toast(e.message,true);}};
@@ -394,7 +435,7 @@ async function boot(){
     if(S.view==="monitor")void monitor.load(true);
     if("serviceWorker" in navigator)await navigator.serviceWorker.register("/sw.js",{scope:"/"});
     void synchronize();
-    setInterval(async()=>{if(!navigator.onLine||S.syncing||$("#dialog").open)return;if(S.queue.length){void synchronize();return;}if(S.view==="monitor"){await monitor.auto();return;}try{await loadSite(S.siteId,false);if(S.view==="overview")await loadOverview();render();}catch{}},15000);
+    setInterval(async()=>{if(!navigator.onLine||S.syncing||$("#dialog").open||$(".sidebar").classList.contains("visible"))return;if(S.queue.length){void synchronize();return;}if(S.view==="monitor"){await monitor.auto();return;}try{await loadSite(S.siteId,false);if(S.view==="overview")await loadOverview();render();}catch{}},15000);
   }catch(e){$("#main").innerHTML=empty("Could not open the workspace",e.message);toast(e.message,true);}
 }
 const resources=createResources({S,esc,rich,day,time,button,empty,field,openForm,api,refreshCsrf,refreshWorkspace,render,toast,onlineOnly,header,store});

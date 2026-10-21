@@ -11,3 +11,6 @@ static/hub/vendor/** -text linguist-vendored=true
 # Keep original INI bytes and their existing whitespace unchanged.
 seed/processing_files/** -text -whitespace
 seed/processing_files/catalogue.json text eol=lf
+
+# Store documents without text or line-ending conversion.
+*.pdf binary

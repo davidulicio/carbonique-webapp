@@ -1,7 +1,7 @@
 # Validation and release checks
 
 The standalone application was checked on Windows with Python 3.12 and
-Django 5.2.18. Its 167 backend tests cover field workflows, role/site restrictions,
+Django 5.2.18. Its 169 backend tests cover field workflows, role/site restrictions,
 retry-safe operations, version conflicts, frozen reports, imports, resource
 permissions, BADM checks/exports, protected media, live public reports, imported
 caveat review, per-note uploads, INI revisioning, synchronized caveat timelines,
@@ -89,7 +89,7 @@ and records are kept outside the application repository and live database.
 Twenty-one additional security tests cover persistent login lockouts, attempts
 through both login routes, forged forwarding headers, cooldown/reset behavior,
 password masking, CSRF, open redirects, host headers, private endpoints, CORS and
-public write rejection. The complete suite now contains 167 tests. Dependency
+public write rejection. The complete suite now contains 169 tests. Dependency
 and static-analysis results, triage, remaining VM checks and the point-in-time
 limits of this review are documented in [SECURITY.md](../SECURITY.md).
 
@@ -103,3 +103,32 @@ a calibration as pending without a conflict, and a retry emptied the queue. A
 fifth failed sign-in for a nonexistent QA account displayed the 15-minute pause
 screen. These actions used an isolated database and cookie names; real user
 accounts and scientific records were preserved.
+
+
+## Responsive layout and deployment guide reviewed 21 October 2026
+
+All 169 backend tests passed after the site-name migration and public GitHub
+source-link change. New checks cover fresh imports, existing code/record links,
+version increments, preserved metadata and public names, plus removal of
+embedded legacy INI copies from both the live and exported report. Current
+INIs link to the supplied GitHub folder; archived scientific evidence is retained.
+
+Browser layout checks covered every workspace section at widths 375, 768, 1024
+and 1366 pixels, plus narrow 320 pixel checks. Short windows used 600 pixel
+height; phone checks also used 568 and 812 pixel heights. The public maintenance
+report and site tab were checked at phone/tablet sizes. No page-level horizontal
+overflow remained in these checks. Wide tables/tabs use local scrolling.
+
+The multicolour sidebar accent is a border rather than an overlapping absolute
+element. The phone drawer blocks background interaction, contains keyboard
+focus, closes with Escape and returns focus to its opener. Phone form controls
+use 16 pixel text. UI checks opened forms without saving fixture changes and
+confirmed an empty browser error log.
+
+The 14-page Arbutus installation PDF was rendered and every page inspected.
+The guide covers fresh setup, portable record migration, private service
+permissions, existing proxy coexistence, HTTPS, firewall/security groups,
+backups, updates, mobile checks and future read-only data plots. Actual VM
+configuration, Linux service startup, nginx/Apache syntax and real SMTP/private
+tower connectivity still require verification on that host. No remote VM or
+tower source files were modified in this review.

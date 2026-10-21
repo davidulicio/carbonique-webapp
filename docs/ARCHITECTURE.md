@@ -28,7 +28,7 @@ For a guided user/developer introduction, see [Application overview](OVERVIEW.md
 | CalibrationLog | Site; work date/type, serviced and replacement sensors, preparation, lab dates, source visit, comments and optimistic version |
 | KnowledgeEntry / KnowledgeFile | Scoped or shared reference notes, HTTP(S) notebook links, protected files, hashes and recoverable archives |
 | Attachment | Permission-checked site; optional visit/task/activity/observation/equipment/caveat/configuration/calibration; hash and original filename |
-| ProcessingFile / ProcessingFileVersion | Relative INI path/site and immutable protected byte revisions, hashes and source timestamps |
+| ProcessingFile / ProcessingFileVersion | Legacy protected INI revision archive retained for backup compatibility; current files are maintained on GitHub |
 | SiteCondition | Site; access statement, review date, editor and optimistic version |
 | BadmProfile / BadmRecord | Site; station class/identifier, applicable groups and repeatable metadata observations |
 | Protocol / SiteMedia | Protected PDF library and site-specific video/image records |
@@ -61,7 +61,7 @@ Authenticated APIs use Django session authentication and CSRF validation. They a
 | POST `/api/sync/` | Ordered, idempotent field operations |
 | `/api/sites/`, `/api/equipment/`, `/api/deployments/`, `/api/caveats/` | Role-scoped CRUD without destructive delete endpoints |
 | `/api/configurations/` | Read/create immutable scientific configuration versions |
-| `/api/processing-files/`, `/processing-files/ID/` | INI library, bulk revision upload and protected original-byte downloads |
+| `/api/processing-files/`, `/processing-files/ID/` | Legacy recovery endpoints for protected INI revisions; not used by the current workspace |
 | `/fieldnotes/`, `/fieldnotes/content/`, `/fieldnotes/download/` | Public current report and self-contained export; GET only |
 | `/api/dois/`, `/api/equipment-history/`, `/api/checklists/` | Related reference and maintenance records |
 | `/api/team/` | Admin-only team management |
@@ -85,14 +85,16 @@ A note operation and its dependent files are enqueued in one IndexedDB transacti
 `/fieldnotes/` embeds the current database report in a sandboxed iframe;
 `/fieldnotes/content/` also applies a response sandbox for direct access. The
 named projection includes sites, visits and all caveat statuses, known scientific
-images, tower diagrams and latest eligible INIs. Other resources and operational
+images, tower diagrams and the upstream GitHub INI link. Other resources and operational
 uploads stay authenticated. `/reference/` redirects to this report.
 
 Inline scripts/styles and embedded image/font data are permitted; same-origin
-privileges, external requests and private API access are blocked. Responses use
+privileges, external resource requests and private API access are blocked.
+User-selected links may open an ordinary external tab with no opener, so GitHub
+can work normally without granting its scripts the app origin. Responses use
 no-store. `/fieldnotes/download/` returns a self-contained snapshot. See
 [Public site](PUBLIC_SITE.md) for field scope and [Processing files](PROCESSING_FILES.md)
-for version storage. The source HTML archive is not a live input.
+for the maintained upstream source. The source HTML archive is not a live input.
 
 ## Boundaries
 

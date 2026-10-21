@@ -86,5 +86,4 @@ class Command(BaseCommand):
             if not path.is_file():
                 raise CommandError(f"Missing supplied protocol: {filename}")
             Protocol.objects.get_or_create(pk=uuid.uuid5(uuid.NAMESPACE_URL, "carbonique-protocol:" + filename), defaults={"title": title, "category": category, "bundled_file": filename, "filename": filename, "sha256": info["sha256"], "size": info["size"], "revision": info["revision"], "summary": "Original supplied protocol. Open the PDF for the complete instructions, figures and revision details."})
-        call_command("import_processing_files", stdout=self.stdout)
         self.stdout.write(self.style.SUCCESS(f"Resource snapshot installed: {len(sites['sites'])} sites, {len(notes)} source notes, {len(caveats)} caveats, {len(ini_files)} INI files and {len(titles)} protocols. Existing edits preserved."))

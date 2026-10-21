@@ -12,7 +12,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 
 from inventory.models import Site
-from .models import Attachment, DataCaveat, Deployment, ImportRecord, ProcessingFile, Visit
+from .models import Attachment, DataCaveat, Deployment, ImportRecord, Visit
 from .serializers import clean_html
 
 
@@ -244,47 +244,12 @@ def context():
             "cross_check": clean_html(str(evidence.get("xref", ""))),
             "needs_confirmation": clean_html(str(evidence.get("flag", ""))),
             "plots": plots.get(caveat.pk, []), "links": links})
-    # Only current scientific INI files for known sites and shared include files
-    # enter the report; internal notes, actors and version history stay private.
-    ini_files = []
-    for document in ProcessingFile.objects.filter(Q(site_id__in=site_ids)|Q(site_code='')).prefetch_related('revisions'):
-        version=next(iter(document.revisions.all()),None)
-        if not version:
-            continue
-        try:
-            with version.file.open('rb') as handle:
-                raw=handle.read()
-            from .processing_files import decoded
-            text=decoded(raw)
-        except (OSError,ValueError):
-            continue
-        name=document.path.rsplit('/',1)[-1]
-        ini_files.append({'filename':name,'site':document.site_code or 'Shared include',
-            'stage':f'Version {version.revision}','summary':'Current INI library version.',
-            'text':text,'bytes':base64.b64encode(raw).decode('ascii')})
-    # Compatibility for an installation that has not imported the new library yet.
-    mappings=ImportRecord.objects.filter(source="inventory-export", source_id__startswith="ini:") if not ProcessingFile.objects.exists() else []
-    for mapping in mappings:
-        data = mapping.payload
-        if not isinstance(data, dict) or str(data.get("s", "")).upper() not in {site.code.upper() for site in sites}:
-            continue
-        name = str(data.get("f", ""))
-        if name != name.replace("\\", "/").split("/")[-1] or not name.endswith(".ini"):
-            continue
-        path = settings.BASE_DIR / "seed/ecoflux_inventory_export/ini" / name
-        try:
-            raw = path.read_bytes()
-            text = raw.decode("utf-8-sig")
-        except (OSError, UnicodeError):
-            continue
-        ini_files.append({"filename": name, "site": str(data.get("s", "")),
-            "stage": str(data.get("st", "")), "summary": str(data.get("sum", "")), "text": text,
-            "bytes":base64.b64encode(raw).decode('ascii')})
+    # Processing files are maintained upstream; the public report links there.
     return {"sites": public_sites, "visits": public_visits, "caveats": public_caveats,
         "timeline": timeline_data(public_sites, public_visits, public_caveats),
         "resolved": [item for item in public_caveats if item["status"] == "resolved"],
         "open_caveats": [item for item in public_caveats if item["status"] != "resolved"],
-        "common": common, "ini_files": ini_files, "generated_at": timezone.now(), **assets()}
+        "common": common, "processing_source_url": "https://github.com/CARBONI-QUE/UQAM_Software_and_Settings/tree/main/Database/Calculation_Procedures/TraceAnalysis_ini", "generated_at": timezone.now(), **assets()}
 
 
 def render_report(*, snapshot=False):

@@ -132,6 +132,8 @@ class PublicReportTests(TestCase):
         response=self.client.get('/fieldnotes/content/')
         self.assertEqual(response['Cache-Control'],'no-store')
         self.assertIn('sandbox allow-scripts',response['Content-Security-Policy'])
+        self.assertIn('allow-popups-to-escape-sandbox',response['Content-Security-Policy'])
+        self.assertIn("form-action 'none'",response['Content-Security-Policy'])
         self.assertNotIn('allow-same-origin',response['Content-Security-Policy'])
         download=self.client.get('/fieldnotes/download/')
         self.assertIn('attachment;',download['Content-Disposition'])
@@ -170,12 +172,14 @@ class PublicReportTests(TestCase):
         labels=[point['label_y'] for point in diagram['points']]
         self.assertTrue(all(right-left>=18 for left,right in zip(labels,labels[1:])))
 
-    def test_current_ini_revision_appears_without_rebuilding_the_public_report(self):
+    def test_public_ini_link_uses_github_without_publishing_legacy_copies(self):
         from django.db import transaction
         from .processing_files import store_version
         with tempfile.TemporaryDirectory() as directory, override_settings(MEDIA_ROOT=directory):
-            with transaction.atomic():store_version('Shared_include.ini',b'current=1;\r\n')
-            self.assertContains(self.client.get('/fieldnotes/content/'),'current=1;')
-            with transaction.atomic():store_version('Shared_include.ini',b'current=2;\r\n')
-            response=self.client.get('/fieldnotes/content/')
-            self.assertContains(response,'current=2;');self.assertNotContains(response,'current=1;')
+            with transaction.atomic():
+                store_version('Shared_include.ini', b'legacy_private_setting=1;')
+            for route in ['/fieldnotes/content/', '/fieldnotes/download/']:
+                response = self.client.get(route)
+                self.assertContains(response, 'https://github.com/CARBONI-QUE/UQAM_Software_and_Settings/tree/main/Database/Calculation_Procedures/TraceAnalysis_ini')
+                self.assertNotContains(response, 'legacy_private_setting=1;')
+                self.assertNotContains(response, 'Download INI')

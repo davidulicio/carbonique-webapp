@@ -6,10 +6,10 @@
 @media(max-width:760px){.pdf-controls{gap:6px;font-size:11px}.monitor-metrics strong{font-size:20px}}
 :root{--forest:#38260e;--green:#8ec161;--gold:#f7c200;--blue:#54b4cc;--ink:#302e28;--muted:#6c665b;--paper:#f8f9f5;--danger:#b00b00;--line:#e5e5db}
 h1,h2,h3{font-family:"Roboto Condensed","Roboto",sans-serif;letter-spacing:0}
-.sidebar{background:#38260e;border-top:5px solid #8ec161}
+.sidebar{background:#38260e;border-block:4px solid transparent;border-image:linear-gradient(90deg,#8ec161 25%,#54b4cc 25% 50%,#f7c200 50% 75%,#77633c 75%) 1}
 .brand img{padding:12px;width:100%;border-radius:5px}
 .brand{padding-left:0;padding-right:0}
-.sidebar:after{content:"";height:4px;background:linear-gradient(90deg,#8ec161 25%,#54b4cc 25% 50%,#f7c200 50% 75%,#77633c 75%);position:absolute;bottom:0;left:0;right:0}
+/* A real border stays at the viewport edge while the navigation scrolls. */
 .button.primary{background:#2c6f0e;border-color:#2c6f0e}
 .button.primary:hover{background:#4f9225;border-color:#4f9225}
 .sidebar .muted{color:#d4cab9}.sidebar .nav-button{color:#e5dfd1}.sidebar .nav-button.active{color:white;background:#ffffff16}

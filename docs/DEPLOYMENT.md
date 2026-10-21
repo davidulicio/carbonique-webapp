@@ -1,5 +1,10 @@
 # Running Carbonique Hub in production
 
+For the existing Alliance Arbutus Ubuntu VM, start with the detailed
+[Arbutus installation guide](ARBUTUS_INSTALLATION.md) and
+[printable PDF](Carbonique_Arbutus_Installation_Guide.pdf). Its named-host proxy
+example preserves other websites and uses loopback port 8010.
+
 Read [Security and deployment review](../SECURITY.md) before launch. Use
 `deploy/production.env.example` as the production configuration reference.
 

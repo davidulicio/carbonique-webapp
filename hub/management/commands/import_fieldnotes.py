@@ -10,6 +10,7 @@ from django.core.files.base import ContentFile
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from inventory.models import Site, FieldNote
+from inventory.site_names import SITE_NAMES
 from hub.models import Visit, VisitReport, DataCaveat, Attachment, ConfigurationVersion, ImportRecord
 from hub.reports import render_visit_report
 from hub.serializers import clean_html
@@ -60,7 +61,7 @@ class Command(BaseCommand):
             photos = reference.pop("photos", [])
             metadata = {"reference": reference, "common": data["SITEINFO"].get("common", []), "source": data["SITEINFO"]["source"], "source_edition": data["SITEINFO"]["parsed"], "activation_date_basis": active_label if date_match else "Earliest documented visit used as placeholder; verify activation date."}
             if not site:
-                site = Site.objects.create(code=code, name=fields.get("Site name", ref["title"])[:150], amp=fields.get("AmeriFlux ID", "")[:10], location=fields.get("Location", ref.get("place", "")), description="\n".join(ref.get("desc", [])), date_activated=date, gps_coordinates=f"{ref.get('lat', '')}, {ref.get('lon', '')}", metadata=metadata)
+                site = Site.objects.create(code=code, name=SITE_NAMES.get(code, fields.get("Site name", ref["title"]))[:150], amp=fields.get("AmeriFlux ID", "")[:10], location=fields.get("Location", ref.get("place", "")), description="\n".join(ref.get("desc", [])), date_activated=date, gps_coordinates=f"{ref.get('lat', '')}, {ref.get('lon', '')}", metadata=metadata)
             elif not site.metadata.get("reference"):
                 site.metadata = {**site.metadata, **metadata}
                 site.save(update_fields=["metadata", "updated_at"])

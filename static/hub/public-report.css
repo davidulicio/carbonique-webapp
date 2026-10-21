@@ -65,3 +65,20 @@
 .public-condition.condition-restricted,.public-condition.condition-closed{border-left-color:var(--timeline-fault)}
 @media(max-width:650px){.timeline-row,.timeline-axis,.timeline-column-heads{grid-template-columns:65px minmax(0,1fr) 58px;gap:8px}.timeline-column-heads{font-size:9px}.timeline-count{font-size:11px;white-space:normal}.undated-track{gap:0;padding:1px}}
 @media(prefers-color-scheme:dark){:root{--timeline-caveat:#c5a9ed;--timeline-resolved:#a5ce87}}
+
+
+/* Narrow screens keep record content inside each card. */
+.report-header>div,.stats>div,.filters>*,.card,.instruments section{min-width:0}
+.card{overflow-wrap:anywhere}
+.tabs{overflow-x:auto;max-width:100%}.tabs button{flex-shrink:0}
+.photos{grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+@media(max-width:650px){
+  button,summary,.site-links a{min-height:44px}
+  .filters input,.filters select{font-size:16px}
+  .report-header{flex-wrap:wrap}.report-header>div{flex:1 1 160px}
+  .tabs{gap:0}.tabs button{padding-inline:12px}
+  .timeline-tick{font-size:9px}
+  .timeline-tick:not(:first-child):not(:last-child):nth-child(even){display:none}
+  dl,.instruments dl{grid-template-columns:1fr;gap:3px}
+  dd{margin-bottom:8px}
+}

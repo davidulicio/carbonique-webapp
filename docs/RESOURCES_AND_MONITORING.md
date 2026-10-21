@@ -56,9 +56,9 @@ files. The data-download procedure is retired and removed by migration 0006.
 Mozilla PDF.js is bundled with its Apache-2.0 license, so PDFs are not sent to an
 external viewer. Protected media remains authenticated and site scoped.
 
-Twenty current INIs copied from the supplied TraceAnalysis source initialize a
-separate versioned library in Data & processing. The original eight configuration
-evidence files are retained. See [Processing files](PROCESSING_FILES.md).
+Data & processing links to the current TraceAnalysis folder maintained on
+GitHub. The public report uses the same link. Original configuration evidence
+and source snapshots are retained as historical records. See [Processing files](PROCESSING_FILES.md).
 
 Each site's condition has a status, statement, review/restriction date, editor
 and timestamp. An overdue date prompts review; it never automatically opens a
@@ -205,4 +205,5 @@ and failure handling. Final routing/firewall checks must be done on the VM.
 See [VALIDATION.md](VALIDATION.md) for the application checks and deployment
 boundaries. The public report is generated from current records, and its HTML
 export is a snapshot. Seven protocol PDFs, structured inventory records, supplied
-photographs/plots and historical/current INI source copies are retained.
+photographs/plots and historical INI source evidence are retained. Current INIs
+are linked to GitHub rather than mirrored by the app.

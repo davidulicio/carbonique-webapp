@@ -27,7 +27,7 @@ default accounts are supplied. Create other accounts under Administration.
 | `seed/ecoflux_inventory_export/ini/` | Eight complete TraceAnalysis configuration files, with descriptions and caveat links |
 | `seed/ecoflux_inventory_export/*.md` | Human-readable source descriptions, conventions and known gaps; included in the source export download |
 | `seed/protocols/`, `catalogue.json` | Seven bundled protocol PDFs; the data-download procedure is retired |
-| `seed/processing_files/`, `catalogue.json` | Twenty current INI source copies, SHA-256 hashes and source modification times |
+| `seed/processing_files/`, `catalogue.json` | Original supplied INI snapshot, SHA-256 hashes and source modification times; archival only, not current GitHub settings |
 | `seed/badm/schema.json` | Official ICOS template definitions, vocabulary, requirements and source/version information |
 | `public/fieldnotes/index.html` | Original source archive; live public report now reads database records |
 | `static/hub/` | Carbonique logos, colors, Roboto typography and local application/PDF assets |
@@ -50,15 +50,14 @@ protocol PDFs and processing files retain their supplied content.
 
 ## Processing files and protocol changes
 
-`import_resources` installs seven protocols and initializes the twenty-file INI
-library. The retired data-download procedure is removed by migration 0006,
-including its installed protected file. Its original outside the app is untouched.
-It is no longer in the catalogue or import options.
+`import_resources` installs seven protocols and historical configuration evidence.
+The retired data-download procedure is removed by migration 0006, including its
+installed protected file. Its original outside the app is untouched.
 
-The INI import copies source bytes into protected version storage; it never
-modifies or executes originals. Bundled initialization skips existing revisions,
-preserving later team uploads. See [Processing files](PROCESSING_FILES.md) for
-bulk uploads and explicit imports from a newer source directory.
+The former twenty-file working INI library is no longer initialized by normal
+setup. Current settings are maintained in GitHub and linked from the app and
+public report. Original source snapshots and prior private revisions remain
+archival evidence. See [Processing files](PROCESSING_FILES.md).
 
 ## Repeat imports and later updates
 
