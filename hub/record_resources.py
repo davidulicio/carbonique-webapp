@@ -11,7 +11,7 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from django.db.models import Q
 from django.http import Http404
-from PIL import Image, UnidentifiedImageError
+from .uploads import image_content_type
 from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -179,12 +179,7 @@ def knowledge(request, pk=None):
 def upload_type(data, filename):
     suffix = Path(filename).suffix.lower()
     if suffix in {'.png', '.jpg', '.jpeg', '.gif', '.webp'}:
-        try:
-            with Image.open(io.BytesIO(data)) as image:
-                image.verify()
-                return Image.MIME.get(image.format, 'application/octet-stream')
-        except (UnidentifiedImageError, OSError, Image.DecompressionBombError):
-            raise ValidationError('The selected image is invalid.')
+        return image_content_type(io.BytesIO(data), filename)
     if suffix == '.pdf':
         if not data.startswith(b'%PDF-'): raise ValidationError('The selected PDF is invalid.')
         return 'application/pdf'

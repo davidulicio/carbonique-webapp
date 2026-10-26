@@ -1,5 +1,7 @@
 # Carbonique Hub installation on Arbutus
 
+Before installing or updating, follow the [26 October security maintenance supplement](SECURITY_MAINTENANCE.md), including Python and host patch requirements.
+
 This guide installs Carbonique Hub on an existing Ubuntu 24.04 virtual machine
 in the Digital Research Alliance of Canada Arbutus cloud. It uses PostgreSQL,
 Gunicorn, systemd and an HTTPS reverse proxy. Docker is not required. Follow the

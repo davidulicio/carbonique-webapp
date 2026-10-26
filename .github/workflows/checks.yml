@@ -1,24 +1,41 @@
 name: Application checks
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 8 * * 1'
 permissions:
   contents: read
 jobs:
   application:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      DEBUG: 'True'
+      PYTHONDONTWRITEBYTECODE: '1'
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          python-version: '3.12'
-      - uses: actions/setup-node@v4
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          node-version: '24'
+          python-version: '3.12.16'
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '24.22.1'
+          package-manager-cache: false
       - name: Check browser modules
         run: |
-          for source in static/hub/app.js static/hub/record-resources.js static/hub/processing-files.js static/hub/public-report.js static/hub/resources.js static/hub/monitor.js static/hub/pdf-viewer.js static/hub/storage.js static/hub/sw.js; do
+          for source in static/hub/*.js; do
             node --check "$source"
           done
-      - run: python -m pip install -r requirements.txt
+      - name: Install application dependencies
+        run: |
+          python -m pip install --upgrade pip==26.2.2
+          python -m pip install -r requirements.txt
+          python -m pip check
       - name: Audit application dependencies
         run: |
           python -m pip install pip-audit==2.10.1

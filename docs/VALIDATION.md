@@ -1,7 +1,7 @@
 # Validation and release checks
 
 The standalone application was checked on Windows with Python 3.12 and
-Django 5.2.18. Its 169 backend tests cover field workflows, role/site restrictions,
+Django 5.2.18. Its 179 backend tests cover field workflows, role/site restrictions,
 retry-safe operations, version conflicts, frozen reports, imports, resource
 permissions, BADM checks/exports, protected media, live public reports, imported
 caveat review, per-note uploads, INI revisioning, synchronized caveat timelines,
@@ -84,12 +84,12 @@ file archive/restore; and unavailable-server calibration recording, reload and
 reconnection with an empty queue after synchronization. Test accounts, documents
 and records are kept outside the application repository and live database.
 
-## Security update
+## Security update reviewed 20 October 2026
 
 Twenty-one additional security tests cover persistent login lockouts, attempts
 through both login routes, forged forwarding headers, cooldown/reset behavior,
 password masking, CSRF, open redirects, host headers, private endpoints, CORS and
-public write rejection. The complete suite now contains 169 tests. Dependency
+public write rejection. The suite then contained 167 tests. Dependency
 and static-analysis results, triage, remaining VM checks and the point-in-time
 limits of this review are documented in [SECURITY.md](../SECURITY.md).
 
@@ -132,3 +132,26 @@ backups, updates, mobile checks and future read-only data plots. Actual VM
 configuration, Linux service startup, nginx/Apache syntax and real SMTP/private
 tower connectivity still require verification on that host. No remote VM or
 tower source files were modified in this review.
+
+## Security maintenance verified 26 October 2026
+
+All **179 tests** passed on Windows and on Ubuntu 24.04 with the verified
+GitHub Actions Python 3.12.16 runtime. The installed local app environment also
+passed all 179 after updating its libraries. Ten new checks exercise restricted
+image decoders and file signatures, invalid/oversized images, compression and
+unknown JSON charsets, bounded Accept-header parsing and normal API requests.
+
+The old requirements reproduce 40 advisory findings in two packages. Updated
+REST framework 3.18.3 and Pillow 13.0.0 requirements audit cleanly on Windows
+(16 resolved packages) and Linux (15). No finding was ignored. pip dependency
+checks, all local browser module syntax checks with Node 24.22.1, static-file
+collection, Django system checks, migration drift and diff formatting passed.
+Production checks under simulated HTTPS settings reported only the intentional
+HSTS preload warning W021. The Docker version gate was exercised against the
+old and patched Python interpreters; no full image build was possible here.
+
+See [the dated advisory assessment and VM update procedure](SECURITY_MAINTENANCE.md).
+The VM still needs its own supported Python, certificate-store, nginx and OS
+patch verification. The local Windows interpreter remains 3.12.10 despite its
+updated libraries. No remote VM changes or live test records were made. The
+CI workflow changes will run on GitHub after the commit is pushed.

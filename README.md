@@ -23,9 +23,13 @@ collapsible menu, touch controls, single-column forms and contained table scroll
 
 ## Security before publishing
 
-Read **[Security and deployment review](SECURITY.md)** before exposing the VM.
+Read **[Security and deployment review](SECURITY.md)** and the
+**[26 October security update and VM patch procedure](docs/SECURITY_MAINTENANCE.md)**
+before exposing the VM. The Docker build requires patched upstream Python
+3.12.16+; it intentionally stops if the pulled base is older.
 The app limits failed logins, protects private responses and uses restrictive
-browser headers. The nginx example includes bot/request limits. New passwords
+browser headers. The nginx example includes bot/request limits. REST framework and image-decoder
+security patches are included; CI audits dependencies on every push and weekly. New passwords
 require at least 12 characters; sessions last 12 hours. Prepared field records
 remain on the device if sign-in expires.
 
@@ -36,14 +40,16 @@ protection has its database tables. No default user accounts are supplied.
 
 ## Start locally
 
-Requires **Python 3.12 or newer** (tested with Python 3.12), a modern browser, and no Node build step. SQLite is included with Python. Windows runs the Django development server; Gunicorn is for Linux production servers.
+Requires **a security-patched Python 3.12 or newer** (CI uses 3.12.16), a modern browser, and no Node build step. SQLite is included with Python. Windows runs the Django development server; Gunicorn is for Linux production servers.
 
 ### Windows PowerShell
 
-Open the `carbonique-webapp` repository root in PowerShell. Run commands one at a time, stopping if any command fails. If Python 3.12 is missing, install it before creating the environment. Then run:
+Open the `carbonique-webapp` repository root in PowerShell. Run commands one at a time, stopping if any command fails. Install a patched supported Python before creating the environment; older Windows
+3.12 installers do not contain the latest source-only security fixes. Then run:
 
 ```powershell
 py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip==26.2.2
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
 Copy-Item .env.example .env
 .\.venv\Scripts\python.exe manage.py migrate
@@ -59,6 +65,7 @@ If your installed Python is newer, use `py -m venv .venv` instead of `py -3.12`.
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
+python -m pip install --upgrade pip==26.2.2
 python -m pip install -r requirements.txt
 cp .env.example .env
 python manage.py migrate

@@ -203,6 +203,7 @@ alternative deployment package.
 | `hub/services.py` | Ordered field operations and retry/conflict handling |
 | `hub/record_models.py`, `hub/record_resources.py`, `static/hub/record-resources.js` | Per-site calibration logs, source-visit links, shared/site technical references and protected reference files |
 | `hub/security.py`, `carbonique/settings.py`, `templates/registration/login_locked.html` | Browser/cache policy, trusted proxy addresses, Django Axes login protection and the pause screen |
+| `hub/uploads.py`, `hub/test_request_security.py` | Matching raster decoders, oversized-image rejection and request-parser security checks |
 | `hub/resources_api.py`, `hub/badm.py` | Conditions, protocols, media, BADM validation and exports |
 | `hub/monitor.py`, `hub/licor.py` | Server-side tower queries, allowlist, cooldowns, snapshots and response redaction |
 | `hub/views.py`, `hub/public_report.py`, `templates/` | Live public projection, page rendering and report export |
@@ -317,7 +318,7 @@ keep existing upstream migration identities. After changing cached frontend
 assets, review the service worker's cache version/update behavior.
 
 Run the checks in [VALIDATION.md](VALIDATION.md) before committing. The current
-backend suite contains 167 tests. A typical local verification is:
+backend suite contains 179 tests. A typical local verification is:
 
 ```bash
 python manage.py check
@@ -393,3 +394,9 @@ Site naming defaults live in `inventory/site_names.py`; migration 0015 updates
 existing records once, and `update_site_names` provides an explicit recovery
 command after an older backup is restored. The original source metadata remains
 available for provenance while current site names are used in rendered views.
+
+Security maintenance and the CI failure repair are documented in
+[Security maintenance](SECURITY_MAINTENANCE.md). Dependency checks run on pushes,
+pull requests and weekly; proposed dependency updates require review. The app
+uses patched REST framework and Pillow versions and restricts uploaded image
+decoders. VM Python/nginx/system-library patches remain an operator responsibility.

@@ -1,5 +1,7 @@
 # Running Carbonique Hub in production
 
+Before installing or updating, follow the [26 October security maintenance supplement](SECURITY_MAINTENANCE.md), including Python and host patch requirements.
+
 For the existing Alliance Arbutus Ubuntu VM, start with the detailed
 [Arbutus installation guide](ARBUTUS_INSTALLATION.md) and
 [printable PDF](Carbonique_Arbutus_Installation_Guide.pdf). Its named-host proxy

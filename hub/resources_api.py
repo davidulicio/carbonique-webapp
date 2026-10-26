@@ -10,7 +10,7 @@ from django.db import transaction
 from django.http import FileResponse, Http404, HttpResponse, StreamingHttpResponse
 from django.utils import timezone
 from django.views.decorators.clickjacking import xframe_options_sameorigin
-from PIL import Image, UnidentifiedImageError
+from .uploads import image_content_type
 from rest_framework import serializers
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import PermissionDenied, ValidationError
@@ -187,12 +187,7 @@ def uploaded_file(request, kind):
         if suffix != ".pdf" or not head.startswith(b"%PDF-"):
             raise ValidationError("Upload a valid PDF file.")
     elif suffix in {".gif", ".webp", ".jpg", ".jpeg", ".png"}:
-        try:
-            with Image.open(file) as img:
-                img.verify()
-                content_type = Image.MIME[img.format]
-        except (UnidentifiedImageError, OSError, KeyError, Image.DecompressionBombError):
-            raise ValidationError("Invalid image.")
+        content_type = image_content_type(file, file.name)
     elif suffix in {".mp4", ".m4v"} and head[4:8] == b"ftyp":
         content_type = "video/mp4"
     elif suffix == ".webm" and head.startswith(b"\x1aE\xdf\xa3"):

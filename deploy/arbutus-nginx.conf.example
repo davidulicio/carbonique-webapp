@@ -36,6 +36,8 @@ server {
     ssl_certificate /etc/letsencrypt/live/carbonique.example.org/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/carbonique.example.org/privkey.pem;
     ssl_protocols TLSv1.2 TLSv1.3;
+    # Disable session tickets while applying the current nginx security updates.
+    ssl_session_tickets off;
     server_tokens off;
     access_log /var/log/nginx/carbonique-access.log carbonique_arbutus_security;
     client_max_body_size 105m;

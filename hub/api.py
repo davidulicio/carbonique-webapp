@@ -9,7 +9,7 @@ from django.db import transaction, IntegrityError
 from django.db.models import Q, F
 from django.http import Http404
 from django.utils import timezone
-from PIL import Image, UnidentifiedImageError
+from .uploads import image_content_type
 from rest_framework import mixins, viewsets
 from rest_framework.decorators import api_view
 from rest_framework.exceptions import APIException, PermissionDenied, ValidationError
@@ -373,12 +373,7 @@ def upload_attachment(request):
             raise ValidationError('Restore the calibration log before adding files.')
     content_type = "application/octet-stream"
     if file.name.lower().endswith((".jpg", ".jpeg", ".png", ".gif", ".webp")):
-        try:
-            with Image.open(file) as img:
-                img.verify()
-                content_type = Image.MIME.get(img.format, "application/octet-stream")
-        except (UnidentifiedImageError, OSError, Image.DecompressionBombError):
-            raise ValidationError("This file is not a valid supported image.")
+        content_type = image_content_type(file, file.name)
         file.seek(0)
     elif file.name.lower().endswith(".pdf"):
         if file.read(5) != b"%PDF-":

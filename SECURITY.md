@@ -1,6 +1,12 @@
 # Security and deployment review
 
-Reviewed 20 October 2026. This is an application/code and local-test review,
+Reviewed 26 October 2026.
+
+The [current advisory assessment and VM patch instructions](docs/SECURITY_MAINTENANCE.md)
+record the 26 October dependency fixes, CI repair, patched runtime requirements
+and remaining host work. Earlier validation below is retained with its original date.
+
+This is an application/code and local-test review,
 not a penetration test of the destination VM. The app has not been deployed or
 exposed publicly by this review. Public pages can be requested by bots; the goal
 is to protect private records and limit abuse, not to promise that bots cannot
@@ -27,7 +33,30 @@ client/account. Another account at the same address is not locked by those
 failures. nginx separately limits account rotation from one address. These
 controls reduce guessing; they do not replace strong passwords or MFA.
 
-## Verification results
+## Verification results from 26 October 2026
+
+- All **179 tests** passed in an isolated Windows environment, the updated local
+  app environment, and Ubuntu 24.04 using verified GitHub Actions Python 3.12.16.
+- The previous requirements produced **40 known advisory findings in 2 packages**.
+  Updated requirements produced **zero known findings** in 16 resolved Windows
+  packages and 15 Linux packages. The platform difference is the Windows tzdata
+  dependency. No advisory was suppressed.
+- Ten new regression checks cover matching image signatures/decoders, invalid
+  images, decompression-bomb warnings, compressed/unknown JSON charsets, bounded
+  Accept-header parser work and ordinary UTF-8/JSON behavior.
+- Linux static collection, Django checks and migration-drift checks passed.
+  Node 24.22.1 accepted every local browser module's syntax. Simulated production
+  checks reported only the intentional HSTS preload warning W021.
+- The Docker runtime guard rejects Python 3.12.10 and accepts 3.12.16. A full
+  Docker build and actual nginx/systemd/SMTP/private-tower checks were not run.
+  The patched official Docker base was still pending registry publication.
+- The local venv has patched REST framework and Pillow libraries. Its original
+  Python 3.12.10 interpreter still requires replacement before use with untrusted
+  material. No VM package, firewall, account or tower configuration was changed.
+- No application migration was added and the live database was not used for
+  test records. Its existing 6 sites, 127 visits, 19 caveats and 1 account remain.
+
+## Verification results from 20 October 2026
 
 - 167 backend tests passed, including 21 security regression checks for lockouts,
   spoofed headers, independent clients, cooldowns, password masking, CSRF,
@@ -101,8 +130,8 @@ and HTTP; its production-security warnings are expected locally.
     trusted field devices: prepared offline copies cannot be revoked remotely.
 
 The public scope deliberately includes sites, visits/observations and caveats,
-plus supplied reference figures and eligible scientific INIs. Do not place
-passwords, private endpoints or personal/private notes in those public fields.
+plus supplied reference figures and a link to the maintained scientific INIs on
+GitHub. Do not place passwords, private endpoints or personal/private notes in those public fields.
 Public reports do not expose inventory, BADM, internal uploads, the technical
 library, calibration logs, account data or tower connection settings.
 
