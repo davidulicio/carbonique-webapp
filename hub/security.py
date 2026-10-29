@@ -39,3 +39,30 @@ class SecurityHeadersMiddleware:
         if request.path.startswith(("/api/", "/accounts/", "/admin/", "/attachments/", "/legacy-attachments/", "/knowledge-files/", "/processing-files/", "/protocols/", "/site-media/", "/sites/")) or request.path in {"/", "/export.csv", "/inventory-source.zip"}:
             response["Cache-Control"] = "private, no-store"
         return response
+
+
+class WorkspaceIdentityMiddleware:
+    """Reject a stale tab before private views run; expose no session credential."""
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        from django.http import JsonResponse
+        from django.utils.crypto import salted_hmac
+        private = request.path.startswith(("/api/", "/attachments/", "/legacy-attachments/", "/knowledge-files/", "/processing-files/", "/protocols/", "/site-media/", "/sites/"))
+        if not private:
+            return self.get_response(request)
+        account = str(request.user.pk) if request.user.is_authenticated else ""
+        session = salted_hmac("workspace-session", request.session.session_key).hexdigest() if account and request.session.session_key else ""
+        expected_account = request.headers.get("X-Workspace-Account")
+        expected_session = request.headers.get("X-Workspace-Session")
+        browser_fetch = request.headers.get("Sec-Fetch-Dest") == "empty" and request.headers.get("Sec-Fetch-Mode") in {"cors", "same-origin"}
+        initial_read = request.method == "GET" and request.path in {"/api/bootstrap/", "/api/csrf/"}
+        unbound_browser = browser_fetch and expected_account is None and not initial_read
+        if unbound_browser or (expected_account is not None and expected_account != account) or (expected_session is not None and expected_session != session):
+            response = JsonResponse({"detail": "The signed-in session changed. Reload and sign in with the account that owns this work. Pending records remain on this device.", "code": "workspace_identity_changed"}, status=409)
+        else:
+            response = self.get_response(request)
+        response["X-Workspace-Account"] = account
+        response["X-Workspace-Session"] = session
+        return response

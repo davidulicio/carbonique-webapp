@@ -1,12 +1,31 @@
+import {protocolCacheKey} from "./offline-state.js";
 /* Site context and reference resources share the existing workspace and dialogs. */
 export function createResources(ctx) {
-  const {S, esc, rich, day, time, button, empty, field, openForm, api, refreshCsrf, refreshWorkspace, render, toast, onlineOnly, header, store} = ctx;
+  const {S, esc, rich, day, time, button, empty, field, openForm, api, refreshCsrf, refreshWorkspace, render, toast, onlineOnly, header, store, privateFetch} = ctx;
   const manage = () => ["admin", "manager"].includes(S.me?.role);
   const state = () => S.data?.resources || {};
   const badm = () => state().badm ? {...state().badm,templates:S.badmTemplates||{}} : null;
   async function loadSchema(){if(S.badmTemplates)return;const saved=await store.get("meta","badm-schema");if(saved)S.badmTemplates=saved.templates;if(navigator.onLine){const definition=await api("/api/badm/schema/");S.badmTemplates=definition.templates;await store.put("meta","badm-schema",definition);}}
   const labels = {unknown:"Not assessed", open:"Accessible", caution:"Use caution", restricted:"Restricted access", closed:"Inaccessible"};
   const link = (label, url, extra="") => `<a class="button secondary small" href="${esc(url)}" ${extra}>${label}</a>`;
+  async function refreshProtocols(){
+    if(navigator.onLine){S.protocols=await api("/api/protocols/");await store.put("meta",`${S.me.id}:protocols`,S.protocols);}
+  }
+  async function cacheProtocol(protocol){
+    const key=protocolCacheKey(S.me.id,protocol);
+    let blob=await store.get("downloads",key);
+    if(!blob){
+      const response=await privateFetch(protocol.url);
+      if(!response.ok||response.redirected)throw new Error("Protocol could not be downloaded. Refresh the library while signed in.");
+      blob=await response.blob();
+      if(protocol.sha256){
+        const digest=Array.from(new Uint8Array(await crypto.subtle.digest("SHA-256",await blob.arrayBuffer())),value=>value.toString(16).padStart(2,"0")).join("");
+        if(digest!==protocol.sha256)throw new Error("The protocol changed while downloading. Reopen it to get the current revision.");
+      }
+      await store.put("downloads",key,blob);
+    }
+    return blob;
+  }
   async function save(path, data, method="PATCH", form) {
     onlineOnly(); await refreshCsrf();
     await api(path, {method, data:form?undefined:data, form});
@@ -60,11 +79,13 @@ export function createResources(ctx) {
   async function action(action,id) {
     if(!action.startsWith("resource-"))return false;
     if(action==="resource-protocol-read"){
+      await refreshProtocols();
       const p=S.protocols.find(p=>p.id===id);
-      openForm(p.title,`<div class="row-actions">${link("Open PDF",p.url,'target="_blank" rel="noopener"')}${link("Download PDF",p.url+"?download=1")}</div><div id="protocol-viewer" class="protocol-pages"><p>Loading the original PDF…</p></div>`,null);
+      if(!p)throw new Error("This protocol was archived or replaced. Refresh the library.");
+      openForm(p.title,`<p class="small muted">${navigator.onLine?"Online revision":"Offline saved revision"}: ${esc(p.revision||p.version)} · ${navigator.onLine?"Current catalogue checked":"Reconnect to check for newer revisions"}</p><div class="row-actions">${link("Open PDF",p.url,'target="_blank" rel="noopener"')}${link("Download PDF",p.url+"?download=1")}</div><div id="protocol-viewer" class="protocol-pages"><p>Loading the original PDF…</p></div>`,null);
       document.querySelector("#dialog").classList.add("resource-reader");
       document.querySelector("#dialog").addEventListener("close",()=>document.querySelector("#dialog").classList.remove("resource-reader"),{once:true});
-      let pdfBlob=await store.get("downloads",`${S.me.id}:${p.url}`);if(!pdfBlob){const response=await fetch(p.url,{credentials:"same-origin"});if(!response.ok)throw new Error("Protocol could not be downloaded.");pdfBlob=await response.blob();await store.put("downloads",`${S.me.id}:${p.url}`,pdfBlob);}
+      const pdfBlob=await cacheProtocol(p);
       const {showPDF}=await import("./pdf-viewer.js");const cleanup=await showPDF(document.querySelector("#protocol-viewer"),await pdfBlob.arrayBuffer());
       document.querySelector("#dialog").addEventListener("close",cleanup,{once:true});
       return true;
@@ -83,5 +104,5 @@ export function createResources(ctx) {
     if(action==="resource-media-edit")mediaForm(state().media.find(m=>m.id===id));
     return true;
   }
-  return {manage,conditionHTML,mediaHTML,protocolsView,badmView,action,loadSchema};
+  return {manage,conditionHTML,mediaHTML,protocolsView,badmView,action,loadSchema,refreshProtocols,cacheProtocol};
 }

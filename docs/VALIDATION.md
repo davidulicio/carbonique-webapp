@@ -1,7 +1,7 @@
 # Validation and release checks
 
 The standalone application was checked on Windows with Python 3.12 and
-Django 5.2.18. Its 179 backend tests cover field workflows, role/site restrictions,
+Django 5.2.18. Its 199 backend tests cover field workflows, role/site restrictions,
 retry-safe operations, version conflicts, frozen reports, imports, resource
 permissions, BADM checks/exports, protected media, live public reports, imported
 caveat review, per-note uploads, INI revisioning, synchronized caveat timelines,
@@ -155,3 +155,37 @@ The VM still needs its own supported Python, certificate-store, nginx and OS
 patch verification. The local Windows interpreter remains 3.12.10 despite its
 updated libraries. No remote VM changes or live test records were made. The
 CI workflow changes will run on GitHub after the commit is pushed.
+
+## Audit corrections verified 29 October 2026
+
+The local Django run discovered **199 tests**: **196 passed** and the **three
+PostgreSQL-specific concurrency tests skipped** on SQLite. The local run does
+not establish PostgreSQL correctness. The CI matrix now runs the full backend
+suite on SQLite and PostgreSQL, including duplicate receipts, simultaneous edits
+and overlapping deployment attempts. That new hosted matrix is pending the push.
+
+Four deterministic Node behavior tests passed. Nine Chromium browser tests
+passed with real IndexedDB, including overlapping site loads, acknowledged records
+surviving a later sync error and reload, another account signing out with work
+pending, changed-cookie rejection, updated protocol bytes, atomic clearing,
+older-snapshot rejection, phone layout/JSON export and prepared offline reopening.
+The browser suite checks page errors. These runs used disposable records and
+local files on port 8786, with dotenv loading and real tower connections disabled.
+Chromium was tested on Windows; Firefox and Safari were not exercised.
+
+The portable backup/restore drill preserved a synthetic account password hash,
+site restrictions, visit/task/file links and exact binary attachment bytes. It
+used the test database and separate source/restore media directories. The real
+workspace still has 6 sites, 127 visits, 19 caveats, 1 account and no deployment
+rows. No live imports, migrations or account changes were performed.
+
+The Python and npm dependency audits reported zero known vulnerabilities. Django
+configuration/migration checks, all first-party JavaScript syntax and diff
+formatting passed. The service worker uses v11 and includes the new offline state
+module without changing the IndexedDB schema or discarding existing outboxes.
+
+The twelve corrections and upgrade instructions are mapped in
+[Audit remediation](AUDIT_REMEDIATION.md). Existing runtime/OS/proxy patch work,
+production PostgreSQL restore, TLS/firewall validation and actual tower routing
+remain staging/operator checks. The local Windows Python interpreter is still
+3.12.10; dependency updates and tests do not patch that interpreter.

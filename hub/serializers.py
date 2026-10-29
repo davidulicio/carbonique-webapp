@@ -1,5 +1,7 @@
 import bleach
 from rest_framework import serializers
+from django.utils import timezone
+from .permissions import accessible_sites
 from inventory.models import Site, Equipment, History, DOI
 from .models import Visit, Task, TaskActivity, VisitObservation, VisitReport, Deployment, ConfigurationVersion, DataCaveat, Attachment, ChecklistTemplate
 
@@ -71,6 +73,13 @@ class VisitObservationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 class DeploymentSerializer(serializers.ModelSerializer):
+    def validate(self, attrs):
+        now = timezone.now()
+        for key in ("installed_at", "removed_at"):
+            value = attrs.get(key, getattr(self.instance, key, None))
+            if value and value > now:
+                raise serializers.ValidationError({key: "Record installations and removals after they happen. Future deployment scheduling is not supported."})
+        return attrs
     class Meta:
         model = Deployment
         fields = "__all__"
@@ -96,9 +105,18 @@ class CaveatSerializer(serializers.ModelSerializer):
         return clean_html(value)
     def validate_treatment(self, value):
         return clean_html(value)
+    def visible_configurations(self, obj):
+        user = getattr(self.context.get("request"), "user", None) or self.context.get("user")
+        if "allowed_site_ids" not in self.context:
+            self.context["allowed_site_ids"] = set(accessible_sites(user).values_list("pk", flat=True))
+        return [config for config in obj.configurations.all() if config.site_id in self.context["allowed_site_ids"]]
     def get_configuration_details(self, obj):
         return [{"id": str(config.pk), "site": config.site_id, "label": config.label,
-            "effective_from": config.effective_from.isoformat()} for config in obj.configurations.all()]
+            "effective_from": config.effective_from.isoformat()} for config in self.visible_configurations(obj)]
+    def to_representation(self, obj):
+        data = super().to_representation(obj)
+        data["configurations"] = [str(config.pk) for config in self.visible_configurations(obj)]
+        return data
 
 class AttachmentSerializer(serializers.ModelSerializer):
     url = serializers.SerializerMethodField()
@@ -116,6 +134,8 @@ class ChecklistSerializer(serializers.ModelSerializer):
         if not isinstance(value, list) or len(value) > 100:
             raise serializers.ValidationError("Use a list of at most 100 tasks.")
         for task in value:
-            if not isinstance(task, dict) or not task.get("title") or len(task["title"]) > 250 or task.get("priority", "normal") not in ("normal", "high"):
-                raise serializers.ValidationError("Each task needs a title and a valid priority.")
+            if not isinstance(task, dict) or not isinstance(task.get("title"), str) or not task["title"].strip() or len(task["title"]) > 250 or task.get("priority", "normal") not in ("normal", "high"):
+                raise serializers.ValidationError("Each task needs a text title of at most 250 characters and a valid priority.")
+            if not isinstance(task.get("details", ""), str) or len(task.get("details", "")) > 20000:
+                raise serializers.ValidationError("Task details must be text of at most 20000 characters.")
         return value

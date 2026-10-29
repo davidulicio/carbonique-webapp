@@ -1,7 +1,7 @@
 import { showPDF } from "./pdf-viewer.js";
 
 export function createRecordResources(ctx) {
-  const {S, esc, day, time, button, empty, field, openForm, api, refreshCsrf, refreshWorkspace, render, toast, onlineOnly, header, enqueue, uploadForm, attachmentsHTML, uuid, today, write, values, noteFileField, noteFiles} = ctx;
+  const {privateFetch,S, esc, day, time, button, empty, field, openForm, api, refreshCsrf, refreshWorkspace, render, toast, onlineOnly, header, enqueue, uploadForm, attachmentsHTML, uuid, today, write, values, noteFileField, noteFiles} = ctx;
   const types=[["swap","Sensor swap"],["onsite","On-site calibration"],["lab","Lab calibration"]];
   const preparations=[["cleaned_calibrated","Cleaned and lab calibrated"],["cleaned","Cleaned only"],["unknown","Not confirmed"]];
   const categories=[["general","General information"],["hardware","Hardware and manuals"],["wiring","Wiring and installation"],["troubleshooting","Troubleshooting"],["repairs","Repairs and service"],["notes","Notebook / OneNote"]];
@@ -92,7 +92,7 @@ export function createRecordResources(ctx) {
       case "records-knowledge-archive":case "records-knowledge-restore":openForm(name.endsWith("restore")?"Restore reference?":"Archive reference?","<p>Archived references remain available in the library's history.</p>",()=>changeArchive(entry(id),name.endsWith("archive")));break;
       case "records-file-read":{
         onlineOnly();const file=entries().flatMap(r=>r.files||[]).find(f=>f.id===id);openForm(file.filename,'<div class="pdf-viewer" id="reference-pdf">Loading document…</div>',null);
-        const container=document.getElementById("reference-pdf");const response=await fetch(file.url,{credentials:"same-origin",cache:"no-store"});if(!response.ok)throw new Error("The document could not be opened. Sign in or refresh the library.");
+        const container=document.getElementById("reference-pdf");const response=await privateFetch(file.url);if(!response.ok)throw new Error("The document could not be opened. Sign in or refresh the library.");
         const data=new Uint8Array(await response.arrayBuffer());if(!container.isConnected)break;
         const destroy=await showPDF(container,data);document.getElementById("dialog").addEventListener("close",destroy,{once:true});break;
       }

@@ -10,8 +10,25 @@ permissions:
 jobs:
   application:
     runs-on: ubuntu-24.04
-    timeout-minutes: 15
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        database: [sqlite, postgresql]
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_DB: carbonique_ci
+          POSTGRES_USER: carbonique_ci
+          POSTGRES_PASSWORD: isolated-ci-only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U carbonique_ci -d carbonique_ci"
+          --health-interval 5s --health-timeout 5s --health-retries 10
     env:
+      DATABASE_URL: ${{ matrix.database == 'postgresql' && 'postgresql://carbonique_ci:isolated-ci-only@127.0.0.1:5432/carbonique_ci' || 'sqlite:///:memory:' }}
       DEBUG: 'True'
       PYTHONDONTWRITEBYTECODE: '1'
       PIP_DISABLE_PIP_VERSION_CHECK: '1'
@@ -44,3 +61,15 @@ jobs:
       - run: python manage.py check
       - run: python manage.py makemigrations --check --dry-run
       - run: python manage.py test hub
+      - name: Frontend behavior tests
+        if: matrix.database == 'sqlite'
+        run: node --test tests/frontend/*.test.cjs
+      - name: Install browser test tools
+        if: matrix.database == 'sqlite'
+        run: |
+          npm ci --ignore-scripts
+          npm audit --audit-level=moderate
+          npx playwright install --with-deps chromium
+      - name: Browser regression tests
+        if: matrix.database == 'sqlite'
+        run: npx playwright test

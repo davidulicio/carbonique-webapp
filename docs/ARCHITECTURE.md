@@ -64,7 +64,8 @@ Authenticated APIs use Django session authentication and CSRF validation. They a
 | `/api/processing-files/`, `/processing-files/ID/` | Legacy recovery endpoints for protected INI revisions; not used by the current workspace |
 | `/fieldnotes/`, `/fieldnotes/content/`, `/fieldnotes/download/` | Public current report and self-contained export; GET only |
 | `/api/dois/`, `/api/equipment-history/`, `/api/checklists/` | Related reference and maintenance records |
-| `/api/team/` | Admin-only team management |
+| `/api/team/` | Network-wide administrator team management |
+| POST `/api/logout/` | Bound-session sign-out; local clearing is an account-specific IndexedDB transaction |
 | POST `/api/attachments/` | Retry-safe multipart uploads |
 | `/attachments/ID/`, `/legacy-attachments/KIND/ID/` | Permission-checked downloads |
 
@@ -78,7 +79,7 @@ Each operation has a unique ID, account namespace, target site, client-generated
 
 The outbox is synchronized while the app is open. It verifies the signed-in account before sending another account's records. Notes are append-only; task state changes use optimistic concurrency. Closed visits reject new field observations until explicitly reopened. Attachments can be added later without altering a frozen report.
 
-A note operation and its dependent files are enqueued in one IndexedDB transaction. Task activity has a stable client UUID so attachments can target an individual event before sync. Upload retries compare all association IDs and cannot silently relink files. Uploaded files remain in IndexedDB until acknowledged, then are removed from the outbox. The report and data snapshot are refreshed after syncing. A queued conflict retains its local payload until reviewed, retried, exported or discarded.
+A note operation and its dependent files are enqueued in one IndexedDB transaction. Task activity has a stable client UUID so attachments can target an individual event before sync. Upload retries compare all association IDs and cannot silently relink files. Uploaded files remain in IndexedDB until acknowledged, then are removed from the outbox. Each acknowledgement updates the durable cached snapshot before removing its outbox entry. Revision comparisons stop a slower snapshot response from overwriting acknowledged records. The report and data snapshot are refreshed after syncing. A queued conflict retains its local payload until reviewed, retried, exported or discarded.
 
 ## Public reference
 
@@ -141,3 +142,20 @@ for a username/address pair. The public report keeps its separate origin-isolati
 sandbox policy. The deployment proxy adds request and connection limits; HTTP
 429 does not turn queued field records into a permanent synchronization error.
 See [SECURITY.md](../SECURITY.md) for operator recovery and remaining server work.
+
+## Audit correction boundaries
+
+See [Audit corrections](AUDIT_REMEDIATION.md) for the complete finding map.
+`WorkspaceIdentityMiddleware` checks the expected account/session for private
+requests; first bootstrap/CSRF reads establish identity. Unbound private browser
+fetches require a reload. Responses expose a keyed session fingerprint, never
+the session cookie. Account-specific storage guards and tab broadcasts enforce
+the same boundary locally; sign-out preserves other accounts' pending work.
+
+Team administration and shared checklist/site creation require network-wide
+administration. Caveat configuration identifiers/details use request scope in
+every serializer. Operation receipts recheck current site access before replay.
+Inventory and hub operational models are read only in Django admin. New deployment
+transitions must be in the past or present; future scheduling is unsupported.
+The full history remains in snapshots; pagination/conditional tokens need a
+measured design before changing offline completeness.

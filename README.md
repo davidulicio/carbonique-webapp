@@ -21,6 +21,13 @@ data flow and troubleshooting steps. Detailed deployment, import and resource
 guides are linked from there. The workspace also adapts to phones with a
 collapsible menu, touch controls, single-column forms and contained table scrolling.
 
+## Application audit corrections
+
+The [29 October audit correction guide](docs/AUDIT_REMEDIATION.md) documents all
+12 fixes, account/session boundaries, durable offline synchronization, protocol
+revision checks and the upgrade steps for prepared devices. Operational records
+are edited in the workspace; Django admin now presents them read only.
+
 ## Security before publishing
 
 Read **[Security and deployment review](SECURITY.md)** and the
@@ -143,7 +150,7 @@ See [Public site behavior](docs/PUBLIC_SITE.md).
 | Tower monitoring | Read-only network and individual tower checks, diagnostics and recent snapshot charts |
 | Administration | Sites, accounts, roles, site access and maintenance checklists |
 
-The selected site is shared by all sections. The browser polls changes every 15 seconds while online, and uploads queued operations when connectivity returns.
+The selected site is shared by all sections. Visible, idle workspaces refresh once per minute while online, and uploads queued operations when connectivity returns.
 
 ## Roles
 
@@ -153,9 +160,9 @@ The selected site is shared by all sections. The browser polls changes every 15 
 | Member | Yes | Yes; may propose draft caveats | Service observations only | No |
 | Researcher | Yes | Yes | Yes; may review caveats and create configurations | No |
 | Manager | Yes | Yes | Yes; also site conditions, BADM, protocols and tower media | No |
-| Admin | Yes | Yes | Yes | Yes |
+| Admin | Yes | Yes | Yes | Assigned site edits; accounts/shared checklists/new sites require network-wide access |
 
-Only managers and administrators edit site conditions, BADM, protocols and tower media. Every team role with site access can download BADM/protocols and view monitoring. A superuser is an administrator. Other accounts need a `TeamMember` role. An empty allowed-sites list means all sites; selecting sites restricts access to those sites. The public site/visit/caveat report is visible to everyone independently of team site restrictions. Write these records with that public audience in mind. Create accounts in Administration; passwords are hashed by Django. No automatic invitation email is sent.
+Only managers and administrators edit site conditions, BADM, protocols and tower media. Every team role with site access can download BADM/protocols and view monitoring. A superuser is an administrator. Other accounts need a `TeamMember` role. An empty allowed-sites list means all sites; selecting sites restricts access to those sites. The public site/visit/caveat report is visible to everyone independently of team site restrictions. Write these records with that public audience in mind. Network-wide administrators create accounts in Administration; passwords are hashed by Django. No automatic invitation email is sent.
 
 ## Offline fieldwork
 
@@ -163,7 +170,8 @@ Only managers and administrators edit site conditions, BADM, protocols and tower
 2. Use **Prepare for fieldwork** and select the sites and attachments to download.
 3. Open the prepared site. Visits, tasks, observations, draft issues and their files are stored in IndexedDB before upload. Each note and its dependent files enter the queue together; upload order preserves their associations.
 4. The app can be reopened offline after its shell and site data have been prepared. This needs **HTTPS**, or `localhost` / `127.0.0.1` during development.
-5. Reconnect and open the app. Check that the sync queue is empty before clearing the device.
+5. Reconnect and open the app. Successful acknowledgements remain visible even if a later record fails. Review the queue, export pending records when needed, and use **Sign out & clear account** only after resolving that account's pending work. Other saved accounts remain intact.
+6. If another tab changes the account, reload the paused workspace and sign in with the account that recorded the work. Never clear browser storage to repair a blocked queue.
 
 The interface distinguishes local pending records from synchronized data. Retried operations and uploads use stable identifiers, avoiding duplicate records. Conflicting edits pause the queue and require review rather than silently overwriting another user's work. Use **Sync queue** to review, retry or export a blocked record.
 
@@ -287,3 +295,14 @@ service and its persistent data belong on a VM or another Django-capable host.
 ## Upstream and implementation notes
 
 See **[UPSTREAM.md](UPSTREAM.md)** for source provenance and **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** for data relationships, API and synchronization behavior. **[docs/VALIDATION.md](docs/VALIDATION.md)** records the checks performed for this build.
+
+## Development behavior tests
+
+Python runs the app; Node is needed only for optional automated frontend tests.
+With patched Python and Node 24, install development tools using `npm ci --ignore-scripts`,
+run `npm run test:frontend`, install Chromium with `npx playwright install chromium`,
+and run `npm run test:browser`. Set `TEST_PYTHON` to the app virtual environment's
+interpreter when `python` resolves elsewhere. Browser fixtures create disposable
+records on loopback port 8786 and never use the normal database/media. CI also
+runs backend tests against PostgreSQL with explicit concurrency regressions.
+See [Validation](docs/VALIDATION.md) for verification and remaining host checks.

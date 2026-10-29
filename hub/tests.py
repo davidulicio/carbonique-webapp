@@ -69,12 +69,13 @@ class HubTests(TestCase):
         self.assertEqual(self.client.patch(url,{"name":"A"},format="json").status_code,400)
         self.assertEqual(self.client.patch(url,{"name":"A","base_version":1},format="json").status_code,200)
         self.assertEqual(self.client.patch(url,{"name":"B","base_version":1},format="json").status_code,409)
-    def test_django_admin_edit_also_invalidates_stale_app_version(self):
+    def test_django_admin_cannot_bypass_app_site_edits(self):
         self.client.force_login(self.admin)
         r=self.client.post(f"/admin/inventory/site/{self.site.pk}/change/",{"name":"Admin correction","code":self.site.code,"amp":self.site.amp,"location":self.site.location,"description":self.site.description,"date_activated":"2025-04-10","gps_coordinates":"","metadata":"{}","_save":"Save"})
-        self.assertEqual(r.status_code,302)
-        self.site.refresh_from_db();self.assertEqual(self.site.version,2)
-        self.assertEqual(self.client.patch(f"/api/sites/{self.site.pk}/",{"name":"Stale overwrite","base_version":1},format="json").status_code,409)
+        self.assertEqual(r.status_code,403)
+        self.site.refresh_from_db();self.assertEqual(self.site.version,1)
+        self.assertNotEqual(self.site.name,"Admin correction")
+        self.assertEqual(self.client.patch(f"/api/sites/{self.site.pk}/",{"name":"App correction","base_version":1},format="json").status_code,200)
     def test_operation_retries_do_not_duplicate(self):
         op=self.operation("task.create",payload={"title":"Check power"})
         first=self.send(op);second=self.send(op)

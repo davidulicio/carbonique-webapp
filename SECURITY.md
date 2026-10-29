@@ -1,6 +1,11 @@
 # Security and deployment review
 
-Reviewed 26 October 2026.
+Reviewed 29 October 2026.
+
+The [application audit corrections](docs/AUDIT_REMEDIATION.md) address the twelve
+confirmed application findings, including restricted account administration,
+private session binding, scoped receipt/configuration reads and offline durability.
+Historical dependency review results below retain their original dates.
 
 The [current advisory assessment and VM patch instructions](docs/SECURITY_MAINTENANCE.md)
 record the 26 October dependency fixes, CI repair, patched runtime requirements
@@ -32,6 +37,21 @@ extend it indefinitely. A successful sign-in resets earlier failures for that
 client/account. Another account at the same address is not locked by those
 failures. nginx separately limits account rotation from one address. These
 controls reduce guessing; they do not replace strong passwords or MFA.
+
+## Verification results from 29 October 2026
+
+The [corrective release](docs/AUDIT_REMEDIATION.md) includes account/session
+binding before private view dispatch, network-wide team administration, current
+scope checks on receipts/configuration metadata, immutable operational admin
+views and guarded account-specific IndexedDB clearing. Successful operations
+are acknowledged durably before their outbox entry is removed.
+
+Local verification: 196 backend tests passed, three PostgreSQL-only tests skipped,
+four Node behavior tests passed and nine Chromium browser tests passed. The
+synthetic portable backup/restore drill passed. Dependency audits reported no
+known Python/npm findings. PostgreSQL concurrency is configured in CI but was
+not exercised locally. No VM or live scientific record was changed. Host/runtime
+patch requirements from the earlier review remain separate deployment work.
 
 ## Verification results from 26 October 2026
 

@@ -13,7 +13,7 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("accounts/", include("django.contrib.auth.urls")),
     path("admin/", admin.site.urls),
-    path("api/bootstrap/", api.bootstrap), path("api/snapshot/", api.snapshot),
+    path("api/bootstrap/", api.bootstrap), path("api/logout/", api.logout), path("api/snapshot/", api.snapshot),
     path("api/processing-files/", processing_files.library),
     path("processing-files/<uuid:pk>/", processing_files.version_file),
     path('api/sites/<int:site_id>/calibrations/', record_resources.calibrations),

@@ -80,6 +80,8 @@ def apply_operation(user, operation):
     # Lock the actor to serialize retries and prevent duplicate receipt races.
     user.__class__.objects.select_for_update().get(pk=user.pk)
     receipt = OperationReceipt.objects.filter(actor=user, operation_id=operation_id).first()
+    # Retries may read archived sites, but revoked access must never replay data.
+    require_site(user, operation.get("site_id"))
     if receipt:
         if receipt.payload_hash != digest:
             raise Conflict("An operation identifier cannot be reused with different content.")
@@ -114,6 +116,8 @@ def apply_operation(user, operation):
         if kind == "visit.close":
             if visit.status != "open":
                 raise Conflict("The visit is already closed.")
+            if occurred_at < visit.started_at:
+                raise ValidationError("Visit end precedes its start. Correct the device clock or edit the recorded start before closing the visit.")
             visit.status, visit.ended_at = "closed", occurred_at
             visit.version += 1
             visit.save()
@@ -139,6 +143,8 @@ def apply_operation(user, operation):
                 if payload["classification"] not in {"routine", "major", "fault"}:
                     raise ValidationError("Invalid classification.")
                 visit.classification = payload["classification"]
+            if "started_at" in payload:
+                visit.started_at = event_time(payload["started_at"])
             if "narrative" in payload:
                 visit.narrative = clean_html(str(payload["narrative"]))
             visit.version += 1
@@ -154,6 +160,8 @@ def apply_operation(user, operation):
         if VisitObservation.objects.filter(pk=record_id).exists():
             raise Conflict("An observation already uses this identifier.")
         note = VisitObservation.objects.create(id=record_id, visit=visit, text=nonempty(payload.get("text"), "Observation", 20000), author=user, author_name=name, occurred_at=occurred_at)
+        from .serializers import VisitObservationSerializer
+        result["record"] = VisitObservationSerializer(note).data
         audit(user, kind, note, site)
     elif kind.startswith("task."):
         activity_id = entity_uuid(payload["activity_id"]) if payload.get("activity_id") else uuid.uuid4()
@@ -216,7 +224,9 @@ def apply_operation(user, operation):
                     raise ValidationError("Unknown task operation.")
                 task.version += 1
                 task.save()
-        TaskActivity.objects.create(id=activity_id, task=task, visit=visit, action=action, task_title=task.title, text=text, author=user, author_name=name, occurred_at=occurred_at)
+        activity = TaskActivity.objects.create(id=activity_id, task=task, visit=visit, action=action, task_title=task.title, text=text, author=user, author_name=name, occurred_at=occurred_at)
+        from .serializers import TaskActivitySerializer
+        result["activity"] = TaskActivitySerializer(activity).data
         result["activity_id"] = str(activity_id)
         result["record"] = TaskSerializer(task).data
         audit(user, kind, task, site, {"version": task.version})
@@ -230,6 +240,8 @@ def apply_operation(user, operation):
             raise Conflict("A caveat already uses this identifier.")
         caveat = DataCaveat.objects.create(id=record_id, source_visit=visit, title=nonempty(payload.get("title"), "Title", 300), description=clean_html(str(payload.get("description", ""))), variables=str(payload.get("variables", ""))[:500], period_label=str(payload.get("period_label", ""))[:500], created_by=user)
         caveat.sites.add(site)
+        from .serializers import CaveatSerializer
+        result["record"] = CaveatSerializer(caveat, context={"user": user}).data
         audit(user, kind, caveat, site)
     else:
         raise ValidationError("Unknown field operation.")

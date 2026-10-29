@@ -27,3 +27,6 @@ test-results/
 # TLS private material belongs in protected server configuration.
 *.key
 *.pem
+
+/playwright-report/
+/blob-report/

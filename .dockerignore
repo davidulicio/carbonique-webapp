@@ -21,3 +21,11 @@ screenshots
 *.log
 *.pem
 *.key
+
+# Browser testing is a development dependency, not part of the running app.
+/tests/
+/playwright.config.cjs
+/package.json
+/package-lock.json
+/playwright-report/
+/blob-report/

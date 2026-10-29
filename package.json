@@ -1,0 +1,12 @@
+{
+  "name": "carbonique-webapp-tests",
+  "private": true,
+  "scripts": {
+    "test:browser": "playwright test",
+    "test:frontend": "node --test tests/frontend/*.test.cjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  },
+  "type": "module"
+}

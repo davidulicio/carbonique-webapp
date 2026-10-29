@@ -25,7 +25,7 @@ def home(request):
 @ensure_csrf_cookie
 def csrf_token(request):
     from django.middleware.csrf import get_token
-    return JsonResponse({"csrfToken": get_token(request), "authenticated": request.user.is_authenticated})
+    return JsonResponse({"csrfToken": get_token(request), "authenticated": request.user.is_authenticated, "account_id": request.user.pk if request.user.is_authenticated else None})
 
 def file_response(field, filename, content_type="application/octet-stream", inline=False):
     try:

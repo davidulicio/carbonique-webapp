@@ -153,7 +153,7 @@ no calibration, restart, settings or logging controls, including for admins.
 
 Viewers read records. Members record field work. Researchers also maintain
 scientific records and inventory. Managers additionally maintain site resources;
-administrators manage accounts and sites. Site restrictions apply on the server,
+network-wide administrators manage accounts and shared checklists; scoped administrators edit assigned sites. Site restrictions apply on the server,
 not just to visible buttons. See the role table in the [README](../README.md).
 
 `/fieldnotes/` is the public read-only report. Site descriptions/conditions,
@@ -318,7 +318,7 @@ keep existing upstream migration identities. After changing cached frontend
 assets, review the service worker's cache version/update behavior.
 
 Run the checks in [VALIDATION.md](VALIDATION.md) before committing. The current
-backend suite contains 179 tests. A typical local verification is:
+backend suite contains 199 tests, including three PostgreSQL-only checks. A typical local verification is:
 
 ```bash
 python manage.py check
@@ -400,3 +400,26 @@ Security maintenance and the CI failure repair are documented in
 pull requests and weekly; proposed dependency updates require review. The app
 uses patched REST framework and Pillow versions and restricts uploaded image
 decoders. VM Python/nginx/system-library patches remain an operator responsibility.
+
+### Audit corrections and behavior tests
+
+The [audit correction guide](AUDIT_REMEDIATION.md) maps all twelve findings to
+implementation and tests. Private fetches carry the expected account and hashed
+session identity; `WorkspaceIdentityMiddleware` validates them before a write.
+Changed sessions pause a tab. `ObjectJSONParser` rejects nonobject request bodies.
+Operational Django admin pages are read only so domain rules cannot be bypassed.
+
+The frontend's `offline-state.js` contains pure projection and acknowledgement
+merging. `storage.js` commits acknowledged snapshots and outbox removal atomically,
+uses snapshot revisions to reject older responses, seals cleared accounts and
+rejects stale-tab writes. Protocol cache keys include their digest; preparation
+and reading share the verified download helper. Selected-site generations stop
+out-of-order loads from displaying or caching another site's records.
+
+`tests/frontend/` supplies deterministic request-order tests. `tests/browser/`
+uses Playwright and real IndexedDB with isolated fixture settings/server, including
+phone and actual service-worker offline reopening. `hub/test_audit_regressions.py`
+covers the backend corrections; `hub/test_backup_restore.py` verifies portable
+restore. PostgreSQL concurrency checks live in `hub/test_postgres_concurrency.py`.
+The CI matrix runs SQLite and PostgreSQL; browser tools are development-only.
+The production VM does not need npm, Playwright or a frontend build step.

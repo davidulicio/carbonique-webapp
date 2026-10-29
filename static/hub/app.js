@@ -1,4 +1,5 @@
 import * as store from "./storage.js";
+import {projectSnapshot,protocolCacheKey} from "./offline-state.js";
 import { createResources } from "./resources.js";
 import { createMonitor } from "./monitor.js";
 import { createProcessingFiles } from "./processing-files.js";
@@ -37,30 +38,67 @@ function normalizeProse(root){
   }
 }
 
-const S = {protocols:[], me:null, sites:[], checklists:[], siteId:null, base:null, data:null, queue:[], view:location.hash.slice(1)||"overview", histMode:"visits", siteTab:"reference", mode:"offsite", filter:"", typeFilter:"all", visitId:null, online:navigator.onLine, syncing:false, blocked:null, csrf:$("meta[name=csrf-token]")?.content, overview:[], team:[], objectURLs:[], dialogURLs:[], prepared:false};
+const S = {protocols:[], me:null, sessionId:null, frozen:false, identityGeneration:0, loadGeneration:0, changeGeneration:0, sites:[], checklists:[], siteId:null, base:null, data:null, queue:[], view:location.hash.slice(1)||"overview", histMode:"visits", siteTab:"reference", mode:"offsite", filter:"", typeFilter:"all", visitId:null, online:navigator.onLine, syncing:false, blocked:null, csrf:$("meta[name=csrf-token]")?.content, overview:[], team:[], objectURLs:[], dialogURLs:[], prepared:false};
 const write = () => ["member","researcher","manager","admin"].includes(S.me?.role);
 const research = () => ["researcher","manager","admin"].includes(S.me?.role);
 const admin = () => S.me?.role === "admin";
+const teamAdmin = () => admin() && S.me?.can_manage_team;
+$("#logout-button").textContent="Sign out & clear account";
 const currentSite = () => S.sites.find(s => s.id === S.siteId);
 const selectedVisit = () => S.data?.visits.find(v => v.id === S.visitId && v.status === "open") || S.data?.visits.find(v => v.status === "open") || null;
 let toastTimer;
 function toast(text, error=false) { const el=$("#toast"); el.textContent=text; el.className=error?"error":""; el.style.display="block"; clearTimeout(toastTimer); toastTimer=setTimeout(()=>el.style.display="none",5500); }
 function errorMessage(value) { return typeof value === "string" ? value : JSON.stringify(value); }
-async function api(path, {method="GET", data, form}={}) {
-  const headers = {};
-  if (method !== "GET") headers["X-CSRFToken"] = S.csrf;
-  if (data !== undefined) headers["Content-Type"] = "application/json";
+function identity(){return {account:S.me?.id,session:S.sessionId,generation:S.identityGeneration};}
+function assertIdentity(expected){
+  if(S.frozen||expected.account!==S.me?.id||expected.generation!==S.identityGeneration||(expected.session&&expected.session!==S.sessionId)){
+    const error=new Error("This workspace's signed-in session changed. Reload to continue; pending work remains saved.");error.status=409;throw error;
+  }
+}
+function freezeWorkspace(message="The signed-in account changed in another tab. Reload to continue. Pending field records remain saved."){
+  if(S.frozen)return;S.frozen=true;S.identityGeneration++;S.loadGeneration++;S.base=null;S.data=null;S.team=[];S.sites=[];S.protocols=[];
+  setNavigationOpen(false,{restoreFocus:false});if($("#dialog").open)closeDialog();
+  for(const url of [...S.objectURLs,...S.dialogURLs])URL.revokeObjectURL(url);S.objectURLs=[];S.dialogURLs=[];
+  $("#main").innerHTML='<section class="panel"><h1>Workspace paused</h1><p>'+esc(message)+'</p></section><p><a class="button primary" href="/">Reload workspace</a> <a class="button secondary" href="/accounts/login/">Sign in</a></p>';
+  toast(message,true);
+}
+const sessionChannel=typeof BroadcastChannel!=="undefined"?new BroadcastChannel("carbonique-workspace-session"):null;
+function announceSession(account,session,logout=false){
+  const event={account,session,logout,nonce:uuid()};sessionChannel?.postMessage(event);
+  try{localStorage.setItem("carbonique-session-event",JSON.stringify(event));}catch{}
+}
+function receiveSession(event){if(S.me&&((event.logout&&event.account===S.me.id)||(!event.logout&&(event.account!==S.me.id||event.session!==S.sessionId))))freezeWorkspace();}
+if(sessionChannel)sessionChannel.onmessage=event=>receiveSession(event.data);
+window.addEventListener("storage",event=>{if(event.key==="carbonique-session-event"&&event.newValue){try{receiveSession(JSON.parse(event.newValue));}catch{}}});
+async function privateFetch(path,options={}){
+  const expected=identity();assertIdentity(expected);
+  const headers=new Headers(options.headers||{});
+  if(expected.account){headers.set("X-Workspace-Account",String(expected.account));if(expected.session)headers.set("X-Workspace-Session",expected.session);}
   let response;
-  try { response = await fetch(path, {method, headers, credentials:"same-origin", cache:"no-store", body:form || (data!==undefined ? JSON.stringify(data) : undefined)}); }
-  catch { S.online=false; updateConnection(); throw new Error("No connection. Your queued field records remain on this device."); }
-  S.online=true; updateConnection();
-  const body = await response.json().catch(()=>({detail:response.status===429?"Too many requests. Wait a moment and retry; queued records remain on this device.":"Unexpected server response."}));
-  if (!response.ok) { const e=new Error(errorMessage(body)); e.status=response.status; e.body=body; throw e; }
+  try{response=await fetch(path,{...options,headers,credentials:"same-origin",cache:"no-store"});}
+  catch{S.online=false;updateConnection();throw new Error("No connection. Your queued field records remain on this device.");}
+  assertIdentity(expected);S.online=true;updateConnection();
+  if(expected.account&&(response.headers.get("X-Workspace-Account")!==String(expected.account)||(expected.session&&response.headers.get("X-Workspace-Session")!==expected.session))){
+    freezeWorkspace();const error=new Error("The signed-in session changed. Reload and sign in with the original account.");error.status=409;throw error;
+  }
+  return response;
+}
+async function api(path,{method="GET",data,form}={}){
+  const expected=identity(),headers={};
+  if(method!=="GET")headers["X-CSRFToken"]=S.csrf;
+  if(data!==undefined)headers["Content-Type"]="application/json";
+  const response=await privateFetch(path,{method,headers,body:form||(data!==undefined?JSON.stringify(data):undefined)});
+  const body=await response.json().catch(()=>({detail:response.status===429?"Too many requests. Wait and retry; queued records remain saved.":"Unexpected server response."}));
+  assertIdentity(expected);
+  if(!response.ok){const error=new Error(errorMessage(body));error.status=response.status;error.body=body;throw error;}
+  if(path==="/api/bootstrap/"||path==="/api/csrf/")body.workspace_session=response.headers.get("X-Workspace-Session");
   return body;
 }
 async function refreshCsrf() {
   const data = await api("/api/csrf/");
   S.csrf=data.csrfToken;
+  if(S.me&&data.account_id!==S.me.id){freezeWorkspace();throw new Error("Sign in with the account that owns this work.");}
+  if(S.me&&!S.sessionId&&data.workspace_session){S.sessionId=data.workspace_session;await store.activateAccount(S.me.id,S.sessionId);}
   if (!data.authenticated) { const error=new Error("Sign in again to upload the queued records. They remain saved on this device."); error.status=403; throw error; }
 }
 function updateConnection() {
@@ -74,22 +112,12 @@ function project() {
   if (!S.base) return;
   S.data=clone(S.base);
   S.data.calibrations ||= []; S.data.knowledge ||= [];
-  for (const item of S.queue.filter(q=>q.siteId===S.siteId||(q.kind==="upload"&&q.fields.equipment&&S.data.equipment.some(e=>e.id===Number(q.fields.equipment))))) {
-    if (item.kind === "upload") { S.data.attachments.push({id:item.id,visit:item.fields.visit||null,equipment:item.fields.equipment||null,caveat:item.fields.caveat||null,configuration:item.fields.configuration||null,task:item.fields.task||null,activity:item.fields.activity||null,observation:item.fields.observation||null,calibration:item.fields.calibration||null,filename:item.file.name,caption:item.fields.caption,content_type:item.file.type,url:"",pending:true}); continue; }
-    const op=item.operation,p=op.payload,t=S.data.tasks.find(t=>t.id===op.entity_id),v=S.data.visits.find(v=>v.id===op.entity_id);
-    const visitId=p.visit_id||null;
-    if (op.kind === "visit.create") S.data.visits.unshift({id:op.entity_id,site:S.siteId,date:p.date,crew:p.crew,title:p.title,classification:p.classification||"routine",status:"open",started_at:op.occurred_at,version:1,reports:[],narrative:"",pending:true});
-    else if (op.kind.startsWith("visit.") && v) { if (op.kind==="visit.close") {v.status="closed";v.ended_at=op.occurred_at;} else if(op.kind==="visit.reopen")v.status="open"; else if(op.kind==="visit.edit")Object.assign(v,p); v.version++;v.pending=true; }
-    else if(op.kind==="observation.create") S.data.observations.push({id:op.entity_id,visit:visitId,text:p.text,author_name:S.me.name,occurred_at:op.occurred_at,pending:true});
-    else if(op.kind==="task.create") { const newTask={id:op.entity_id,site:S.siteId,title:p.title,details:p.details||"",priority:p.priority||"normal",status:"pending",due_date:p.due_date||null,created_visit:visitId,created_by:S.me.id,created_at:op.occurred_at,version:1,pending:true};S.data.tasks.push(newTask);S.data.activities.push({id:p.activity_id||op.id,task:op.entity_id,visit:visitId,action:"created",task_title:p.title,text:p.text||"",author_name:S.me.name,occurred_at:op.occurred_at,pending:true}); }
-    else if(op.kind.startsWith("task.") && t) { const action={"task.complete":"completed","task.reopen":"reopened","task.comment":"commented","task.edit":"edited","task.archive":"archived"}[op.kind];if(op.kind==="task.complete")t.status="done";if(op.kind==="task.reopen")t.status="pending";if(op.kind==="task.archive")t.status="archived";if(op.kind==="task.edit")Object.assign(t,p);if(op.kind!=="task.comment")t.version++;t.pending=true;S.data.activities.push({id:p.activity_id||op.id,task:t.id,visit:visitId,action,task_title:t.title,text:p.text||"",author_name:S.me.name,occurred_at:op.occurred_at,pending:true}); }
-    else if(op.kind==="calibration.create")S.data.calibrations.unshift({...p,id:op.entity_id,site:S.siteId,version:1,is_archived:false,pending:true});
-    else if(op.kind==="calibration.edit"){const record=S.data.calibrations.find(r=>r.id===op.entity_id);if(record){Object.assign(record,p);record.version++;record.pending=true;}}
-    else if(op.kind==="caveat.draft")S.data.caveats.push({id:op.entity_id,sites:[S.siteId],title:p.title,description:p.description,variables:p.variables,period_label:p.period_label,status:"draft",treatment:"",version:1,pending:true});
-  }
+  S.data=projectSnapshot(S.base,S.queue,S.me,S.siteId);
 }
 let queueOrder=Date.now();
 async function enqueue(kind, entityId, payload={}, version, files=[]) {
+  assertIdentity(identity());
+  if (!S.base||S.base.site.id!==S.siteId)throw new Error("Wait for the selected site to finish loading.");
   if (!write() || currentSite()?.is_archived) throw new Error("This site is read-only.");
   for(const file of files)if(file.size>25*1024*1024)throw new Error("Maximum file size is 25 MB per file.");
   payload={...payload};
@@ -106,46 +134,71 @@ async function enqueue(kind, entityId, payload={}, version, files=[]) {
   void synchronize();return entityId;
 }
 async function queueFile(file,fields,siteId=S.siteId) {
+  assertIdentity(identity());
   if (file.size>25*1024*1024) throw new Error("Maximum file size is 25 MB.");
   const item={id:uuid(),kind:"upload",account:S.me.id,siteId,file,fields,order:queueOrder=Math.max(queueOrder+1,Date.now())};
   await store.put("outbox",item.id,item); await readQueue();project();render();void synchronize();
 }
-async function synchronize() {
-  if(S.syncing || !S.me || !navigator.onLine || S.blocked || !S.queue.length)return;
-  S.syncing=true;updateConnection();
-  try {
-    await refreshCsrf();
-    const me=await api("/api/bootstrap/");
-    if(me.me.id!==S.me.id)throw new Error("The signed-in account differs from the account that recorded this work. Sign in with the original account.");
+async function synchronize(){
+  if(S.frozen||S.syncing||!S.me||!navigator.onLine||S.blocked||!S.queue.length)return;
+  const expected=identity();S.syncing=true;updateConnection();let saved=0;
+  try{
+    await refreshCsrf();await api("/api/bootstrap/");
     while(true){
-      await readQueue(); if(!S.queue.length||S.blocked)break;
-      const item=S.queue[0];
-      try {
-        if(item.kind==="upload") { const form=new FormData();form.append("id",item.id);form.append("site",item.siteId);form.append("file",item.file,item.file.name);for(const[k,v]of Object.entries(item.fields))if(v)form.append(k,v);await api("/api/attachments/",{method:"POST",form}); }
-        else { const reply=await api("/api/sync/",{method:"POST",data:{operations:[item.operation]}});const result=reply.results[0];if(!result?.ok){const error=new Error(errorMessage(result?.error));error.status=result?.status;error.body=result?.error;throw error;} }
-        await store.remove("outbox",item.id);
-      } catch(e) { if(e.status && ![429,503].includes(e.status)){item.error={status:e.status,message:e.message,body:e.body};await store.put("outbox",item.id,item);await readQueue();}throw e; }
+      assertIdentity(expected);await readQueue();if(!S.queue.length||S.blocked)break;
+      const item=S.queue[0];let result;
+      try{
+        if(item.kind==="upload"){
+          const form=new FormData();form.append("id",item.id);form.append("site",item.siteId);form.append("file",item.file,item.file.name);
+          for(const [key,value] of Object.entries(item.fields))if(value)form.append(key,value);
+          result=await api("/api/attachments/",{method:"POST",form});
+        }else{
+          const reply=await api("/api/sync/",{method:"POST",data:{operations:[item.operation]}});result=reply.results[0];
+          if(!result?.ok){const error=new Error(errorMessage(result?.error));error.status=result?.status;error.body=result?.error;throw error;}
+        }
+        assertIdentity(expected);
+        await store.acknowledge(item,result,S.me);saved++;S.changeGeneration++;
+        if(S.siteId===item.siteId){const base=await store.get("snapshots",`${expected.account}:${item.siteId}`);assertIdentity(expected);if(S.siteId===item.siteId)S.base=base;}
+      }catch(error){
+        if(!S.frozen&&error.status&&![429,503].includes(error.status)){item.error={status:error.status,message:error.message,body:error.body};await store.put("outbox",item.id,item);await readQueue();}
+        throw error;
+      }
     }
-    await loadSite(S.siteId,false);await loadOverview();
-    toast("All field records are synced.");
-  } catch(e){toast(e.message,true);}
-  finally {S.syncing=false;await readQueue();project();if(!$("#dialog").open)render();updateConnection();}
+    await loadSite(S.siteId,false);await loadOverview();toast(`${saved} records synced. No pending work remains.`);
+  }catch(error){toast(`${saved?`${saved} records synced; remaining work stays saved. `:""}${error.message}`,true);}
+  finally{S.syncing=false;if(!S.frozen){await readQueue();project();if(!$("#dialog").open)render();updateConnection();}}
 }
-async function loadSite(id,draw=true) {
-  if(!id)return;
-  S.siteId=Number(id);await store.put("meta",`${S.me.id}:selected`,S.siteId);
+async function loadSite(id,draw=true){
+  if(!id||S.frozen)return;
+  const siteId=Number(id),expected=identity(),generation=++S.loadGeneration,changes=S.changeGeneration;
+  const current=()=>!S.frozen&&S.me?.id===expected.account&&S.identityGeneration===expected.generation&&S.siteId===siteId&&generation===S.loadGeneration&&changes===S.changeGeneration;
+  if(S.siteId!==siteId){S.base=null;S.data=null;}
+  S.siteId=siteId;if(draw)render();
+  await store.put("meta",`${expected.account}:selected`,siteId);
   let data;
-  if(navigator.onLine){try{data=await api(`/api/snapshot/?site=${S.siteId}`);await store.put("snapshots",`${S.me.id}:${S.siteId}`,data);}catch(e){if(e.status){throw e;}}}
-  if(!data)data=await store.get("snapshots",`${S.me.id}:${S.siteId}`);
-  if(!data){S.base=null;S.data=null;$("#main").innerHTML=empty("This site is not available offline","Prepare this site while you have a connection.");return;}
-  S.base=data;const index=S.sites.findIndex(s=>s.id===S.siteId);if(index>=0)S.sites[index]=data.site;
-  project();$("#site-select").value=S.siteId;if(draw)render();
+  const revision=await store.get("meta",`${expected.account}:snapshot-revision:${siteId}`)||0;
+  if(navigator.onLine){try{
+    data=await api(`/api/snapshot/?site=${siteId}`);
+    if(!current())return;
+    if(Number(data.site?.id)!==siteId)throw new Error("The server returned another site's data. Refresh the workspace.");
+    if(!await store.saveSnapshot(expected.account,siteId,data,revision))data=await store.get("snapshots",`${expected.account}:${siteId}`);
+  }catch(error){if(error.status||S.frozen)throw error;}}
+  if(!current())return;
+  if(!data)data=await store.get("snapshots",`${expected.account}:${siteId}`);
+  if(!current())return;
+  if(!data||Number(data.site?.id)!==siteId){S.base=null;S.data=null;$("#main").innerHTML=empty("This site is not available offline","Prepare this site while connected.");return;}
+  S.base=data;const index=S.sites.findIndex(site=>site.id===siteId);if(index>=0)S.sites[index]=data.site;
+  project();$("#site-select").value=siteId;if(draw)render();
 }
-async function loadOverview(){if(!navigator.onLine)return;try{S.overview=await api("/api/overview/");await store.put("meta",`${S.me.id}:overview`,S.overview);}catch{}}
+async function loadOverview(){
+  if(!navigator.onLine||S.frozen)return;
+  const expected=identity();try{const overview=await api("/api/overview/");assertIdentity(expected);await store.put("meta",`${expected.account}:overview`,overview);S.overview=overview;}catch{}
+}
 function header(title,subtitle,actions=""){return `<div class="page-header"><div><span class="eyebrow">${esc(currentSite()?.code||"CARBONIQUE NETWORK")}</span><h1>${title}</h1><p>${subtitle}</p></div><div class="page-actions">${actions}</div></div>`;}
 function stat(label,value,foot=""){return `<div class="stat"><div class="label"><span class="accent"></span>${label}</div><strong>${value}</strong><small>${foot}</small></div>`;}
 function renderNavigation(){const views=[["overview","◫","Overview"],["field","✓","Field work"],["history","◷","History"],["sites","⌁","Sites & instruments"],["data","≋","Data & processing"],["inventory","▤","Equipment inventory"],["monitor","◉","Tower status"],["badm","◇","Site BADM"],["protocols","▧","Protocols"],["knowledge","▥","Reference library"]];if(admin())views.push(["admin","⚙","Administration"]);$("#navigation").innerHTML=views.map(([id,icon,label])=>`<button class="nav-button ${S.view===id?"active":""}" data-action="view" data-id="${id}"><span class="nav-icon" aria-hidden="true">${icon}</span>${label}</button>`).join("")+'<a class="nav-button" href="/fieldnotes/" target="_blank" rel="noopener"><span class="nav-icon" aria-hidden="true">↗</span>Public Field Notes</a>';}
 function render(){
+  if(S.frozen)return;
   const main=$("#main"),sameView=main.dataset.view===S.view&&main.dataset.site===String(S.siteId);
   const detailKey=element=>element.dataset.key||[(element.closest("article")?.id||element.closest("article")?.querySelector("h3")?.textContent||""),element.querySelector("summary")?.textContent].join(":");
   const details=sameView?new Map([...main.querySelectorAll("details")].map(element=>[detailKey(element),element.open])):new Map();
@@ -228,7 +281,7 @@ function siteReferenceView(){
   const site=S.data.site,reference=site.metadata.reference||{},sections=clone(reference.sections||[]).filter(section=>section.h!=="Processing settings");
   for(const section of sections)for(const item of section.items||[])if(item.k==="Site name")item.v=site.name;
   const deployments=S.data.deployments.sort((a,b)=>b.installed_at.localeCompare(a.installed_at));
-  const active=deployments.filter(d=>!d.removed_at||new Date(d.removed_at)>new Date());
+  const active=deployments.filter(d=>new Date(d.installed_at)<=new Date()&&(!d.removed_at||new Date(d.removed_at)>new Date()));
   const equip=id=>S.data.equipment.find(e=>e.id===id);
   return `<div class="grid-two"><div><div class="panel"><div class="panel-title"><h2>${esc(site.name)}</h2>${pill(site.is_archived?"archived":"active")}</div><div class="rich-text">${rich(site.description)}</div><div class="metadata-list">${[["Site code",site.code],["AmeriFlux ID",site.amp],["Active since",day(site.date_activated)],["Coordinates",site.gps_coordinates||`${reference.lat??"Not recorded"}, ${reference.lon??"Not recorded"}`],["Logger time basis","Fixed EST · UTC−05:00"],["Retired",site.date_retired?day(site.date_retired):"Not recorded"]].map(([k,v])=>`<div class="metadata-row"><span>${esc(k)}</span><span>${esc(v)}</span></div>`).join("")}</div>${attachmentsHTML({visit:null,equipment:null,caveat:null,configuration:null,calibration:null})}</div>${resources.mediaHTML()}${sections.map(section=>`<div class="panel"><h2>${esc(section.h)}</h2>${(section.items||[]).map(i=>`<div class="metadata-row"><span>${esc(i.k)}</span><span>${esc(i.v)}</span></div>`).join("")}${(section.subs||[]).map(sub=>`<div class="section-divider"><h3>${esc(sub.h)}</h3>${(sub.items||[]).map(i=>`<div class="metadata-row"><span>${esc(i.k)}</span><span>${esc(i.v)}</span></div>`).join("")}</div>`).join("")}</div>`).join("")}</div><aside><div class="panel"><h3>Tower & sensor positions</h3>${mastDiagram(active,sections)}<p class="small muted">Heights above ground. Depths are positive downward. Reference values are shown when no deployment history is available.</p></div><div class="panel"><div class="panel-title"><h3>Instrument deployments</h3>${research()?button("＋ Add","add-deployment"):""}</div>${deployments.map(d=>`<div class="section-divider"><strong>${esc(equip(d.equipment)?.instrument||"Instrument")}</strong><span class="small muted">${esc(equip(d.equipment)?.serial_number||"")} · ${d.height_m!==null?`${d.height_m} m high`:d.depth_m!==null?`${d.depth_m} m deep`:"Position not recorded"}</span><p class="small">${time(d.installed_at)} → ${d.removed_at?time(d.removed_at):"Present"}<br>${esc(d.variables)}</p>${research()?button("Edit / record removal","edit-deployment",d.id):""}</div>`).join("")||empty("No deployment records","Historical reference metadata remains available on the left.")}</div></aside></div>`;
 }
@@ -237,7 +290,7 @@ function referenceProcessingHTML(){const site=S.data.site,sections=[...(site.met
 let processingFiles;
 function dataView(){const caveats=S.data.caveats.filter(c=>(c.title+" "+c.description+" "+c.variables).toLowerCase().includes(S.filter.toLowerCase())&&(S.typeFilter==="all"||c.status===S.typeFilter));return header("Data & processing","Connect measurement issues to their affected periods and treatment.",`<a class="button secondary" href="/inventory-source.zip">Download source inventory</a>${write()?button("＋ Flag data issue","draft-caveat","","primary"):""}`)+`<div class="toolbar"><input data-search="caveats" value="${esc(S.filter)}" placeholder="Search caveats or variables…" aria-label="Search caveats"><select data-filter="caveat-status">${["all","draft","reviewed","resolved"].map(v=>`<option value="${v}" ${S.typeFilter===v?"selected":""}>${v==="all"?"All statuses":v}</option>`).join("")}</select></div>${processingFiles.view()}${referenceProcessingHTML()}<div class="data-grid">${caveats.map(c=>`<article class="caveat-card">${pill(c.status)} ${c.pending?`<span class="offline-tag">Pending sync</span>`:""}<h3>${esc(c.title)}</h3><p class="small muted">${esc(c.period_label||"Affected period needs review")}${c.variables?` · ${esc(c.variables)}`:""}</p>${c.affected_from?`<p class="small">${esc(c.affected_from)} → ${esc(c.affected_to||"Ongoing")}<br>${esc(c.time_basis)}</p>`:""}<div class="rich-text">${rich(c.description)}</div>${c.treatment?`<div class="section-divider"><h3>Processing treatment</h3><div class="rich-text">${rich(c.treatment)}</div></div>`:""}${c.evidence?.flag?`<div class="notice"><strong>Needs confirmation</strong><div class="rich-text">${rich(c.evidence.flag)}</div></div>`:""}${c.evidence?.xref?`<details><summary>Cross-check against field notes</summary><div class="rich-text">${rich(c.evidence.xref)}</div></details>`:""}${attachmentsHTML({caveat:c.id})}${Object.keys(c.evidence||{}).length?`<details class="section-divider"><summary class="small">Source evidence</summary><pre class="json-block">${esc(JSON.stringify(c.evidence,null,2))}</pre></details>`:""}<div class="row-actions section-divider">${research()?button("Review / edit","edit-caveat",c.id):""}${write()?button("Attach evidence","upload-caveat",c.id):""}</div></article>`).join("")||empty("No matching caveats")}</div><div class="panel" style="margin-top:25px"><div class="panel-title"><h2>Scientific configuration history</h2>${research()?button("＋ New version","add-config","","primary"):""}</div>${S.data.configurations.sort((a,b)=>b.effective_from.localeCompare(a.effective_from)).map(c=>`<details class="section-divider"><summary><strong>${esc(c.label)}</strong> <span class="small muted">${esc(c.effective_from)} → ${esc(c.effective_to||"Open-ended")} · ${esc(c.time_basis)}</span></summary><pre class="json-block">${esc(JSON.stringify(c.settings,null,2))}</pre><p class="small">${esc(c.notes)}</p>${attachmentsHTML({configuration:c.id})}<div class="row-actions">${research()?button("Create corrected version","replace-config",c.id):""}${write()?button("Attach INI / metadata","upload-config",c.id):""}</div></details>`).join("")||empty("No structured configurations yet","Reference processing settings remain available under Sites & instruments.")}</div>`;}
 function inventoryView(){const items=S.data.equipment.filter(e=>(e.instrument+" "+e.serial_number+" "+e.model_number).toLowerCase().includes(S.filter.toLowerCase()));return header("Equipment inventory","Follow each instrument from storage to deployment and repair.",research()?button("＋ Add equipment","add-equipment","","primary"):"")+`<div class="toolbar"><input data-search="inventory" value="${esc(S.filter)}" placeholder="Search instrument, model or serial number…" aria-label="Search inventory"></div><div class="panel table-wrap"><table><thead><tr><th>Instrument</th><th>Model / manufacturer</th><th>Serial number</th><th>Current site</th><th>Status</th><th>Actions</th></tr></thead><tbody>${items.map(e=>`<tr><td><strong>${esc(e.instrument)}</strong><span class="small muted">Purchased ${day(e.date_purchased)}</span></td><td>${esc(e.model_number)}<span class="small muted">${esc(e.manufacturer)}</span></td><td>${esc(e.serial_number)||"Not recorded"}</td><td>${esc(S.sites.find(s=>s.id===e.site)?.code||"Storage / unassigned")}</td><td>${pill(e.is_archived?"archived":e.status)}</td><td><div class="row-actions">${button("Details / history","equipment-details",e.id)}${research()?button("Edit","edit-equipment",e.id):""}</div></td></tr>`).join("")}</tbody></table>${!items.length?empty("No tracked equipment records yet","Instrument specifications from the supplied reference are under Sites & instruments. Create tracked equipment records when serial numbers and purchase details are known."):""}</div>`;}
-function adminView(){if(!admin())return empty("Administrator access required");return header("Administration","Manage sites, team access and maintenance checklists.",`<a class="button secondary" href="/admin/" target="_blank">Django administration ↗</a>`)+`<div class="panel"><div class="panel-title"><h2>Sites</h2>${button("＋ Add site","add-site","","primary")}</div><div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>AmeriFlux</th><th>Status</th><th></th></tr></thead><tbody>${S.sites.map(s=>`<tr><td>${esc(s.code)}</td><td>${esc(s.name)}</td><td>${esc(s.amp)}</td><td>${pill(s.is_archived?"archived":"active")}</td><td>${button("Edit","edit-site",s.id)} ${button(s.is_archived?"Restore":"Archive","archive-site",s.id)}</td></tr>`).join("")}</tbody></table></div></div><div class="panel"><div class="panel-title"><h2>Team</h2>${button("＋ Create account","add-member","","primary")}</div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Username / email</th><th>Role</th><th>Access</th><th></th></tr></thead><tbody>${S.team.map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.username)}<span class="small muted">${esc(u.email)}</span></td><td>${esc(u.role||"Not assigned")}</td><td>${u.is_active?"Active":"Disabled"}</td><td>${u.id!==S.me.id?button("Edit access","edit-member",u.id):""}</td></tr>`).join("")}</tbody></table></div></div><div class="panel"><div class="panel-title"><h2>Maintenance checklists</h2>${button("＋ Add checklist","add-checklist","","primary")}</div>${S.checklists.map(c=>`<div class="section-divider"><strong>${esc(c.name)}</strong> <span class="small muted">${c.tasks.length} tasks</span> ${button("Edit","edit-checklist",c.id)}</div>`).join("")}</div>`;}
+function adminView(){if(!admin())return empty("Administrator access required");return header("Administration","Manage sites, team access and maintenance checklists.",`<a class="button secondary" href="/admin/" target="_blank">Django administration ↗</a>`)+`<div class="panel"><div class="panel-title"><h2>Sites</h2>${teamAdmin()?button("＋ Add site","add-site","","primary"):""}</div><div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>AmeriFlux</th><th>Status</th><th></th></tr></thead><tbody>${S.sites.map(s=>`<tr><td>${esc(s.code)}</td><td>${esc(s.name)}</td><td>${esc(s.amp)}</td><td>${pill(s.is_archived?"archived":"active")}</td><td>${button("Edit","edit-site",s.id)} ${button(s.is_archived?"Restore":"Archive","archive-site",s.id)}</td></tr>`).join("")}</tbody></table></div></div>${teamAdmin()?`<div class="panel"><div class="panel-title"><h2>Team</h2>${button("＋ Create account","add-member","","primary")}</div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Username / email</th><th>Role</th><th>Access</th><th></th></tr></thead><tbody>${S.team.map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.username)}<span class="small muted">${esc(u.email)}</span></td><td>${esc(u.role||"Not assigned")}</td><td>${u.is_active?"Active":"Disabled"}</td><td>${u.id!==S.me.id?button("Edit access","edit-member",u.id):""}</td></tr>`).join("")}</tbody></table></div></div><div class="panel"><div class="panel-title"><h2>Maintenance checklists</h2>${button("＋ Add checklist","add-checklist","","primary")}</div>${S.checklists.map(c=>`<div class="section-divider"><strong>${esc(c.name)}</strong> <span class="small muted">${c.tasks.length} tasks</span> ${button("Edit","edit-checklist",c.id)}</div>`).join("")}</div>`:'<div class="panel"><p>Network-wide administrator access is required to manage accounts and shared checklists.</p></div>'}`;}
 
 function field(name,label,value="",{type="text",required=false,help="",options,wide=false,multiple=false}={}){
   const control=options?`<select name="${name}" ${multiple?"multiple":""}>${options.map(([v,l])=>`<option value="${esc(v)}" ${multiple?(value||[]).map(String).includes(String(v))?"selected":"":String(value)===String(v)?"selected":""}>${esc(l)}</option>`).join("")}</select>`:type==="textarea"?`<textarea name="${name}" ${required?"required":""}>${esc(value)}</textarea>`:`<input name="${name}" type="${type}" value="${esc(value)}" ${required?"required":""} ${type==="number"?'step="any"':""}>`;
@@ -258,9 +311,9 @@ const noteFileField=()=>'<label class="wide">Documents, images, audio or video (
 const onlineOnly=()=>{if(!navigator.onLine)throw new Error("This change needs a connection. Field tasks, visits, observations and files can still be saved offline.");};
 processingFiles=createProcessingFiles({data:()=>S.data,site:currentSite,canWrite:research,openForm,api,refreshCsrf,refreshWorkspace,render,esc,button,empty,toast,onlineOnly});
 async function mutate(endpoint,data,id){onlineOnly();await refreshCsrf();await api(`/api/${endpoint}/${id?id+"/":""}`,{method:id?"PATCH":"POST",data});await refreshWorkspace();toast("Saved.");}
-async function refreshWorkspace(){const b=await api("/api/bootstrap/");S.me=b.me;S.sites=b.sites;S.checklists=b.checklists;S.protocols=b.protocols||[];if(!S.sites.some(s=>s.id===S.siteId))S.siteId=S.sites.find(s=>!s.is_archived)?.id||S.sites[0]?.id;await store.put("meta",`${S.me.id}:bootstrap`,b);populateSites();await loadSite(S.siteId,false);await loadOverview();if(admin())S.team=await api("/api/team/");}
+async function refreshWorkspace(){const b=await api("/api/bootstrap/");if(b.me.id!==S.me.id){freezeWorkspace();return;}S.me=b.me;S.sites=b.sites;S.checklists=b.checklists;S.protocols=b.protocols||[];if(!S.sites.some(s=>s.id===S.siteId))S.siteId=S.sites.find(s=>!s.is_archived)?.id||S.sites[0]?.id;await store.put("meta",`${S.me.id}:bootstrap`,b);populateSites();await loadSite(S.siteId,false);await loadOverview();if(teamAdmin())S.team=await api("/api/team/");}
 function taskForm(task){openForm(task?"Edit task":"Plan work at this site",`<div class="form-grid">${field("title","Task title",task?.title,{required:true,wide:true})}${field("details","Details / equipment to bring",task?.details,{type:"textarea",wide:true})}${field("priority","Priority",task?.priority||"normal",{options:[["normal","Normal"],["high","High"]]})}${field("due_date","Due date",task?.due_date,{type:"date"})}${noteFileField()}</div>`,async form=>{const data=values(form);if(task)await enqueue("task.edit",task.id,data,task.version,noteFiles(form));else await enqueue("task.create",uuid(),data,undefined,noteFiles(form));});}
-function visitForm(visit){openForm(visit?"Visit details":"Start a field visit",`<div class="form-grid">${field("date","Visit date",visit?.date||today(),{type:"date",required:true})}${field("classification","Visit type",visit?.classification||"routine",{options:[["routine","Routine"],["major","Major work"],["fault","Fault"]]})}${field("title","Visit title",visit?.title||"",{wide:true})}${field("crew","Crew",visit?.crew||S.me.name,{required:true,wide:true})}${visit?field("narrative","Field notes",visit.narrative,{type:"textarea",wide:true}):""}${noteFileField()}</div>`,async form=>{const id=visit?.id||uuid();await enqueue(visit?"visit.edit":"visit.create",id,values(form),visit?.version,noteFiles(form));S.visitId=id;S.mode="onsite";S.view="field";},visit?"Save changes":"Start visit");}
+function visitForm(visit){openForm(visit?"Visit details":"Start a field visit",`<div class="form-grid">${field("date","Visit date",visit?.date||today(),{type:"date",required:true})}${field("classification","Visit type",visit?.classification||"routine",{options:[["routine","Routine"],["major","Major work"],["fault","Fault"]]})}${field("title","Visit title",visit?.title||"",{wide:true})}${field("crew","Crew",visit?.crew||S.me.name,{required:true,wide:true})}${visit?field("started_at","Recorded start (your local time)",localInput(visit.started_at),{type:"datetime-local",required:true,help:"Correct a device-clock error here before ending the visit."}):""}${visit?field("narrative","Field notes",visit.narrative,{type:"textarea",wide:true}):""}${noteFileField()}</div>`,async form=>{const id=visit?.id||uuid();if(visit&&form.get("started_at"))form.set("started_at",new Date(form.get("started_at")).toISOString());await enqueue(visit?"visit.edit":"visit.create",id,values(form),visit?.version,noteFiles(form));S.visitId=id;S.mode="onsite";S.view="field";},visit?"Save changes":"Start visit");}
 function noteForm(title,save){openForm(title,field("text","Observation","",{type:"textarea",required:true})+noteFileField(),form=>save(form.get("text"),noteFiles(form)));}
 function uploadForm(fields={}){openForm("Attach photographs or files",`<p class="small muted">Files are saved on this device first and uploaded when a connection is available. Maximum 25 MB per file.</p><label>Files<input name="files" type="file" multiple required></label>${field("caption","Caption / description")}`,async form=>{for(const file of form.getAll("files")){if(file.size)await queueFile(file,{...fields,caption:form.get("caption")},fields.equipment?(S.data.equipment.find(e=>e.id===Number(fields.equipment))?.site||S.siteId):S.siteId);}toast("Files saved on this device; upload is queued.");},"Save files");}
 function siteForm(site){openForm(site?"Edit site information":"Add site",`<p class="notice small">Site information and field visits appear in the read-only public report.</p><div class="form-grid">${field("code","Site code",site?.code,{required:true})}${field("amp","AmeriFlux ID",site?.amp||"",{required:true})}${field("name","Site name",site?.name,{required:true,wide:true})}${field("location","Location",site?.location,{required:true,wide:true})}${field("date_activated","Active since",site?.date_activated||today(),{type:"date",required:true})}${field("date_retired","Retired date",site?.date_retired,{type:"date"})}${field("gps_coordinates","Coordinates",site?.gps_coordinates,{wide:true})}${field("description","Site description",site?.description,{type:"textarea",required:true,wide:true})}<details class="wide"><summary>Advanced reference metadata</summary>${field("metadata","Reference metadata (JSON)",JSON.stringify(site?.metadata||{},null,2),{type:"textarea",help:"Preserve the reference.sections structure to retain instrument information."})}</details></div>`,async form=>{const d=values(form);d.date_retired=d.date_retired||null;d.metadata=JSON.parse(d.metadata||"{}");if(site)d.base_version=site.version;await mutate("sites",d,site?.id);});}
@@ -268,7 +321,7 @@ function equipmentForm(equipment){openForm(equipment?"Edit equipment":"Add equip
 const localInput=value=>{if(!value)return "";const d=new Date(value);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,16);};
 const ecInput=value=>value?new Date(new Date(value).getTime()-5*3600000).toISOString().slice(0,16):"";
 const ecUTC=value=>value?new Date(value+"-05:00").toISOString():null;
-function deploymentForm(deployment){const equipment=S.data.equipment.filter(e=>!e.is_archived);openForm(deployment?"Edit deployment / record removal":"Record instrument deployment",`<div class="form-grid">${field("equipment","Individual instrument",deployment?.equipment||equipment[0]?.id,{options:equipment.map(e=>[e.id,`${e.instrument} · ${e.serial_number||e.model_number||e.id}`]),required:true,wide:true})}${field("installed_at","Installed at (your local time)",localInput(deployment?.installed_at||new Date().toISOString()),{type:"datetime-local",required:true})}${field("removed_at","Removed at (your local time)",localInput(deployment?.removed_at),{type:"datetime-local"})}${field("height_m","Height above ground (m)",deployment?.height_m,{type:"number"})}${field("depth_m","Depth below ground (m)",deployment?.depth_m,{type:"number"})}${field("variables","Measured variables",deployment?.variables,{wide:true,help:"For example TA_1_1_1, RH_1_1_1"})}${field("position","Position / mounting location",deployment?.position,{wide:true})}${field("notes","Notes",deployment?.notes,{type:"textarea",wide:true})}</div>`,async form=>{const d=values(form);d.site=S.siteId;d.equipment=Number(d.equipment);d.installed_at=new Date(d.installed_at).toISOString();d.removed_at=d.removed_at?new Date(d.removed_at).toISOString():null;d.height_m=d.height_m||null;d.depth_m=d.depth_m||null;if(deployment)d.base_version=deployment.version;await mutate("deployments",d,deployment?.id);});}
+function deploymentForm(deployment){const equipment=S.data.equipment.filter(e=>!e.is_archived);openForm(deployment?"Edit deployment / record removal":"Record instrument deployment",`<div class="form-grid">${field("equipment","Individual instrument",deployment?.equipment||equipment[0]?.id,{options:equipment.map(e=>[e.id,`${e.instrument} · ${e.serial_number||e.model_number||e.id}`]),required:true,wide:true})}<p class="small muted wide">Record completed installations and removals. Future scheduling is not supported.</p>${field("installed_at","Installed at (your local time)",localInput(deployment?.installed_at||new Date().toISOString()),{type:"datetime-local",required:true})}${field("removed_at","Removed at (your local time)",localInput(deployment?.removed_at),{type:"datetime-local"})}${field("height_m","Height above ground (m)",deployment?.height_m,{type:"number"})}${field("depth_m","Depth below ground (m)",deployment?.depth_m,{type:"number"})}${field("variables","Measured variables",deployment?.variables,{wide:true,help:"For example TA_1_1_1, RH_1_1_1"})}${field("position","Position / mounting location",deployment?.position,{wide:true})}${field("notes","Notes",deployment?.notes,{type:"textarea",wide:true})}</div>`,async form=>{const d=values(form);d.site=S.siteId;d.equipment=Number(d.equipment);d.installed_at=new Date(d.installed_at).toISOString();d.removed_at=d.removed_at?new Date(d.removed_at).toISOString():null;d.height_m=d.height_m||null;d.depth_m=d.depth_m||null;if(deployment)d.base_version=deployment.version;await mutate("deployments",d,deployment?.id);});}
 function configForm(previous){openForm(previous?"Create corrected configuration version":"New processing configuration",`<p class="small muted">Times below use fixed EST (UTC−05:00), without daylight saving time. Existing configurations are retained.</p><div class="form-grid">${field("label","Configuration label",previous?.label||"EddyPro / SmartFlux settings",{required:true,wide:true})}${field("effective_from","Effective from (fixed EST)",ecInput(previous?.effective_from)||today()+"T00:00",{type:"datetime-local",required:true})}${field("effective_to","Effective to (fixed EST)",ecInput(previous?.effective_to),{type:"datetime-local"})}${field("deployment","Related deployment",previous?.deployment||"",{options:[["","Site-wide settings"],...S.data.deployments.map(d=>[d.id,`${S.data.equipment.find(e=>e.id===d.equipment)?.instrument||"Instrument"} · ${time(d.installed_at)}`])],wide:true})}${field("settings","Processing settings (JSON)",JSON.stringify(previous?.settings||{sonic_height_m:null,north_offset_deg:null,intake_length_cm:null},null,2),{type:"textarea",required:true,wide:true})}${field("notes","Reason / supporting notes",previous?.notes,{type:"textarea",wide:true})}</div>`,async form=>{const d=values(form);d.site=S.siteId;d.effective_from=ecUTC(d.effective_from);d.effective_to=ecUTC(d.effective_to);d.deployment=d.deployment||null;d.settings=JSON.parse(d.settings);d.time_basis="EST_FIXED_UTC_MINUS_05";if(previous)d.supersedes=previous.id;await mutate("configurations",d);});}
 function caveatForm(caveat,visitId){
   if(!caveat){openForm("Flag a data issue",`<div class="form-grid">${field("title","Issue title","",{required:true,wide:true})}${field("description","What happened?","",{type:"textarea",required:true,wide:true})}${field("variables","Affected variables","",{wide:true})}${field("period_label","Affected period / uncertainty","",{wide:true,help:"For example: since the previous visit; exact start needs checking."})}</div>`,form=>enqueue("caveat.draft",uuid(),{...values(form),visit_id:visitId||null}),"Save draft for review");return;}
@@ -277,23 +330,24 @@ function caveatForm(caveat,visitId){
 function memberForm(user){openForm(user?"Edit team access":"Create team account",`<div class="form-grid">${!user?field("username","Username","",{required:true}):""}${!user?field("name","Name","",{required:true}):""}${!user?field("email","Email address","",{type:"email",wide:true}):""}${field("password",user?"New password (optional)":"Initial password","",{type:"password",required:!user,wide:true,help:"Share credentials directly with the colleague; this form does not send an invitation."})}${field("role","Role",user?.role||"member",{options:[["viewer","Viewer"],["member","Field member"],["researcher","Researcher"],["manager","Manager"],["admin","Administrator"]],wide:true})}${field("sites","Allowed sites",user?.sites||[],{options:S.sites.map(s=>[s.id,s.code]),multiple:true,wide:true,help:"Leave empty for access to all sites."})}${user?`<label class="wide"><input type="checkbox" name="is_active" ${user.is_active?"checked":""}>Account is active</label>`:""}</div>`,async form=>{onlineOnly();const d=values(form);d.sites=form.getAll("sites").map(Number);if(user){d.id=user.id;d.is_active=form.has("is_active");}await api("/api/team/",{method:user?"PATCH":"POST",data:d});await refreshWorkspace();toast("Team access updated.");});}
 function checklistForm(checklist){openForm(checklist?"Edit maintenance checklist":"Add maintenance checklist",`${field("name","Checklist name",checklist?.name,{required:true})}${field("lines","Tasks",checklist?.tasks.map(t=>`${t.title}|${t.details||""}|${t.priority||"normal"}`).join("\n")||"",{type:"textarea",required:true,help:"One task per line: title | details | normal or high"})}`,async form=>{const tasks=form.get("lines").split("\n").filter(l=>l.trim()).map(line=>{const[title,details,priority]=line.split("|").map(v=>v.trim());return{title,details:details||"",priority:priority||"normal"};});await mutate("checklists",{name:form.get("name"),tasks},checklist?.id);});}
 async function copy(text){if(navigator.clipboard){try{await navigator.clipboard.writeText(text);toast("Copied.");return;}catch{}}const box=document.createElement("textarea");box.value=text;document.body.append(box);box.select();document.execCommand("copy");box.remove();toast("Copied.");}
-async function downloadAttachment(id){const attachment=S.data.attachments.find(a=>a.id===id);let blob=attachment.pending?S.queue.find(q=>q.id===id)?.file:await store.get("downloads",`${S.me.id}:${attachment.url}`);if(!blob){const response=await fetch(attachment.url,{credentials:"same-origin"});if(!response.ok||response.redirected)throw new Error("Sign in to download this file.");blob=await response.blob();}const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download=attachment.filename||"attachment";link.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
+async function downloadAttachment(id){const attachment=S.data.attachments.find(a=>a.id===id);let blob=attachment.pending?S.queue.find(q=>q.id===id)?.file:await store.get("downloads",`${S.me.id}:${attachment.url}`);if(!blob){const response=await privateFetch(attachment.url);if(!response.ok||response.redirected)throw new Error("Sign in to download this file.");blob=await response.blob();}const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download=attachment.filename||"attachment";link.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
 async function prepareFieldwork(){
   onlineOnly();openForm("Prepare for fieldwork",`<p>Choose sites to save on this device, including tasks, instrument reference information and attachments.</p><p class="small muted">Use a trusted device. Cached records and photographs remain available offline until you sign out and clear this device.</p>${field("sites","Sites",[S.siteId],{options:S.sites.filter(s=>!s.is_archived).map(s=>[s.id,s.code+" · "+s.name]),multiple:true})}<label><input type="checkbox" name="files" checked>Download attachments and protocols</label><div id="prepare-progress" class="small muted"></div>`,async form=>{
     if(!("serviceWorker" in navigator))throw new Error("Offline reopening requires a browser with service-worker support and HTTPS (or localhost).");
     const ids=form.getAll("sites");if(!ids.length)throw new Error("Select at least one site.");
     const registration=await Promise.race([navigator.serviceWorker.ready,new Promise((_,reject)=>setTimeout(()=>reject(new Error("The offline app could not be installed. Check your connection and use HTTPS or localhost.")),15000))]);
-    await new Promise((resolve,reject)=>{const channel=new MessageChannel(),timer=setTimeout(()=>{channel.port1.close();reject(new Error("The app shell could not be saved. Try preparing again while connected."));},15000);channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();event.data.ok?resolve():reject(new Error(event.data.error));};registration.active.postMessage("CACHE_SHELL",[channel.port2]);});
+    await new Promise((resolve,reject)=>{const channel=new MessageChannel(),timer=setTimeout(()=>{channel.port1.close();reject(new Error("The app shell could not be saved. Try preparing again while connected."));},60000);channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();event.data.ok?resolve():reject(new Error(event.data.error));};registration.active.postMessage("CACHE_SHELL",[channel.port2]);});
     let count=0,missing=0;
-    for(const id of ids){$("#prepare-progress").textContent=`Saving ${S.sites.find(s=>s.id===Number(id)).code}…`;const data=await api(`/api/snapshot/?site=${id}`);await store.put("snapshots",`${S.me.id}:${id}`,data);if(form.has("files"))for(const a of data.attachments){try{const response=await fetch(a.url,{credentials:"same-origin"});if(!response.ok||response.redirected)throw new Error();await store.put("downloads",`${S.me.id}:${a.url}`,await response.blob());count++;}catch{missing++;}}}
-    await resources.loadSchema();if(form.has("files"))for(const protocol of S.protocols.filter(p=>p.available!==false)){try{const response=await fetch(protocol.url,{credentials:"same-origin"});if(!response.ok||response.redirected)throw new Error();await store.put("downloads",`${S.me.id}:${protocol.url}`,await response.blob());count++;}catch{missing++;}}
+    for(const id of ids){$("#prepare-progress").textContent=`Saving ${S.sites.find(s=>s.id===Number(id)).code}…`;const account=S.me.id,revision=await store.get("meta",`${account}:snapshot-revision:${id}`)||0;const data=await api(`/api/snapshot/?site=${id}`);if(Number(data.site?.id)!==Number(id))throw new Error("Unexpected site response.");await store.saveSnapshot(account,Number(id),data,revision);if(form.has("files"))for(const a of data.attachments){try{const response=await privateFetch(a.url);if(!response.ok||response.redirected)throw new Error();await store.put("downloads",`${S.me.id}:${a.url}`,await response.blob());count++;}catch{missing++;}}}
+    await resources.loadSchema();await resources.refreshProtocols();if(form.has("files"))for(const protocol of S.protocols.filter(p=>p.available!==false)){try{await resources.cacheProtocol(protocol);count++;}catch{missing++;}}
     await store.put("meta",`${S.me.id}:prepared`,new Date().toISOString());S.prepared=true;toast(`${ids.length} sites and ${count} attachments saved for offline use.${missing?` ${missing} files could not be downloaded.`:""}`);
   },"Download selected sites");
 }
-async function queueDialog(){await readQueue();openForm("Synchronization queue",`<p class="small muted">${S.queue.length} records remain on this device. A blocked item pauses later records so dependent work stays in order.</p>${S.queue.map(item=>`<div class="section-divider"><strong>${esc(item.kind==="upload"?item.file.name:item.operation.kind)}</strong><p class="small muted">${esc(S.sites.find(s=>s.id===item.siteId)?.code)} · ${time(new Date(item.order).toISOString())}</p>${item.error?`<div class="error">${esc(item.error.message)}</div><div class="row-actions">${button("Review & retry","review-queue",item.id)}${button("Export pending record","export-queue",item.id)}${button("Discard this record","discard-queue",item.id,"danger small")}</div>`:""}</div>`).join("")||empty("Everything is synced")}`,async()=>{closeDialog();S.blocked=null;void synchronize();},"Sync now");}
-async function reviewQueue(id){const item=S.queue.find(q=>q.id===id);onlineOnly();const latest=await api(`/api/snapshot/?site=${item.siteId}`);const record=item.kind==="operation"?[...latest.tasks,...latest.visits,...(latest.calibrations||[])].find(r=>r.id===item.operation.entity_id):null;closeDialog();openForm("Review the conflicting record",`<p>Compare your queued change with the current server record before retrying.</p><h3>Your change</h3><pre class="json-block">${esc(JSON.stringify(item.operation?.payload||item.fields,null,2))}</pre><h3>Current record</h3><pre class="json-block">${esc(JSON.stringify(record||item.error.body,null,2))}</pre><p class="small muted">Retry uses the current version. Your intended change will still be checked by the server.</p>`,async()=>{if(item.operation){item.operation.id=uuid();if(record)item.operation.base_version=record.version;}delete item.error;await store.put("outbox",item.id,item);await readQueue();void synchronize();},"Apply my change to current version");}
-async function navigate(view){S.view=view;S.filter="";S.typeFilter="all";location.hash=view;setNavigationOpen(false);if(view==="badm")await resources.loadSchema();if(view==="knowledge")await records.loadKnowledge();if(view==="monitor"){monitor.network();render();await monitor.load(true);return;}if(view==="admin"&&admin()&&navigator.onLine)S.team=await api("/api/team/");render();}
+async function queueDialog(){await readQueue();const all=await store.all("outbox"),other=all.filter(item=>item.account!==S.me.id).length,usage=await navigator.storage?.estimate?.().catch(()=>null);const counts=S.sites.map(site=>[site,S.queue.filter(item=>item.siteId===site.id).length]).filter(([,count])=>count);openForm("Synchronization queue",`<p class="small muted">${esc(S.me.name)}: ${S.queue.length} pending records${usage?` · Device storage ${(usage.usage/1024/1024).toFixed(1)} MiB used`:""}.</p>${counts.map(([site,count])=>`<p class="small">${esc(site.code)}: ${count} pending</p>`).join("")}${other?`<p class="notice small">Other saved accounts have ${other} pending records. Signing out here preserves their work.</p>`:""}<p class="small muted">Selected site last refreshed: ${time(S.base?.server_time)}. Use Export pending record for recovery before discarding a blocked entry.</p><p class="small muted">${S.queue.length} records remain on this device. A blocked item pauses later records so dependent work stays in order.</p>${S.queue.map(item=>`<div class="section-divider"><strong>${esc(item.kind==="upload"?item.file.name:item.operation.kind)}</strong><p class="small muted">${esc(S.sites.find(s=>s.id===item.siteId)?.code)} · ${time(new Date(item.order).toISOString())}</p>${item.error?`<div class="error">${esc(item.error.message)}</div>`:""}<div class="row-actions">${item.error?button("Review & retry","review-queue",item.id):""}${button("Export pending record","export-queue",item.id)}${button("Discard this record","discard-queue",item.id,"danger small")}</div></div>`).join("")||empty("Everything is synced")}`,async()=>{closeDialog();S.blocked=null;void synchronize();},"Sync now");}
+async function reviewQueue(id){const item=S.queue.find(q=>q.id===id);onlineOnly();const latest=await api(`/api/snapshot/?site=${item.siteId}`);const record=item.kind==="operation"?[...latest.tasks,...latest.visits,...(latest.calibrations||[])].find(r=>r.id===item.operation.entity_id):null;closeDialog();openForm("Review the conflicting record",`<p>Compare your queued change with the current server record before retrying.</p>${item.operation?.kind==="visit.close"?field("event_time","Recorded end (your local time)",localInput(item.operation.occurred_at),{type:"datetime-local",required:true,help:"Correct this only when the recorded device time was wrong. Other field event times remain unchanged."}):""}<h3>Your change</h3><pre class="json-block">${esc(JSON.stringify(item.operation?.payload||item.fields,null,2))}</pre><h3>Current record</h3><pre class="json-block">${esc(JSON.stringify(record||item.error.body,null,2))}</pre><p class="small muted">Retry uses the current version. Your intended change will still be checked by the server.</p>`,async form=>{if(item.operation){item.operation.id=uuid();if(item.operation.kind==="visit.close"&&form.get("event_time"))item.operation.occurred_at=new Date(form.get("event_time")).toISOString();if(record)item.operation.base_version=record.version;}delete item.error;await store.put("outbox",item.id,item);await readQueue();void synchronize();},"Apply my change to current version");}
+async function navigate(view){if(S.frozen)return;S.view=view;S.filter="";S.typeFilter="all";location.hash=view;setNavigationOpen(false);if(view==="badm")await resources.loadSchema();if(view==="knowledge")await records.loadKnowledge();if(view==="monitor"){monitor.network();render();await monitor.load(true);return;}if(view==="admin"&&teamAdmin()&&navigator.onLine)S.team=await api("/api/team/");render();}
 document.addEventListener("click",async event=>{
+  if(S.frozen)return;
   const target=event.target.closest("[data-action]");if(!target)return;event.preventDefault();const action=target.dataset.action,id=target.dataset.id;
   try{if(await records.action(action,id))return;if(await processingFiles.action(action,id))return;if(await resources.action(action,id))return;if(await monitor.action(action,id))return;const task=S.data?.tasks.find(t=>t.id===id),visit=S.data?.visits.find(v=>v.id===id);switch(action){
     case"related-tab":activateRelatedTab(target);break;
@@ -373,7 +427,7 @@ document.addEventListener("keydown",event=>{
 });
 let searchTimer;document.addEventListener("input",event=>{if(!event.target.dataset.search)return;S.filter=event.target.value;clearTimeout(searchTimer);const start=event.target.selectionStart,end=event.target.selectionEnd,key=event.target.dataset.search;searchTimer=setTimeout(()=>{render();const input=document.querySelector(`[data-search="${key}"]`);input?.focus();input?.setSelectionRange(start,end);},180);});
 document.addEventListener("change",event=>{if(event.target.dataset.filter){S.typeFilter=event.target.value;render();}});
-$("#site-select").onchange=async event=>{S.visitId=null;await loadSite(Number(event.target.value));};
+$("#site-select").onchange=async event=>{S.visitId=null;try{await loadSite(Number(event.target.value));}catch(error){toast(error.message,true);}};
 // Older prepared shells can still load the updated assets while offline.
 if(!$("#navigation-close"))$(".sidebar").insertAdjacentHTML("afterbegin",'<button id="navigation-close" class="icon-button navigation-close" aria-label="Close navigation">×</button>');
 if(!$("#navigation-backdrop"))document.body.insertAdjacentHTML("afterbegin",'<button id="navigation-backdrop" class="navigation-backdrop" aria-label="Close navigation" tabindex="-1" hidden></button>');
@@ -417,28 +471,34 @@ setNavigationOpen(false,{restoreFocus:false});
 $("#prepare-button").onclick=()=>prepareFieldwork().catch(e=>toast(e.message,true));
 $("#queue-button").onclick=()=>queueDialog().catch(e=>toast(e.message,true));
 $("#refresh-button").onclick=async()=>{try{await synchronize();await refreshWorkspace();render();toast("Workspace refreshed.");}catch(e){toast(e.message,true);}};
-$("#logout-button").onclick=()=>openForm("Sign out and clear this device?",`<p>${S.queue.length?`There are ${S.queue.length} pending records. Sync or export them before signing out.`:"Your offline site copies and downloaded attachments will be removed from this device."}</p>`,async()=>{if(S.queue.length)throw new Error("Resolve or export and discard the pending records before clearing this device.");await refreshCsrf();await fetch("/accounts/logout/",{method:"POST",headers:{"X-CSRFToken":S.csrf},credentials:"same-origin"});await store.clearDevice();const reg=await navigator.serviceWorker?.getRegistration();reg?.active?.postMessage("CLEAR_SHELL");location.href="/accounts/login/";},"Sign out & clear");
+$("#logout-button").onclick=()=>openForm("Sign out and clear this account's copies?",`<p>Pending work must be synchronized or exported and discarded first. Only this account's offline site copies and downloads are cleared. Other saved accounts remain intact.</p>`,async()=>{
+  await readQueue();if(S.queue.length)throw new Error("Resolve this account's pending work before signing out.");
+  await refreshCsrf();const account=S.me.id,session=S.sessionId;await api("/api/logout/",{method:"POST",data:{}});
+  try{await store.clearAccount(account,session);}finally{announceSession(account,session,true);freezeWorkspace("Signed out. Any pending work that arrived during sign-out remains saved. Sign in again to review it.");}
+  location.href="/accounts/login/";
+},"Sign out & clear account");
 window.addEventListener("online",()=>{S.online=true;updateConnection();void synchronize();});window.addEventListener("offline",()=>{S.online=false;updateConnection();});
-window.addEventListener("hashchange",()=>{const view=location.hash.slice(1);if(view&&view!==S.view)void navigate(view);});
+window.addEventListener("hashchange",()=>{const view=location.hash.slice(1);if(view&&view!==S.view)void navigate(view).catch(error=>toast(error.message,true));});
 function populateSites(){$("#site-select").innerHTML=S.sites.map(s=>`<option value="${s.id}">${esc(s.code)} · ${esc(s.name)}</option>`).join("");if(S.siteId)$("#site-select").value=S.siteId;}
 async function boot(){
   try{
     let bootstrap;
-    if(navigator.onLine){try{bootstrap=await api("/api/bootstrap/");await store.put("meta","active-account",bootstrap.me.id);await store.put("meta",`${bootstrap.me.id}:bootstrap`,bootstrap);}catch(e){if(e.status)throw e;}}
+    if(navigator.onLine){try{bootstrap=await api("/api/bootstrap/");await store.activateAccount(bootstrap.me.id,bootstrap.workspace_session);await store.put("meta",`${bootstrap.me.id}:bootstrap`,bootstrap);announceSession(bootstrap.me.id,bootstrap.workspace_session);}catch(e){if(e.status)throw e;}}
     if(!bootstrap){const account=await store.get("meta","active-account");bootstrap=await store.get("meta",`${account}:bootstrap`);}
     if(!bootstrap)throw new Error("Sign in online and prepare your sites before working offline.");
-    S.me=bootstrap.me;S.sites=bootstrap.sites;S.checklists=bootstrap.checklists;S.protocols=bootstrap.protocols||[];queueOrder=Math.max(queueOrder,...(await store.all("outbox")).map(q=>q.order||0));
+    S.sessionId=bootstrap.workspace_session||null;store.bindAccount(bootstrap.me.id,S.sessionId);
+    S.me=bootstrap.me;S.sites=bootstrap.sites;S.checklists=bootstrap.checklists;S.protocols=navigator.onLine?(bootstrap.protocols||[]):((await store.get("meta",`${S.me.id}:protocols`))||bootstrap.protocols||[]);queueOrder=Math.max(queueOrder,...(await store.all("outbox")).map(q=>q.order||0));
     S.siteId=(await store.get("meta",`${S.me.id}:selected`))||S.sites.find(s=>!s.is_archived)?.id||S.sites[0]?.id;
     S.overview=(await store.get("meta",`${S.me.id}:overview`))||[];S.prepared=!!(await store.get("meta",`${S.me.id}:prepared`));
-    $("#user-badge").textContent=S.me.name.split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase();$("#user-badge").title=S.me.name+" · "+S.me.role;populateSites();await readQueue();await loadSite(S.siteId,false);await loadOverview();if(S.view==="badm")await resources.loadSchema();if(S.view==="admin"&&admin()&&navigator.onLine)S.team=await api("/api/team/");render();
+    $("#user-badge").textContent=S.me.name.split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase();$("#user-badge").title=S.me.name+" · "+S.me.role;populateSites();await readQueue();await loadSite(S.siteId,false);await loadOverview();if(S.view==="badm")await resources.loadSchema();if(S.view==="admin"&&teamAdmin()&&navigator.onLine)S.team=await api("/api/team/");render();
     if(S.view==="knowledge"){await records.loadKnowledge();render();}
     if(S.view==="monitor")void monitor.load(true);
     if("serviceWorker" in navigator)await navigator.serviceWorker.register("/sw.js",{scope:"/"});
     void synchronize();
-    setInterval(async()=>{if(!navigator.onLine||S.syncing||$("#dialog").open||$(".sidebar").classList.contains("visible"))return;if(S.queue.length){void synchronize();return;}if(S.view==="monitor"){await monitor.auto();return;}try{await loadSite(S.siteId,false);if(S.view==="overview")await loadOverview();render();}catch{}},15000);
+    setInterval(async()=>{if(S.frozen||document.hidden||!navigator.onLine||S.syncing||$("#dialog").open||$(".sidebar").classList.contains("visible"))return;if(S.queue.length){void synchronize();return;}if(S.view==="monitor"){await monitor.auto();return;}try{await loadSite(S.siteId,false);if(S.view==="overview")await loadOverview();render();}catch{}},60000);
   }catch(e){$("#main").innerHTML=empty("Could not open the workspace",e.message);toast(e.message,true);}
 }
-const resources=createResources({S,esc,rich,day,time,button,empty,field,openForm,api,refreshCsrf,refreshWorkspace,render,toast,onlineOnly,header,store});
+const resources=createResources({S,esc,rich,day,time,button,empty,field,openForm,api,refreshCsrf,refreshWorkspace,render,toast,onlineOnly,header,store,privateFetch});
 const monitor=createMonitor({S,esc,button,empty,header,time,api,render,toast,store});
-const records=createRecordResources({S,esc,day,time,button,empty,field,openForm,api,refreshCsrf,refreshWorkspace,render,toast,onlineOnly,header,enqueue,uploadForm,attachmentsHTML,uuid,today,write,values,noteFileField,noteFiles});
+const records=createRecordResources({S,esc,day,time,button,empty,field,openForm,api,refreshCsrf,refreshWorkspace,render,toast,onlineOnly,header,enqueue,uploadForm,attachmentsHTML,uuid,today,write,values,noteFileField,noteFiles,privateFetch});
 void boot();

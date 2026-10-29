@@ -16,7 +16,7 @@ from rest_framework.exceptions import APIException, PermissionDenied, Validation
 from rest_framework.response import Response
 from inventory.models import Site, Equipment, History, DOI, Photo, Document, FieldNote
 from .models import Visit, Task, TaskActivity, VisitObservation, Deployment, ConfigurationVersion, DataCaveat, Attachment, ChecklistTemplate, TeamMember
-from .permissions import accessible_sites, require_site, require_role, role_for, display_name
+from .permissions import accessible_sites, require_site, require_role, role_for, display_name, network_admin, require_network_admin
 from .serializers import SiteSerializer, EquipmentSerializer, HistorySerializer, DOISerializer, TaskSerializer, VisitSerializer, TaskActivitySerializer, VisitObservationSerializer, DeploymentSerializer, ConfigurationSerializer, CaveatSerializer, AttachmentSerializer, ChecklistSerializer
 from .services import apply_operation, audit, check_version, Conflict
 
@@ -26,10 +26,10 @@ def all_team(user):
 def legacy_attachments(site, equipment):
     output = []
     equipment_ids = set(equipment.values_list("pk", flat=True))
-    for p in Photo.objects.filter(fieldnote__site=site).select_related("fieldnote"):
+    for p in Photo.objects.filter(fieldnote__site=site).select_related("fieldnote__hub_visit"):
         visit = getattr(p.fieldnote, "hub_visit", None)
         output.append({"id": f"photo-{p.pk}", "filename": Path(p.photo.name).name, "caption": f"Photo · {p.fieldnote.date_visited}", "content_type": "image/jpeg", "visit": str(visit.pk) if visit else None, "equipment": None, "caveat": None, "configuration": None, "url": f"/legacy-attachments/photo/{p.pk}/", "legacy": True})
-    for d in Document.objects.select_related("content_type").all():
+    for d in Document.objects.select_related("content_type").prefetch_related("content_object"):
         obj = d.content_object
         obj_site = obj.pk if isinstance(obj, Site) else getattr(obj, "site_id", None)
         if obj_site == site.pk or (isinstance(obj, Equipment) and obj.pk in equipment_ids):
@@ -43,7 +43,7 @@ def bootstrap(request):
     sites = accessible_sites(request.user).order_by("code")
     from .resources_api import ProtocolSerializer
     from .models import Protocol
-    return Response({"me": {"id": request.user.pk, "username": request.user.username, "name": display_name(request.user), "email": request.user.email, "role": role_for(request.user), "can_edit_shared_references": request.user.is_superuser or not request.user.team_member.sites.exists()}, "sites": SiteSerializer(sites, many=True).data, "protocols": ProtocolSerializer(Protocol.objects.filter(is_archived=False), many=True).data, "checklists": ChecklistSerializer(ChecklistTemplate.objects.filter(is_active=True), many=True).data, "server_time": timezone.now(), "public_reference_enabled": settings.PUBLIC_FIELDNOTES_ENABLED})
+    return Response({"me": {"id": request.user.pk, "username": request.user.username, "name": display_name(request.user), "email": request.user.email, "role": role_for(request.user), "can_manage_team": network_admin(request.user), "can_edit_shared_references": request.user.is_superuser or not request.user.team_member.sites.exists()}, "sites": SiteSerializer(sites, many=True).data, "protocols": ProtocolSerializer(Protocol.objects.filter(is_archived=False), many=True).data, "checklists": ChecklistSerializer(ChecklistTemplate.objects.filter(is_active=True), many=True).data, "server_time": timezone.now(), "public_reference_enabled": settings.PUBLIC_FIELDNOTES_ENABLED})
 
 @api_view(["GET"])
 def snapshot(request):
@@ -56,7 +56,7 @@ def snapshot(request):
     from .processing_files import library_state
     from .record_resources import CalibrationSerializer, knowledge_state
     from .resources_api import resource_state
-    return Response({"calibrations": CalibrationSerializer(site.calibrations.all(), many=True).data, "knowledge": knowledge_state(request.user), "processing_files": library_state(request.user), "resources": resource_state(site), "site": SiteSerializer(site).data, "tasks": TaskSerializer(site.tasks.all(), many=True).data, "visits": VisitSerializer(visits, many=True).data, "activities": TaskActivitySerializer(TaskActivity.objects.filter(task__site=site), many=True).data, "observations": VisitObservationSerializer(VisitObservation.objects.filter(visit__site=site), many=True).data, "equipment": EquipmentSerializer(equipment, many=True).data, "equipment_history": HistorySerializer(History.objects.filter(item__in=equipment), many=True).data, "deployments": DeploymentSerializer(site.deployments.all(), many=True).data, "configurations": ConfigurationSerializer(site.configurations.all(), many=True).data, "caveats": CaveatSerializer(caveats, many=True).data, "attachments": AttachmentSerializer(attachments, many=True).data + legacy_attachments(site, equipment), "dois": DOISerializer(site.doi_records.all(), many=True).data, "server_time": timezone.now()})
+    return Response({"calibrations": CalibrationSerializer(site.calibrations.all(), many=True).data, "knowledge": knowledge_state(request.user), "processing_files": library_state(request.user), "resources": resource_state(site), "site": SiteSerializer(site).data, "tasks": TaskSerializer(site.tasks.all(), many=True).data, "visits": VisitSerializer(visits, many=True).data, "activities": TaskActivitySerializer(TaskActivity.objects.filter(task__site=site), many=True).data, "observations": VisitObservationSerializer(VisitObservation.objects.filter(visit__site=site), many=True).data, "equipment": EquipmentSerializer(equipment, many=True).data, "equipment_history": HistorySerializer(History.objects.filter(item__in=equipment), many=True).data, "deployments": DeploymentSerializer(site.deployments.all(), many=True).data, "configurations": ConfigurationSerializer(site.configurations.all(), many=True).data, "caveats": CaveatSerializer(caveats, many=True, context={"request": request}).data, "attachments": AttachmentSerializer(attachments, many=True).data + legacy_attachments(site, equipment), "dois": DOISerializer(site.doi_records.all(), many=True).data, "server_time": timezone.now()})
 
 @api_view(["POST"])
 def sync(request):
@@ -78,6 +78,8 @@ def sync(request):
 class ScopedViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin, mixins.UpdateModelMixin, viewsets.GenericViewSet):
     write_roles = ("researcher", "manager", "admin")
     def validate_scope(self, data, instance=None):
+        if instance and getattr(instance, "site_id", None):
+            require_site(self.request.user, instance.site_id, writable=True)
         site = data.get("site", getattr(instance, "site", None))
         if site:
             require_site(self.request.user, site.pk, writable=True)
@@ -112,7 +114,7 @@ class ScopedViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.Cre
         version = getattr(serializer.instance, "version", None)
         if version is not None:
             check_version(serializer.instance, self.request.data.get("base_version"))
-        before = dict(serializer.__class__(serializer.instance).data)
+        before = dict(serializer.__class__(serializer.instance, context=serializer.context).data)
         kwargs = {"version": version + 1} if version is not None else {}
         obj = self.save_validated(serializer, **kwargs)
         audit(self.request.user, "updated", obj, site, {"before": json.loads(json.dumps(before, default=str))})
@@ -125,7 +127,10 @@ class SiteViewSet(ScopedViewSet):
         return super().get_queryset().filter(pk__in=accessible_sites(self.request.user))
     def validate_scope(self, data, instance=None):
         # Editing an archived site is how an administrator restores it.
-        return require_site(self.request.user, instance.pk) if instance else None
+        if instance:
+            return require_site(self.request.user, instance.pk)
+        require_network_admin(self.request.user)
+        return None
 
 class EquipmentViewSet(ScopedViewSet):
     queryset = Equipment.objects.all()
@@ -152,7 +157,9 @@ class DeploymentViewSet(ScopedViewSet):
             raise ValidationError("Site and equipment are required.")
         if instance and (instance.equipment_id != equipment.pk or instance.site_id != site.pk):
             raise ValidationError("A deployment's site and instrument cannot be changed. Record removal, then create a new deployment.")
-        Equipment.objects.select_for_update().get(pk=equipment.pk)
+        equipment = Equipment.objects.select_for_update().get(pk=equipment.pk)
+        if equipment.site_id:
+            require_site(self.request.user, equipment.site_id, writable=True)
         if equipment.site_id and equipment.site_id not in accessible_sites(self.request.user).values_list("id", flat=True):
             raise PermissionDenied("You do not have access to this instrument.")
         return site
@@ -254,19 +261,28 @@ class HistoryViewSet(mixins.ListModelMixin, mixins.CreateModelMixin, viewsets.Ge
         audit(self.request.user, "equipment.history_added", obj, item.site)
 
 class ChecklistViewSet(ScopedViewSet):
+    def create(self, request, *args, **kwargs):
+        require_network_admin(request.user)
+        return super().create(request, *args, **kwargs)
+    def update(self, request, *args, **kwargs):
+        require_network_admin(request.user)
+        return super().update(request, *args, **kwargs)
     queryset = ChecklistTemplate.objects.all()
     serializer_class = ChecklistSerializer
     write_roles = ("admin",)
 
 @api_view(["GET", "POST", "PATCH"])
 def team(request):
-    require_role(request.user, "admin")
+    require_network_admin(request.user)
     User = get_user_model()
     if request.method == "GET":
         return Response([{"id": u.pk, "username": u.username, "email": u.email, "name": display_name(u), "role": role_for(u), "is_active": u.is_active, "sites": list(u.team_member.sites.values_list("pk", flat=True)) if hasattr(u, "team_member") else []} for u in User.objects.all().order_by("username")])
     data = request.data
+    for field in ("username", "name", "email", "password"):
+        if field in data and not isinstance(data[field], str):
+            raise ValidationError({field: "Use a text value."})
     role = data.get("role", "viewer")
-    if role not in dict(TeamMember.ROLES):
+    if not isinstance(role, str) or role not in dict(TeamMember.ROLES):
         raise ValidationError("Unknown team role.")
     if not isinstance(data.get("sites", []), list):
         raise ValidationError("Allowed sites must be a list.")
@@ -405,3 +421,10 @@ def overview(request):
         caveat_ids = list(s.caveats.exclude(status="resolved").values_list("pk", flat=True))
         output.append({"id": s.pk, "code": s.code, "name": s.name, "condition": condition_data(s), "archived": s.is_archived, "pending": s.tasks.filter(status="pending").count(), "high_priority": s.tasks.filter(status="pending", priority="high").count(), "open_visits": s.visits.filter(status="open").count(), "visits": s.visits.count(), "caveats": len(caveat_ids), "caveat_ids": caveat_ids, "last_visit": last.date if last else None})
     return Response(output)
+
+
+@api_view(["POST"])
+def logout(request):
+    from django.contrib.auth import logout as end_session
+    end_session(request)
+    return Response({"ok": True})

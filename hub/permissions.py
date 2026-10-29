@@ -18,6 +18,15 @@ def require_role(user, *roles):
     if role_for(user) not in roles:
         raise PermissionDenied("Your team role does not allow this action.")
 
+def network_admin(user):
+    return role_for(user) == "admin" and (user.is_superuser or not user.team_member.sites.exists())
+
+
+def require_network_admin(user):
+    if not network_admin(user):
+        raise PermissionDenied("Network-wide administrator access is required to manage accounts and shared checklists.")
+
+
 def accessible_sites(user):
     role = role_for(user)
     if not role:

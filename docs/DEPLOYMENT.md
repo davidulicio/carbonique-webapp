@@ -12,6 +12,11 @@ Read [Security and deployment review](../SECURITY.md) before launch. Use
 
 The source supports a normal Django deployment. It has not been deployed to your live server. Use a dedicated hostname and serve at `/`; the browser API and service-worker paths assume the hostname root.
 
+Read the [29 October correction rollout steps](AUDIT_REMEDIATION.md#deploying-this-correction)
+when upgrading existing devices. Close/reload older tabs online and prepare them
+again after service worker v11 installs. Do not delete an unsynchronized outbox.
+No database migration or repeated import is needed for this corrective release.
+
 ## Linux with Gunicorn
 
 1. Copy/clone the repository to `/srv/carbonique-webapp`, create a Python virtual environment and install `requirements.txt`.
