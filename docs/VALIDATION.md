@@ -162,7 +162,8 @@ The local Django run discovered **199 tests**: **196 passed** and the **three
 PostgreSQL-specific concurrency tests skipped** on SQLite. The local run does
 not establish PostgreSQL correctness. The CI matrix now runs the full backend
 suite on SQLite and PostgreSQL, including duplicate receipts, simultaneous edits
-and overlapping deployment attempts. That new hosted matrix is pending the push.
+and overlapping deployment attempts. The first hosted run and its correction
+are recorded below.
 
 Four deterministic Node behavior tests passed. Nine Chromium browser tests
 passed with real IndexedDB, including overlapping site loads, acknowledged records
@@ -189,3 +190,32 @@ The twelve corrections and upgrade instructions are mapped in
 production PostgreSQL restore, TLS/firewall validation and actual tower routing
 remain staging/operator checks. The local Windows Python interpreter is still
 3.12.10; dependency updates and tests do not patch that interpreter.
+
+## PostgreSQL CI follow-up, 29 October 2026
+
+The first hosted PostgreSQL run at commit `8426ab4` reported 25 errors with
+`OperationalError: the connection is closed`. SQLite and the dependency audit
+passed. Six download checks called `response.close()` directly inside Django
+`TestCase` transactions. That fires request-finished connection cleanup outside
+the test client's iterator wrapper and closes the PostgreSQL connection while
+the transaction is still active. Later requests then fail, causing cascading
+errors. SQLite's in-memory connection hid this test-lifecycle problem.
+
+The original processing-file permission test reproduced the same error against
+a disposable PostgreSQL 17.11 instance. The six checks now consume
+`response.streaming_content`, assert the expected file bytes and confirm that
+the response closed. The test client's normal cleanup wrapper handles the
+connection lifecycle. Application behavior, access controls and schema are unchanged.
+
+After the correction, the complete backend suite passed on both databases:
+
+- PostgreSQL 17.11: **199 passed**, including all three concurrency tests and
+  the portable backup/restore drill, in 81.745 seconds.
+- SQLite: **196 passed, three PostgreSQL-only tests skipped**, in 61.576 seconds.
+
+These were local Windows Python runs. PostgreSQL ran in a temporary WSL cluster
+using UTF-8 test databases and loopback-only port 55439, and was stopped after
+verification. No system database service was installed and the normal app
+records/media were not changed. The corrected hosted workflow still needs to
+run after this follow-up commit is pushed. Browser/frontend code was unchanged;
+the earlier browser results above were not rerun for this test-only correction.

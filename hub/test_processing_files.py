@@ -59,7 +59,10 @@ class ProcessingFileTests(TestCase):
         other=Site.objects.create(code='UQAM_2',name='Other',amp='CA-Alt',location='Quebec',description='Other',date_activated='2025-01-01')
         other_url=self.upload(name='UQAM_2_FirstStage.ini').data['files'][1]['latest']['url']
         member=self.user.team_member;member.sites.add(self.site)
-        response=self.client.get(own);self.assertEqual(response.status_code,200);response.close()
+        response=self.client.get(own);self.assertEqual(response.status_code,200)
+        # Consume the test client iterator so cleanup preserves the test transaction.
+        self.assertEqual(b''.join(response.streaming_content),b'trace = 1;\r\n')
+        self.assertTrue(response.closed)
         self.assertEqual(self.client.get(other_url).status_code,404)
         self.assertEqual(self.upload(name='Common_include.ini').status_code,403)
         self.assertEqual(self.upload(name='UQAM_2_FirstStage.ini').status_code,403)

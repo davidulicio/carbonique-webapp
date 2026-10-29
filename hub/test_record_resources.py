@@ -166,7 +166,10 @@ class RecordResourcesTests(TestCase):
     def test_viewer_can_download_library_but_cannot_modify(self):
         record=self.reference(self.site);upload=self.upload(record);self.assertEqual(upload.status_code,200)
         file=KnowledgeFile.objects.get();self.client.force_authenticate(self.viewer)
-        response=self.client.get(f'/knowledge-files/{file.pk}/');self.assertEqual(response.status_code,200);response.close()
+        response=self.client.get(f'/knowledge-files/{file.pk}/');self.assertEqual(response.status_code,200)
+        # Consume the test client iterator so cleanup preserves the test transaction.
+        self.assertEqual(b''.join(response.streaming_content),b'Wiring revision A')
+        self.assertTrue(response.closed)
         self.assertEqual(self.client.post('/api/knowledge/',{'title':'No'},format='json').status_code,403)
         self.assertEqual(self.upload(record).status_code,403)
     def test_library_files_bytes_duplicate_retry_and_private_download(self):
@@ -213,7 +216,9 @@ class RecordResourcesTests(TestCase):
         types=set(record.files.values_list('content_type',flat=True))
         self.assertEqual(types,{'image/png','application/pdf','application/octet-stream'})
         response=self.client.get(f"/knowledge-files/{record.files.get(content_type='image/png').pk}/")
-        self.assertIn('inline',response['Content-Disposition']);response.close()
+        self.assertIn('inline',response['Content-Disposition'])
+        self.assertEqual(b''.join(response.streaming_content),buffer.getvalue())
+        self.assertTrue(response.closed)
     def test_library_archive_restore_retains_files(self):
         record=self.reference(self.site);self.upload(record);file=record.files.get()
         url=f'/api/knowledge/{record.pk}/files/{file.pk}/'
@@ -224,7 +229,9 @@ class RecordResourcesTests(TestCase):
         self.assertEqual(self.client.patch(url,{'is_archived':False,'base_version':2},format='json').status_code,200)
         self.assertEqual(self.client.patch(f'/api/knowledge/{record.pk}/',{'is_archived':True,'base_version':1},format='json').status_code,200)
         self.assertEqual(self.upload(record).status_code,400)
-        response=self.client.get(f'/knowledge-files/{file.pk}/');self.assertEqual(response.status_code,200);response.close()
+        response=self.client.get(f'/knowledge-files/{file.pk}/');self.assertEqual(response.status_code,200)
+        self.assertEqual(b''.join(response.streaming_content),b'Wiring revision A')
+        self.assertTrue(response.closed)
         self.assertEqual(self.client.patch(f'/api/knowledge/{record.pk}/',{'is_archived':False,'base_version':2},format='json').status_code,200)
         with self.assertRaises(ProtectedError):record.delete()
     def test_library_archived_site_is_read_only(self):

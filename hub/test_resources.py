@@ -162,7 +162,9 @@ class ResourceTests(TestCase):
         self.assertIn(b"%PDF",b"".join(response.streaming_content))
         response=self.client.get(f"/protocols/{ident}/file/?download=1")
         self.assertIn("attachment",response["Content-Disposition"])
-        response.close()
+        # Consume the test client iterator so cleanup preserves the test transaction.
+        self.assertEqual(b"".join(response.streaming_content),b"%PDF-1.4\nexample")
+        self.assertTrue(response.closed)
         self.client.force_authenticate(self.users["manager"])
         self.assertEqual(self.client.patch(f"/api/protocols/{ident}/",{"is_archived":True,"base_version":1},format="json").status_code,200)
         self.assertEqual(len(self.client.get("/api/protocols/").data),0)
@@ -181,7 +183,9 @@ class ResourceTests(TestCase):
         self.client.force_authenticate(self.users["viewer"])
         url=response.data["url"]
         response=self.client.get(url)
-        self.assertEqual(response.status_code,200);response.close()
+        self.assertEqual(response.status_code,200)
+        self.assertEqual(b"".join(response.streaming_content),b"\x00\x00\x00\x18ftypmp42"+b"x"*20)
+        self.assertTrue(response.closed)
         response=self.client.get(url,HTTP_RANGE="bytes=4-7")
         self.assertEqual(response.status_code,206)
         self.assertEqual(response["Content-Range"],"bytes 4-7/32")

@@ -98,8 +98,11 @@ editing of deployments, caveats, equipment, sites and other operational records.
 
 CI is configured to run the Django suite against SQLite and PostgreSQL, plus Node behavior tests,
 audits of Python and npm development dependencies, and Chromium browser tests.
-The new hosted matrix has not run before this local commit is pushed. The browser
-runner creates disposable databases/files and test-only accounts;
+The first hosted matrix passed SQLite and exposed direct streaming-response
+cleanup in several PostgreSQL tests. Those tests now consume the download iterator,
+verify its bytes and confirm the response closes without ending the enclosing
+test transaction. See [Validation](VALIDATION.md) for the reproduction and results.
+The browser runner creates disposable databases/files and test-only accounts;
 it disables dotenv loading and never seeds the normal application database.
 Node and Playwright are development tools and are not needed on the production
 VM. The Docker image excludes their manifests, runner and fixture scripts.
