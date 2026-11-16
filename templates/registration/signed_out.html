@@ -1,0 +1,10 @@
+{% load static %}<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signed out · Carbonique</title><link rel="stylesheet" href="{% static 'hub/style.css' %}"></head>
+<body class="simple-page"><main class="panel"><h1>You’re signed out</h1>
+{% if device_logout %}
+<p id="sign-out-status" role="status" data-account="{{ device_logout.account }}" data-session="{{ device_logout.fingerprint }}">Clearing this account’s offline site copies…</p>
+<noscript><p>Enable JavaScript, then sign in to the workspace to manage your offline copies.</p></noscript>
+{% endif %}
+<a class="button primary" href="{% url 'login' %}">Sign in</a>
+</main>{% if device_logout %}<script type="module" src="{% static 'hub/signed-out.js' %}"></script>{% endif %}</body></html>

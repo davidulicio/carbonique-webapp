@@ -6,10 +6,10 @@ const base=id=>({site:{id,metadata:{}},tasks:[],visits:[],activities:[],observat
 const modules=import(pathToFileURL(path.join(__dirname,'../../static/hub/offline-state.js')));
 test('late site response cannot overwrite another site or cache key',async()=>{
  const {projectSnapshot}=await modules,pending=[],cache=new Map(),S={me:{id:7},siteId:1,sites:[{id:1},{id:2}],base:base(1),queue:[],loadGeneration:0,changeGeneration:0,identityGeneration:0};
- const scope={S,navigator:{onLine:true},identity:()=>({account:7,generation:0}),api:url=>new Promise(resolve=>pending.push({url,resolve})),store:{get:async(name,key)=>cache.get(name+':'+key),put:async(name,key,value)=>cache.set(name+':'+key,structuredClone(value)),saveSnapshot:async(account,site,data)=>{cache.set('snapshots:'+account+':'+site,data);return true;}},$:()=>({}),empty:()=>'',project:()=>{S.data=projectSnapshot(S.base,S.queue,S.me,S.siteId)},render:()=>{}};
+ const scope={S,AbortController,navigator:{onLine:true},identity:()=>({account:7,generation:0}),api:(url,{signal})=>new Promise(resolve=>pending.push({url,resolve,signal})),store:{get:async(name,key)=>cache.get(name+':'+key),put:async(name,key,value)=>cache.set(name+':'+key,structuredClone(value)),saveSnapshot:async(account,site,data)=>{cache.set('snapshots:'+account+':'+site,data);return true;}},$:()=>({}),empty:()=>'',project:()=>{S.data=projectSnapshot(S.base,S.queue,S.me,S.siteId)},render:()=>{}};
  vm.createContext(scope);vm.runInContext(part('async function loadSite(','async function loadOverview('),scope);
- const first=scope.loadSite(1,false);await tick();const second=scope.loadSite(2,false);await tick();pending[1].resolve(base(2));await second;pending[0].resolve(base(1));await first;
- assert.equal(S.siteId,2);assert.equal(S.base.site.id,2);assert.equal(cache.get('snapshots:7:2').site.id,2);
+ const first=scope.loadSite(1);await tick();const second=scope.loadSite(2);await tick();pending[1].resolve(base(2));await second;pending[0].resolve(base(1));await first;
+ assert.equal(S.siteId,2);assert.equal(S.base.site.id,2);assert.equal(pending[0].signal.aborted,true);assert.equal(cache.has('snapshots:7:2'),false);
 });
 test('partial synchronization keeps acknowledged records durably visible',async()=>{
  const {projectSnapshot,mergeAcknowledgement}=await modules;

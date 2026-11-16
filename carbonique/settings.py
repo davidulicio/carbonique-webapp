@@ -1,6 +1,7 @@
 """SQLite locally; DATABASE_URL or EcoFlux DB_* in production."""
 import os
 from pathlib import Path
+from urllib.parse import urlsplit
 from datetime import timedelta
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
@@ -18,6 +19,20 @@ ALLOWED_HOSTS = [s.strip() for s in os.environ.get("ALLOWED_HOSTS", "localhost,1
 CSRF_TRUSTED_ORIGINS = [s.strip() for s in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",") if s.strip()]
 INSTALLED_APPS = ["django.contrib.admin", "django.contrib.auth", "django.contrib.contenttypes", "django.contrib.sessions", "django.contrib.messages", "django.contrib.staticfiles", "rest_framework", "inventory", "hub", "axes"]
 MIDDLEWARE = ["django.middleware.security.SecurityMiddleware", "hub.security.SecurityHeadersMiddleware", "whitenoise.middleware.WhiteNoiseMiddleware", "django.contrib.sessions.middleware.SessionMiddleware", "django.middleware.common.CommonMiddleware", "django.middleware.csrf.CsrfViewMiddleware", "django.contrib.auth.middleware.AuthenticationMiddleware", "hub.security.WorkspaceIdentityMiddleware", "django.contrib.messages.middleware.MessageMiddleware", "django.middleware.clickjacking.XFrameOptionsMiddleware", "axes.middleware.AxesMiddleware"]
+TRUSTED_TYPES_ENFORCE = env_bool("TRUSTED_TYPES_ENFORCE")
+WEBAUTHN_ORIGIN = os.environ.get("WEBAUTHN_ORIGIN", "").rstrip("/")
+if WEBAUTHN_ORIGIN:
+    origin = urlsplit(WEBAUTHN_ORIGIN)
+    try:
+        valid_origin = (
+            origin.hostname and origin.netloc in {origin.hostname, f"{origin.hostname}:{origin.port}"}
+            and not any((origin.path, origin.query, origin.fragment))
+            and (origin.scheme == "https" or (DEBUG and origin.scheme == "http" and origin.hostname == "localhost"))
+        )
+    except ValueError:
+        valid_origin = False
+    if not valid_origin:
+        raise ImproperlyConfigured("WEBAUTHN_ORIGIN must be the canonical HTTPS origin, or http://localhost in development.")
 ROOT_URLCONF = "carbonique.urls"
 TEMPLATES = [{"BACKEND": "django.template.backends.django.DjangoTemplates", "DIRS": [BASE_DIR / "templates"], "APP_DIRS": True, "OPTIONS": {"context_processors": ["django.template.context_processors.request", "django.contrib.auth.context_processors.auth", "django.contrib.messages.context_processors.messages"]}}]
 WSGI_APPLICATION = "carbonique.wsgi.application"
@@ -89,7 +104,7 @@ AXES_CLIENT_IP_CALLABLE = "hub.security.client_ip"
 AXES_LOCKOUT_TEMPLATE = "registration/login_locked.html"
 AXES_HTTP_RESPONSE_CODE = 429
 AXES_DISABLE_ACCESS_LOG = True
-AXES_SENSITIVE_PARAMETERS = ["csrfmiddlewaretoken", "token", "secret", "api_key"]
+AXES_SENSITIVE_PARAMETERS = ["csrfmiddlewaretoken", "password", "token", "secret", "api_key"]
 AXES_ALLOWED_CORS_ORIGINS = []
 TRUSTED_PROXY_NETWORKS = [item.strip() for item in os.environ.get("TRUSTED_PROXY_NETWORKS", "127.0.0.1/32,::1/128").split(",") if item.strip()]
 if not DEBUG and (not ALLOWED_HOSTS or "*" in ALLOWED_HOSTS):

@@ -3,9 +3,28 @@ const DB_NAME="carbonique-hub-v1";
 let opening,owner;
 function database(){
   if(!opening)opening=new Promise((resolve,reject)=>{
-    const request=indexedDB.open(DB_NAME,1);
-    request.onupgradeneeded=()=>{for(const name of ["meta","snapshots","outbox","downloads"])request.result.createObjectStore(name);};
-    request.onsuccess=()=>resolve(request.result);request.onerror=()=>reject(request.error);
+    const request=indexedDB.open(DB_NAME,2);
+    request.onupgradeneeded=event=>{
+      if(event.oldVersion===0){
+        for(const name of ["meta","snapshots","outbox","downloads"])request.result.createObjectStore(name);
+        return;
+      }
+      // Older copies mix prepared sites with ordinary browsing. Keep the outbox
+      // and session guards, then require fieldwork preparation for new copies.
+      for(const name of ["snapshots","downloads"])request.transaction.objectStore(name).clear();
+      const metadata=request.transaction.objectStore("meta").openCursor();
+      metadata.onsuccess=()=>{
+        const row=metadata.result;if(!row)return;
+        if(!/:(session|sealed)$/.test(String(row.key)))row.delete();
+        row.continue();
+      };
+    };
+    request.onsuccess=()=>{
+      request.result.onversionchange=()=>request.result.close();
+      resolve(request.result);
+    };
+    request.onerror=()=>reject(request.error);
+    request.onblocked=()=>reject(new Error("Close other Carbonique tabs and reload to update offline storage."));
   });
   return opening;
 }
@@ -82,7 +101,7 @@ export async function acknowledge(item,result,actor){
     },fail);
   });
 }
-export async function clearAccount(account,session){
+export async function clearAccount(account,session,{preservePending=false}={}){
   account=Number(account);
   const db=await database();
   await new Promise((resolve,reject)=>{
@@ -91,7 +110,7 @@ export async function clearAccount(account,session){
     tx.oncomplete=resolve;tx.onerror=()=>reject(error||tx.error);tx.onabort=()=>reject(error||tx.error);
     checkOwner(tx,{account,session:session||null},()=>{
       const pending=tx.objectStore("outbox").getAll();pending.onsuccess=()=>{
-        if(pending.result.some(item=>item.account===account)){fail(new Error("Sync or export and discard this account's pending records before signing out."));return;}
+        if(!preservePending&&pending.result.some(item=>item.account===account)){fail(new Error("Sync or export and discard this account's pending records before signing out."));return;}
         for(const name of ["meta","snapshots","downloads"]){
           const cursor=tx.objectStore(name).openCursor();cursor.onsuccess=()=>{
             const row=cursor.result;if(!row)return;

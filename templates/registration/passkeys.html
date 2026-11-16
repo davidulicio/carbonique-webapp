@@ -1,0 +1,29 @@
+{% load static %}<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manage passkeys · Carbonique</title><link rel="stylesheet" href="{% static 'hub/style.css' %}"></head>
+<body class="simple-page"><main class="panel">
+<a href="{% url 'home' %}">← Back to workspace</a>
+<h1>Manage passkeys</h1>
+<p>Use a device or security key you trust to sign in. You can still sign in with your password.</p>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<h2>Registered passkeys</h2>
+{% for key in keys %}
+  <details class="section-divider">
+    <summary>{{ key.label }}{% if key.last_used_at %} · Last used {{ key.last_used_at|date:"Y-m-d H:i" }} UTC{% endif %}</summary>
+    <form method="post" action="{% url 'passkey_remove' key.pk %}">
+      {% csrf_token %}
+      <label>Current password <input type="password" name="password" autocomplete="current-password" required></label>
+      <button class="button danger" type="submit">Remove passkey</button>
+    </form>
+  </details>
+{% empty %}
+  <p>No passkeys registered.</p>
+{% endfor %}
+<p id="passkey-status" role="status"></p>
+<form id="passkey-register" class="section-divider" data-options="{% url 'passkey_registration_options' %}" data-complete="{% url 'passkey_register' %}" hidden>
+  {% csrf_token %}
+  <label>Passkey name <input type="text" name="label" maxlength="80" required></label>
+  <label>Current password <input type="password" name="password" autocomplete="current-password" required></label>
+  <button class="button primary" type="submit">Add a passkey</button>
+</form>
+</main><script type="module" src="{% static 'hub/passkeys.js' %}"></script></body></html>

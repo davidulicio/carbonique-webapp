@@ -9,6 +9,30 @@ async function login(page,username='browser-a'){
 async function nav(page,name){if(await page.locator('#mobile-menu').isVisible())await page.locator('#mobile-menu').click();await page.getByRole('button',{name,exact:true}).click();}
 async function addTask(page,title){await page.locator('[data-action="plan-task"]').click();await page.getByLabel('Task title',{exact:true}).fill(title);await page.locator('#dialog-save').click();await expect(page.locator('#dialog')).not.toBeVisible();}
 async function saved(page,name){return page.evaluate(async name=>{const store=await import('/static/hub/storage.js');return store.all(name);},name);}
+
+test('administrators can enroll and use a passkey',async({page,context})=>{
+ const devtools=await context.newCDPSession(page);
+ await devtools.send('WebAuthn.enable');
+ await devtools.send('WebAuthn.addVirtualAuthenticator',{options:{
+   protocol:'ctap2',transport:'internal',hasResidentKey:true,hasUserVerification:true,
+   isUserVerified:true,automaticPresenceSimulation:true,
+ }});
+ await page.goto('http://localhost:8786/accounts/login/');
+ await page.getByLabel('Username',{exact:true}).fill('browser-a');
+ await page.getByLabel('Password',{exact:true}).fill(password);
+ await page.getByRole('button',{name:'Sign in →',exact:true}).click();
+ await page.getByRole('link',{name:'Manage passkeys'}).click();
+ await page.getByLabel('Passkey name').fill('Browser fixture key');
+ await page.getByLabel('Current password',{exact:true}).fill(password);
+ await page.getByRole('button',{name:'Add a passkey'}).click();
+ await expect(page.getByText('Browser fixture key',{exact:true})).toBeVisible();
+ await page.getByRole('link',{name:'Back to workspace'}).click();
+ await expect(page.locator('#main')).toHaveAttribute('data-site',/\d+/);
+ await page.locator('#logout-button').click();
+ await page.locator('#dialog-save').click();
+ await page.getByRole('button',{name:'Sign in with a passkey'}).click();
+ await expect(page.locator('#main')).toHaveAttribute('data-site',/\d+/);
+});
 async function authWithCookies(context,user){const response=await context.request.get('/accounts/login/');const html=await response.text(),csrf=html.match(/name="csrfmiddlewaretoken" value="([^"]+)"/)[1];const result=await context.request.post('/accounts/login/',{form:{username:user,password,csrfmiddlewaretoken:csrf},headers:{Referer:'http://127.0.0.1:8786/accounts/login/'}});expect(result.ok()).toBeTruthy();}
 function pdf(label){const stream=`BT /F1 12 Tf 72 720 Td (${label}) Tj ET`,objects=['<< /Type /Catalog /Pages 2 0 R >>','<< /Type /Pages /Kids [3 0 R] /Count 1 >>','<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>','<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',`<< /Length ${Buffer.byteLength(stream)} >>\nstream\n${stream}\nendstream`];let data='%PDF-1.4\n',offsets=[0];objects.forEach((object,i)=>{offsets.push(Buffer.byteLength(data));data+=`${i+1} 0 obj\n${object}\nendobj\n`;});const at=Buffer.byteLength(data);data+='xref\n0 6\n0000000000 65535 f \n'+offsets.slice(1).map(x=>`${String(x).padStart(10,'0')} 00000 n \n`).join('')+`trailer\n<< /Size 6 /Root 1 0 R >>\nstartxref\n${at}\n%%EOF\n`;return Buffer.from(data);}
 
@@ -19,7 +43,7 @@ test('site switching keeps the selected site and every stored snapshot aligned',
  await page.route('**/api/snapshot/?site=2',async route=>{const response=await route.fetch();held();await gate;await route.fulfill({response});});
  await page.locator('#site-select').selectOption('2');await ready;
  await page.locator('#site-select').selectOption('1');await expect(page.locator('#main')).toHaveAttribute('data-site','1');release();
- await expect.poll(async()=>page.evaluate(async()=>{const db=await new Promise((resolve,reject)=>{const r=indexedDB.open('carbonique-hub-v1',1);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});return new Promise(resolve=>{const tx=db.transaction('snapshots'),request=tx.objectStore('snapshots').openCursor();let ok=true;request.onsuccess=()=>{const row=request.result;if(!row)return resolve(ok);ok&&=Number(String(row.key).split(':').at(-1))===row.value.site.id;row.continue();};});})).toBe(true);
+ await expect.poll(async()=>page.evaluate(async()=>{const db=await new Promise((resolve,reject)=>{const r=indexedDB.open('carbonique-hub-v1');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});return new Promise(resolve=>{const tx=db.transaction('snapshots'),request=tx.objectStore('snapshots').openCursor();let ok=true;request.onsuccess=()=>{const row=request.result;if(!row)return resolve(ok);ok&&=Number(String(row.key).split(':').at(-1))===row.value.site.id;row.continue();};});})).toBe(true);
  await expect(page.locator('#main')).toHaveAttribute('data-site','1');
 });
 test('offline work survives partial synchronization and reload',async({page,context})=>{
@@ -55,7 +79,7 @@ test('protocol replacement renders and caches the new digest',async({page})=>{
 });
 test('atomic account clearing refuses pending work and rejects later stale writes',async({page})=>{
  await login(page);const result=await page.evaluate(async()=>{
-  const store=await import('/static/hub/storage.js'),bootstrap=await store.get('meta',`${await store.get('meta','active-account')}:bootstrap`),account=bootstrap.me.id,session=bootstrap.workspace_session;
+  const store=await import('/static/hub/storage.js'),account=await store.get('meta','active-account'),session=await store.get('meta',`${account}:session`);
   await store.put('outbox','pending-check',{id:'pending-check',account,siteId:1,kind:'operation',operation:{kind:'task.create',payload:{title:'Preserve me'}}});
   let refused=false;try{await store.clearAccount(account,session);}catch{refused=true;}
   const remains=!!(await store.get('outbox','pending-check'));await store.remove('outbox','pending-check');await store.clearAccount(account,session);
@@ -65,7 +89,9 @@ test('atomic account clearing refuses pending work and rejects later stale write
 });
 test('acknowledgements prevent older network responses overwriting local saved records',async({page})=>{
  await login(page);const result=await page.evaluate(async()=>{
-  const store=await import('/static/hub/storage.js'),account=await store.get('meta','active-account'),key=`${account}:1`,before=await store.get('snapshots',key),revision=await store.get('meta',`${account}:snapshot-revision:1`)||0;
+  const store=await import('/static/hub/storage.js'),account=await store.get('meta','active-account'),key=`${account}:1`,session=await store.get('meta',`${account}:session`),revision=await store.get('meta',`${account}:snapshot-revision:1`)||0;
+  const response=await fetch('/api/snapshot/?site=1&offline=1',{headers:{'X-Workspace-Account':String(account),'X-Workspace-Session':session}});
+  const before=await response.json();await store.saveSnapshot(account,1,before,revision);
   const item={id:'ack-test',account,siteId:1,kind:'operation',operation:{id:'ack-test',entity_id:'ack-task',kind:'task.create',payload:{title:'Durable ack'}}};
   await store.put('outbox',item.id,item);await store.acknowledge(item,{record:{id:'ack-task',title:'Durable ack',version:1}}, {id:account,name:'Tester'});
   const replaced=await store.saveSnapshot(account,1,before,revision),after=await store.get('snapshots',key);return {replaced,exists:after.tasks.some(row=>row.id==='ack-task'),pending:!!await store.get('outbox',item.id)};
@@ -82,6 +108,39 @@ test('prepared workspace reopens offline with its saved site and pending work',a
  try{
   await login(page);await page.locator('#prepare-button').click();await page.locator('input[name="files"]').uncheck();await page.locator('#dialog-save').click();await expect(page.locator('#dialog')).not.toBeVisible({timeout:30000});await expect(page.locator('#toast')).toContainText('saved for offline use');
   await nav(page,'Field work');await context.setOffline(true);await addTask(page,'Offline reopen task');await page.reload();
-  await expect(page.getByRole('heading',{name:'Offline reopen task',exact:true})).toBeVisible();expect((await saved(page,'outbox')).some(item=>item.operation?.payload.title==='Offline reopen task')).toBe(true);
+  await expect(page.getByRole('heading',{name:'Offline reopen task',exact:true})).toBeVisible();
+  await expect(page.locator('#site-select option')).toHaveCount(1);
+  expect((await saved(page,'outbox')).some(item=>item.operation?.payload.title==='Offline reopen task')).toBe(true);
  }finally{await context.close();}
+});
+
+test('server-side validation identifies and focuses its form field',async({page})=>{
+ await login(page);await nav(page,'Administration');
+ await page.getByRole('button',{name:/Add site/}).click();
+ for (const [label, value] of [['Site code','TEST_A'],['AmeriFlux ID','CA-QA1'],['Site name','Duplicate fixture'],['Location','Test location'],['Site description','Test description']]) {
+   await page.getByLabel(label,{exact:true}).fill(value);
+ }
+ await page.locator('#dialog-save').click();
+ const code=page.getByLabel('Site code',{exact:true});
+ await expect(code).toHaveAttribute('aria-invalid','true');
+ await expect(code).toBeFocused();
+ await expect(page.getByText('This site code is already in use.',{exact:true})).toBeVisible();
+ await code.fill('NEW_FIXTURE');
+ await expect(code).not.toHaveAttribute('aria-invalid','true');
+});
+
+test('the account logout form clears offline copies and retains its outbox',async({page})=>{
+ await login(page);
+ await page.evaluate(async()=>{
+   const store=await import('/static/hub/storage.js'),account=await store.get('meta','active-account');
+   await store.put('downloads',`${account}:/fixture/`,new Blob(['Private field copy']));
+   await store.put('outbox','workspace-logout-fixture',{id:'workspace-logout-fixture',account});
+   const form=document.createElement('form'),token=document.createElement('input');
+   form.method='post';form.action='/accounts/logout/';token.name='csrfmiddlewaretoken';
+   token.value=document.querySelector('meta[name="csrf-token"]').content;
+   form.append(token);document.body.append(form);form.submit();
+ });
+ await expect(page.locator('#sign-out-status')).toContainText('Offline site copies were cleared');
+ expect(await saved(page,'downloads')).toEqual([]);
+ expect((await saved(page,'outbox')).map(item=>item.id)).toEqual(['workspace-logout-fixture']);
 });

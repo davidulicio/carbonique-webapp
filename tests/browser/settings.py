@@ -7,6 +7,7 @@ DATABASES={'default':{'ENGINE':'django.db.backends.sqlite3','NAME':TEST_ROOT/'br
 MEDIA_ROOT=TEST_ROOT/'media'
 STATIC_ROOT=TEST_ROOT/'staticfiles'
 DEBUG=True
+WEBAUTHN_ORIGIN='http://localhost:8786'
 ALLOWED_HOSTS=['127.0.0.1','localhost','testserver']
 SECURE_SSL_REDIRECT=False
 SESSION_COOKIE_SECURE=False

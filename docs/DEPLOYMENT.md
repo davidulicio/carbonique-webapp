@@ -1,5 +1,13 @@
 # Running Carbonique Hub in production
 
+## Browser security rollout
+
+The workspace CSP is enforced. Trusted Types starts in report-only mode with browser-console diagnostics. After testing workspace forms, PDFs and offline reopening on the deployed origin, set `TRUSTED_TYPES_ENFORCE=True` to enforce Trusted Types.
+
+To enable administrator passkeys, set `WEBAUTHN_ORIGIN=https://carbonique.example.org` to the exact public HTTPS origin. Install the updated dependencies, run migrations, collect static files and restart the app. Administrators can add or remove passkeys from the workspace by confirming their password. Password sign-in and recovery remain available. A change of hostname requires passkey re-enrollment.
+
+After this upgrade, open Carbonique while connected and run **Prepare for fieldwork** again. The browser removes older offline copies because they included data saved during ordinary browsing. Pending records remain with the account that created them.
+
 Before installing or updating, follow the [26 October security maintenance supplement](SECURITY_MAINTENANCE.md), including Python and host patch requirements.
 
 For the existing Alliance Arbutus Ubuntu VM, start with the detailed

@@ -6,6 +6,29 @@ from django.db import models
 from django.utils import timezone
 from inventory.models import Site, Equipment, FieldNote
 
+class PasskeyAccount(models.Model):
+    user = models.OneToOneField(django_settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    handle = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
+
+
+class Passkey(models.Model):
+    account = models.ForeignKey(PasskeyAccount, on_delete=models.CASCADE, related_name="keys")
+    credential_hash = models.CharField(max_length=64, unique=True, editable=False)
+    credential_id = models.BinaryField()
+    public_key = models.BinaryField()
+    sign_count = models.PositiveBigIntegerField()
+    label = models.CharField(max_length=80)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_used_at = models.DateTimeField(null=True, blank=True)
+
+
+class PasskeyChallenge(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    session_binding = models.CharField(max_length=64, db_index=True)
+    challenge = models.BinaryField()
+    purpose = models.CharField(max_length=12)
+    expires_at = models.DateTimeField(db_index=True)
+
 class TeamMember(models.Model):
     ROLES = [(r, r.title()) for r in ("viewer", "member", "researcher", "manager", "admin")]
     user = models.OneToOneField(django_settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="team_member")

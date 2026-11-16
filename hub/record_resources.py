@@ -140,8 +140,11 @@ class KnowledgeSerializer(serializers.ModelSerializer):
         return value
 
 
-def knowledge_state(user):
-    return KnowledgeSerializer(visible_knowledge(user), many=True).data
+def knowledge_state(user, site=None):
+    records = visible_knowledge(user)
+    if site is not None:
+        records = records.filter(Q(site=site) | Q(site__isnull=True))
+    return KnowledgeSerializer(records, many=True).data
 
 
 @api_view(['GET', 'POST', 'PATCH'])

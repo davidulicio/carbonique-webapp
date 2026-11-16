@@ -17,7 +17,8 @@ class Command(BaseCommand):
         if settings.MEDIA_ROOT.resolve() in output.parents:
             raise ValueError("Store backups outside MEDIA_ROOT.")
         fixture = io.StringIO()
-        call_command("dumpdata", "auth.user", "auth.group", "inventory", "hub", use_natural_foreign_keys=True, use_natural_primary_keys=False, indent=2, stdout=fixture)
+        call_command("dumpdata", "auth.user", "auth.group", "inventory", "hub", exclude=["hub.passkeychallenge"],
+                     use_natural_foreign_keys=True, use_natural_primary_keys=False, indent=2, stdout=fixture)
         with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as archive:
             archive.writestr("data.json", fixture.getvalue())
             archive.writestr("manifest.json", json.dumps({"format": "carbonique-backup-v1", "created_at": datetime.now(timezone.utc).isoformat(), "contains_account_password_hashes": True, "requires_quiesced_writers": True}))

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from hub import api, views
+from hub import api, passkeys, views
 from hub import resources_api as resources
 from hub import monitor, processing_files, record_resources
 
@@ -11,7 +11,18 @@ for prefix, cls in [("sites", api.SiteViewSet), ("equipment", api.EquipmentViewS
 
 urlpatterns = [
     path("", views.home, name="home"),
+    path("offline-shell/", views.offline_shell, name="offline_shell"),
+    path("accounts/login/", passkeys.PasskeyLoginView.as_view(), name="login"),
+    path("accounts/logout/", views.DeviceLogoutView.as_view(), name="logout"),
+    path("accounts/signed-out/", views.signed_out, name="signed_out"),
+    path("accounts/passkeys/", passkeys.manage, name="manage_passkeys"),
+    path("accounts/passkeys/sign-in/options/", passkeys.authentication_options, name="passkey_authentication_options"),
+    path("accounts/passkeys/sign-in/", passkeys.sign_in, name="passkey_sign_in"),
+    path("accounts/passkeys/register/options/", passkeys.registration_options, name="passkey_registration_options"),
+    path("accounts/passkeys/register/", passkeys.register, name="passkey_register"),
+    path("accounts/passkeys/<int:pk>/remove/", passkeys.remove, name="passkey_remove"),
     path("accounts/", include("django.contrib.auth.urls")),
+    path("admin/logout/", views.DeviceLogoutView.as_view()),
     path("admin/", admin.site.urls),
     path("api/bootstrap/", api.bootstrap), path("api/logout/", api.logout), path("api/snapshot/", api.snapshot),
     path("api/processing-files/", processing_files.library),

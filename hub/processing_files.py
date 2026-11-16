@@ -91,9 +91,12 @@ def store_version(path, data, user=None, note='', source_modified_at=None, creat
     return version, True
 
 
-def library_state(user):
+def library_state(user, site=None):
     output=[]
-    for document in visible_files(user).prefetch_related('revisions__uploaded_by'):
+    files=visible_files(user)
+    if site is not None:
+        files=files.filter(Q(site=site)|Q(site__isnull=True))
+    for document in files.prefetch_related('revisions__uploaded_by'):
         versions=[{'id':str(version.pk), 'revision':version.revision, 'sha256':version.sha256,
             'size':version.size, 'note':version.note, 'uploaded_at':version.uploaded_at.isoformat(),
             'source_modified_at':version.source_modified_at.isoformat() if version.source_modified_at else None,

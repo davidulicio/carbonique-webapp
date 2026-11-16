@@ -3,6 +3,7 @@ import io
 from pathlib import Path
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LogoutView
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -12,14 +13,45 @@ from rest_framework.exceptions import PermissionDenied
 from inventory.models import Photo, Document, Site
 from .models import Attachment, Task, Visit, DataCaveat
 from .permissions import require_site, role_for
+from .passkeys import available as passkeys_available
+from .security import workspace_session
 from .serializers import clean_html
 
 @login_required
 @ensure_csrf_cookie
 def home(request):
-    if not role_for(request.user):
+    role = role_for(request.user)
+    if not role:
         return render(request, "no_access.html", status=403)
-    return render(request, "app.html")
+    return render(request, "app.html", {"manage_passkeys": role == "admin" and passkeys_available(request)})
+
+
+@require_GET
+def offline_shell(request):
+    return render(request, "app.html", {"offline_shell": True})
+
+
+class DeviceLogoutView(LogoutView):
+    def get_success_url(self):
+        return "/accounts/signed-out/"
+
+    def post(self, request, *args, **kwargs):
+        account, fingerprint = request.user.pk, workspace_session(request)
+        response = super().post(request, *args, **kwargs)
+        if account and fingerprint:
+            request.session["device_logout"] = {"account": account, "fingerprint": fingerprint}
+        if request.is_secure():
+            response["Clear-Site-Data"] = '"cache"'
+        return response
+
+
+@require_GET
+def signed_out(request):
+    if request.user.is_authenticated:
+        return redirect("home")
+    return render(request, "registration/signed_out.html", {
+        "device_logout": request.session.pop("device_logout", None),
+    })
 
 @require_GET
 @ensure_csrf_cookie

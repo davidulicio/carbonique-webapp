@@ -3,6 +3,13 @@ from ipaddress import ip_address, ip_network
 from django.conf import settings
 
 
+def workspace_session(request):
+    from django.utils.crypto import salted_hmac
+    if request.user.is_authenticated and request.session.session_key:
+        return salted_hmac("workspace-session", request.session.session_key).hexdigest()
+    return ""
+
+
 def client_ip(request):
     """Use a proxy's overwritten X-Real-IP only for a configured trusted peer."""
     try:
@@ -31,12 +38,23 @@ class SecurityHeadersMiddleware:
         response = self.get_response(request)
         if response.status_code == 429 and request.path.startswith(("/accounts/", "/admin/login/")):
             response.setdefault("Retry-After", "900")
-        response.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+        response.setdefault(
+            "Permissions-Policy",
+            "camera=(), microphone=(), geolocation=(), accelerometer=(), gyroscope=(), "
+            "magnetometer=(), payment=(), usb=(), publickey-credentials-create=(self), "
+            "publickey-credentials-get=(self)",
+        )
         response.setdefault("Referrer-Policy", "same-origin")
         response.setdefault("X-Content-Type-Options", "nosniff")
         # The sandboxed public report and downloads can supply stricter policies.
         response.setdefault("Content-Security-Policy", "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; media-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-src 'self'; frame-ancestors 'none'")
-        if request.path.startswith(("/api/", "/accounts/", "/admin/", "/attachments/", "/legacy-attachments/", "/knowledge-files/", "/processing-files/", "/protocols/", "/site-media/", "/sites/")) or request.path in {"/", "/export.csv", "/inventory-source.zip"}:
+        if request.path in {"/", "/offline-shell/"}:
+            trusted_types = "require-trusted-types-for 'script'; trusted-types dompurify carbonique-worker"
+            if settings.TRUSTED_TYPES_ENFORCE:
+                response["Content-Security-Policy"] += f"; {trusted_types}"
+            else:
+                response["Content-Security-Policy-Report-Only"] = trusted_types
+        if request.path.startswith(("/api/", "/accounts/", "/admin/", "/attachments/", "/legacy-attachments/", "/knowledge-files/", "/processing-files/", "/protocols/", "/site-media/", "/sites/")) or request.path in {"/", "/offline-shell/", "/export.csv", "/inventory-source.zip"}:
             response["Cache-Control"] = "private, no-store"
         return response
 
@@ -48,12 +66,11 @@ class WorkspaceIdentityMiddleware:
 
     def __call__(self, request):
         from django.http import JsonResponse
-        from django.utils.crypto import salted_hmac
         private = request.path.startswith(("/api/", "/attachments/", "/legacy-attachments/", "/knowledge-files/", "/processing-files/", "/protocols/", "/site-media/", "/sites/"))
         if not private:
             return self.get_response(request)
         account = str(request.user.pk) if request.user.is_authenticated else ""
-        session = salted_hmac("workspace-session", request.session.session_key).hexdigest() if account and request.session.session_key else ""
+        session = workspace_session(request)
         expected_account = request.headers.get("X-Workspace-Account")
         expected_session = request.headers.get("X-Workspace-Session")
         browser_fetch = request.headers.get("Sec-Fetch-Dest") == "empty" and request.headers.get("Sec-Fetch-Mode") in {"cors", "same-origin"}

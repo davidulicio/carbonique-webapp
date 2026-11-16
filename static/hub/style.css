@@ -109,3 +109,12 @@ dialog input,dialog select,dialog textarea{min-width:0;max-width:100%}
 
 .processing-source p{max-width:80ch}
 .rich-text table{display:block;max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}
+[hidden] { display: none !important; }
+.field-error { color: var(--danger); }
+:is([aria-invalid="true"], :user-invalid) { border-color: var(--danger); }
+.dialog-error:empty, #passkey-status:empty { display: none; }
+#passkey-sign-in { margin-top: 12px; }
+.passkey-link { display: block; text-align: center; }
+@media (prefers-color-scheme: dark) {
+  .field-error { color: #ffb6a4; }
+}

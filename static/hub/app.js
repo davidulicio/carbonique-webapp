@@ -1,3 +1,4 @@
+import {rich, setMarkup, workerURL} from "./markup.js";
 import * as store from "./storage.js";
 import {projectSnapshot,protocolCacheKey} from "./offline-state.js";
 import { createResources } from "./resources.js";
@@ -15,16 +16,6 @@ const time = value => value ? new Date(value).toLocaleString("en-CA", {month:"sh
 const pill = value => `<span class="pill ${esc(value)}">${esc(value.replaceAll("_"," "))}</span>`;
 const button = (label, action, id="", cls="secondary small") => `<button type="button" class="button ${cls}" data-action="${action}" data-id="${esc(id)}">${label}</button>`;
 const empty = (title, text="") => `<div class="empty"><strong>${esc(title)}</strong>${esc(text)}</div>`;
-const rich = text => {
-  const tpl = document.createElement("template"); tpl.innerHTML = text || "";
-  const allowed = new Set(["P","BR","STRONG","B","EM","I","UL","OL","LI","A","CODE","PRE","BLOCKQUOTE","H3","H4","TABLE","THEAD","TBODY","TR","TH","TD"]);
-  for (const node of [...tpl.content.querySelectorAll("*")].reverse()) {
-    if (!allowed.has(node.tagName)) { node.replaceWith(...node.childNodes); continue; }
-    for (const attr of [...node.attributes]) if (!(node.tagName === "A" && ["href","title"].includes(attr.name))) node.removeAttribute(attr.name);
-    if (node.tagName === "A") { const href=node.getAttribute("href") || ""; if (!/^(https?:|mailto:)/i.test(href)) node.removeAttribute("href"); node.setAttribute("rel","noopener noreferrer"); }
-  }
-  return tpl.innerHTML;
-};
 // Apply the preferred punctuation to displayed prose; keep file bytes and saved text intact.
 function normalizeProse(root){
   const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT);
@@ -57,9 +48,10 @@ function assertIdentity(expected){
 }
 function freezeWorkspace(message="The signed-in account changed in another tab. Reload to continue. Pending field records remain saved."){
   if(S.frozen)return;S.frozen=true;S.identityGeneration++;S.loadGeneration++;S.base=null;S.data=null;S.team=[];S.sites=[];S.protocols=[];
+  S.siteRequest?.abort();
   setNavigationOpen(false,{restoreFocus:false});if($("#dialog").open)closeDialog();
   for(const url of [...S.objectURLs,...S.dialogURLs])URL.revokeObjectURL(url);S.objectURLs=[];S.dialogURLs=[];
-  $("#main").innerHTML='<section class="panel"><h1>Workspace paused</h1><p>'+esc(message)+'</p></section><p><a class="button primary" href="/">Reload workspace</a> <a class="button secondary" href="/accounts/login/">Sign in</a></p>';
+  setMarkup($("#main"), '<section class="panel"><h1>Workspace paused</h1><p>'+esc(message)+'</p></section><p><a class="button primary" href="/">Reload workspace</a> <a class="button secondary" href="/accounts/login/">Sign in</a></p>');
   toast(message,true);
 }
 const sessionChannel=typeof BroadcastChannel!=="undefined"?new BroadcastChannel("carbonique-workspace-session"):null;
@@ -76,18 +68,18 @@ async function privateFetch(path,options={}){
   if(expected.account){headers.set("X-Workspace-Account",String(expected.account));if(expected.session)headers.set("X-Workspace-Session",expected.session);}
   let response;
   try{response=await fetch(path,{...options,headers,credentials:"same-origin",cache:"no-store"});}
-  catch{S.online=false;updateConnection();throw new Error("No connection. Your queued field records remain on this device.");}
+  catch(error){if(options.signal?.aborted)throw error;S.online=false;updateConnection();throw new Error("No connection. Your queued field records remain on this device.");}
   assertIdentity(expected);S.online=true;updateConnection();
   if(expected.account&&(response.headers.get("X-Workspace-Account")!==String(expected.account)||(expected.session&&response.headers.get("X-Workspace-Session")!==expected.session))){
     freezeWorkspace();const error=new Error("The signed-in session changed. Reload and sign in with the original account.");error.status=409;throw error;
   }
   return response;
 }
-async function api(path,{method="GET",data,form}={}){
+async function api(path,{method="GET",data,form,signal}={}){
   const expected=identity(),headers={};
   if(method!=="GET")headers["X-CSRFToken"]=S.csrf;
   if(data!==undefined)headers["Content-Type"]="application/json";
-  const response=await privateFetch(path,{method,headers,body:form||(data!==undefined?JSON.stringify(data):undefined)});
+  const response=await privateFetch(path,{method,headers,signal,body:form||(data!==undefined?JSON.stringify(data):undefined)});
   const body=await response.json().catch(()=>({detail:response.status===429?"Too many requests. Wait and retry; queued records remain saved.":"Unexpected server response."}));
   assertIdentity(expected);
   if(!response.ok){const error=new Error(errorMessage(body));error.status=response.status;error.body=body;throw error;}
@@ -148,6 +140,12 @@ async function synchronize(){
       assertIdentity(expected);await readQueue();if(!S.queue.length||S.blocked)break;
       const item=S.queue[0];let result;
       try{
+        const snapshotKey=`${expected.account}:${item.siteId}`;
+        if (!await store.get("snapshots",snapshotKey)) {
+          // A queued operation needs a durable base for acknowledgement, even
+          // if the operator had not downloaded this site for offline reopening.
+          await saveFieldSnapshot(item.siteId,expected);
+        }
         if(item.kind==="upload"){
           const form=new FormData();form.append("id",item.id);form.append("site",item.siteId);form.append("file",item.file,item.file.name);
           for(const [key,value] of Object.entries(item.fields))if(value)form.append(key,value);
@@ -168,35 +166,53 @@ async function synchronize(){
   }catch(error){toast(`${saved?`${saved} records synced; remaining work stays saved. `:""}${error.message}`,true);}
   finally{S.syncing=false;if(!S.frozen){await readQueue();project();if(!$("#dialog").open)render();updateConnection();}}
 }
+async function saveFieldSnapshot(siteId,expected){
+  const revision=await store.get("meta",`${expected.account}:snapshot-revision:${siteId}`)||0;
+  const data=await api(`/api/snapshot/?site=${siteId}&offline=1`);
+  assertIdentity(expected);
+  if(Number(data.site?.id)!==Number(siteId))throw new Error("Unexpected site snapshot.");
+  await store.saveSnapshot(expected.account,Number(siteId),data,revision);
+  return data;
+}
 async function loadSite(id,draw=true){
-  if(!id||S.frozen)return;
+  if(!id||S.frozen||(!draw&&S.siteRequest))return;
   const siteId=Number(id),expected=identity(),generation=++S.loadGeneration,changes=S.changeGeneration;
+  S.siteRequest?.abort();
+  const request=S.siteRequest=new AbortController();
   const current=()=>!S.frozen&&S.me?.id===expected.account&&S.identityGeneration===expected.generation&&S.siteId===siteId&&generation===S.loadGeneration&&changes===S.changeGeneration;
   if(S.siteId!==siteId){S.base=null;S.data=null;}
   S.siteId=siteId;if(draw)render();
-  await store.put("meta",`${expected.account}:selected`,siteId);
-  let data;
-  const revision=await store.get("meta",`${expected.account}:snapshot-revision:${siteId}`)||0;
-  if(navigator.onLine){try{
-    data=await api(`/api/snapshot/?site=${siteId}`);
+  try {
+    let data;
+    if(navigator.onLine){
+      try{data=await api(`/api/snapshot/?site=${siteId}`,{signal:request.signal});}
+      catch(error){if(error.status||S.frozen||request.signal.aborted)throw error;}
+    }
     if(!current())return;
-    if(Number(data.site?.id)!==siteId)throw new Error("The server returned another site's data. Refresh the workspace.");
-    if(!await store.saveSnapshot(expected.account,siteId,data,revision))data=await store.get("snapshots",`${expected.account}:${siteId}`);
-  }catch(error){if(error.status||S.frozen)throw error;}}
-  if(!current())return;
-  if(!data)data=await store.get("snapshots",`${expected.account}:${siteId}`);
-  if(!current())return;
-  if(!data||Number(data.site?.id)!==siteId){S.base=null;S.data=null;$("#main").innerHTML=empty("This site is not available offline","Prepare this site while connected.");return;}
-  S.base=data;const index=S.sites.findIndex(site=>site.id===siteId);if(index>=0)S.sites[index]=data.site;
-  project();$("#site-select").value=siteId;if(draw)render();
+    if(!data)data=await store.get("snapshots",`${expected.account}:${siteId}`)||S.base;
+    if(!current())return;
+    if(!data||Number(data.site?.id)!==siteId){
+      S.base=null;S.data=null;setMarkup($("#main"),empty("This site is not available offline","Prepare this site while connected."));
+      return;
+    }
+    S.base=data;const index=S.sites.findIndex(site=>site.id===siteId);if(index>=0)S.sites[index]=data.site;
+    if(S.preparedSites?.includes(siteId))await store.put("meta",`${expected.account}:selected`,siteId);
+    if(!current())return;
+    project();$("#site-select").value=siteId;if(draw)render();
+    return true;
+  } catch(error) {
+    if(!request.signal.aborted)throw error;
+  } finally {
+    if(S.siteRequest===request)S.siteRequest=null;
+  }
 }
 async function loadOverview(){
   if(!navigator.onLine||S.frozen)return;
-  const expected=identity();try{const overview=await api("/api/overview/");assertIdentity(expected);await store.put("meta",`${expected.account}:overview`,overview);S.overview=overview;}catch{}
+  const expected=identity();try{const overview=await api("/api/overview/");assertIdentity(expected);S.overview=overview;}catch{}
 }
 function header(title,subtitle,actions=""){return `<div class="page-header"><div><span class="eyebrow">${esc(currentSite()?.code||"CARBONIQUE NETWORK")}</span><h1>${title}</h1><p>${subtitle}</p></div><div class="page-actions">${actions}</div></div>`;}
 function stat(label,value,foot=""){return `<div class="stat"><div class="label"><span class="accent"></span>${label}</div><strong>${value}</strong><small>${foot}</small></div>`;}
-function renderNavigation(){const views=[["overview","◫","Overview"],["field","✓","Field work"],["history","◷","History"],["sites","⌁","Sites & instruments"],["data","≋","Data & processing"],["inventory","▤","Equipment inventory"],["monitor","◉","Tower status"],["badm","◇","Site BADM"],["protocols","▧","Protocols"],["knowledge","▥","Reference library"]];if(admin())views.push(["admin","⚙","Administration"]);$("#navigation").innerHTML=views.map(([id,icon,label])=>`<button class="nav-button ${S.view===id?"active":""}" data-action="view" data-id="${id}"><span class="nav-icon" aria-hidden="true">${icon}</span>${label}</button>`).join("")+'<a class="nav-button" href="/fieldnotes/" target="_blank" rel="noopener"><span class="nav-icon" aria-hidden="true">↗</span>Public Field Notes</a>';}
+function renderNavigation(){const views=[["overview","◫","Overview"],["field","✓","Field work"],["history","◷","History"],["sites","⌁","Sites & instruments"],["data","≋","Data & processing"],["inventory","▤","Equipment inventory"],["monitor","◉","Tower status"],["badm","◇","Site BADM"],["protocols","▧","Protocols"],["knowledge","▥","Reference library"]];if(admin())views.push(["admin","⚙","Administration"]);setMarkup($("#navigation"), views.map(([id,icon,label])=>`<button class="nav-button ${S.view===id?"active":""}" data-action="view" data-id="${id}"><span class="nav-icon" aria-hidden="true">${icon}</span>${label}</button>`).join("")+'<a class="nav-button" href="/fieldnotes/" target="_blank" rel="noopener"><span class="nav-icon" aria-hidden="true">↗</span>Public Field Notes</a>');}
 function render(){
   if(S.frozen)return;
   const main=$("#main"),sameView=main.dataset.view===S.view&&main.dataset.site===String(S.siteId);
@@ -205,8 +221,8 @@ function render(){
   for(const url of S.objectURLs)URL.revokeObjectURL(url);S.objectURLs=[];
   renderNavigation();updateConnection();
   const views={overview:overviewView,field:fieldView,history:historyView,sites:siteView,data:dataView,inventory:inventoryView,admin:adminView,badm:resources.badmView,protocols:resources.protocolsView,monitor:monitor.view,knowledge:records.knowledgeView};
-  if(!S.data && S.view!=="overview" && S.view!=="admin" && S.view!=="protocols" && S.view!=="monitor" && S.view!=="knowledge"){$("#main").innerHTML=empty("Select an available site");return;}
-  $("#main").innerHTML=(S.sites.find(s=>s.id===S.siteId)?.is_archived?`<div class="notice">This site is archived. Its history remains available.</div>`:"")+(views[S.view]||overviewView)();
+  if(!S.data && S.view!=="overview" && S.view!=="admin" && S.view!=="protocols" && S.view!=="monitor" && S.view!=="knowledge"){setMarkup($("#main"), empty("Select an available site"));return;}
+  setMarkup($("#main"), (S.sites.find(s=>s.id===S.siteId)?.is_archived?`<div class="notice">This site is archived. Its history remains available.</div>`:"")+(views[S.view]||overviewView)());
   normalizeProse(main);
   main.dataset.view=S.view;main.dataset.site=String(S.siteId);
   for(const element of main.querySelectorAll("details"))if(details.has(detailKey(element)))element.open=details.get(detailKey(element));
@@ -292,26 +308,103 @@ function dataView(){const caveats=S.data.caveats.filter(c=>(c.title+" "+c.descri
 function inventoryView(){const items=S.data.equipment.filter(e=>(e.instrument+" "+e.serial_number+" "+e.model_number).toLowerCase().includes(S.filter.toLowerCase()));return header("Equipment inventory","Follow each instrument from storage to deployment and repair.",research()?button("＋ Add equipment","add-equipment","","primary"):"")+`<div class="toolbar"><input data-search="inventory" value="${esc(S.filter)}" placeholder="Search instrument, model or serial number…" aria-label="Search inventory"></div><div class="panel table-wrap"><table><thead><tr><th>Instrument</th><th>Model / manufacturer</th><th>Serial number</th><th>Current site</th><th>Status</th><th>Actions</th></tr></thead><tbody>${items.map(e=>`<tr><td><strong>${esc(e.instrument)}</strong><span class="small muted">Purchased ${day(e.date_purchased)}</span></td><td>${esc(e.model_number)}<span class="small muted">${esc(e.manufacturer)}</span></td><td>${esc(e.serial_number)||"Not recorded"}</td><td>${esc(S.sites.find(s=>s.id===e.site)?.code||"Storage / unassigned")}</td><td>${pill(e.is_archived?"archived":e.status)}</td><td><div class="row-actions">${button("Details / history","equipment-details",e.id)}${research()?button("Edit","edit-equipment",e.id):""}</div></td></tr>`).join("")}</tbody></table>${!items.length?empty("No tracked equipment records yet","Instrument specifications from the supplied reference are under Sites & instruments. Create tracked equipment records when serial numbers and purchase details are known."):""}</div>`;}
 function adminView(){if(!admin())return empty("Administrator access required");return header("Administration","Manage sites, team access and maintenance checklists.",`<a class="button secondary" href="/admin/" target="_blank">Django administration ↗</a>`)+`<div class="panel"><div class="panel-title"><h2>Sites</h2>${teamAdmin()?button("＋ Add site","add-site","","primary"):""}</div><div class="table-wrap"><table><thead><tr><th>Code</th><th>Name</th><th>AmeriFlux</th><th>Status</th><th></th></tr></thead><tbody>${S.sites.map(s=>`<tr><td>${esc(s.code)}</td><td>${esc(s.name)}</td><td>${esc(s.amp)}</td><td>${pill(s.is_archived?"archived":"active")}</td><td>${button("Edit","edit-site",s.id)} ${button(s.is_archived?"Restore":"Archive","archive-site",s.id)}</td></tr>`).join("")}</tbody></table></div></div>${teamAdmin()?`<div class="panel"><div class="panel-title"><h2>Team</h2>${button("＋ Create account","add-member","","primary")}</div><div class="table-wrap"><table><thead><tr><th>Name</th><th>Username / email</th><th>Role</th><th>Access</th><th></th></tr></thead><tbody>${S.team.map(u=>`<tr><td>${esc(u.name)}</td><td>${esc(u.username)}<span class="small muted">${esc(u.email)}</span></td><td>${esc(u.role||"Not assigned")}</td><td>${u.is_active?"Active":"Disabled"}</td><td>${u.id!==S.me.id?button("Edit access","edit-member",u.id):""}</td></tr>`).join("")}</tbody></table></div></div><div class="panel"><div class="panel-title"><h2>Maintenance checklists</h2>${button("＋ Add checklist","add-checklist","","primary")}</div>${S.checklists.map(c=>`<div class="section-divider"><strong>${esc(c.name)}</strong> <span class="small muted">${c.tasks.length} tasks</span> ${button("Edit","edit-checklist",c.id)}</div>`).join("")}</div>`:'<div class="panel"><p>Network-wide administrator access is required to manage accounts and shared checklists.</p></div>'}`;}
 
+const formFieldName = name => ["name", "title"].includes(name) ? "workspace-field-" + name : name;
 function field(name,label,value="",{type="text",required=false,help="",options,wide=false,multiple=false}={}){
-  const control=options?`<select name="${name}" ${multiple?"multiple":""}>${options.map(([v,l])=>`<option value="${esc(v)}" ${multiple?(value||[]).map(String).includes(String(v))?"selected":"":String(value)===String(v)?"selected":""}>${esc(l)}</option>`).join("")}</select>`:type==="textarea"?`<textarea name="${name}" ${required?"required":""}>${esc(value)}</textarea>`:`<input name="${name}" type="${type}" value="${esc(value)}" ${required?"required":""} ${type==="number"?'step="any"':""}>`;
-  return `<label class="${wide?"wide":""}">${esc(label)}${control}${help?`<span class="field-help">${esc(help)}</span>`:""}</label>`;
+  // Prefix names so the HTML sanitizer can keep normal fields like "title".
+  const inputName = formFieldName(name);
+  const labelId = `workspace-field-${name}-label`;
+  const helpId = `workspace-field-${name}-help`;
+  const attributes = `name="${inputName}" aria-labelledby="${labelId}" ${help?`aria-describedby="${helpId}"`:""} ${required?"required":""}`;
+  const control=options?`<select ${attributes} ${multiple?"multiple":""}>${options.map(([v,l])=>`<option value="${esc(v)}" ${multiple?(value||[]).map(String).includes(String(v))?"selected":"":String(value)===String(v)?"selected":""}>${esc(l)}</option>`).join("")}</select>`:type==="textarea"?`<textarea ${attributes}>${esc(value)}</textarea>`:`<input ${attributes} type="${type}" value="${esc(value)}" ${type==="number"?'step="any"':""}>`;
+  return `<label class="${wide?"wide":""}"><span id="${labelId}">${esc(label)}</span>${control}${help?`<span id="${helpId}" class="field-help">${esc(help)}</span>`:""}</label>`;
 }
 let dialogHandler;
 function openForm(title,body,save,label="Save"){
   setNavigationOpen(false);
   S.dialogURLs.forEach(url=>URL.revokeObjectURL(url));S.dialogURLs=[];
-  $("#dialog-title").textContent=title;$("#dialog-body").innerHTML=body;$("#dialog-error").hidden=true;$("#dialog-save").textContent=label;$("#dialog-save").hidden=!save;$("#dialog-save").disabled=false;dialogHandler=save;normalizeProse($("#dialog"));$("#dialog").showModal();void hydrateImages();
+  $("#dialog-title").textContent=title;setMarkup($("#dialog-body"),body);$("#dialog-error").textContent="";$("#dialog-save").textContent=label;$("#dialog-save").hidden=!save;$("#dialog-save").disabled=false;dialogHandler=save;normalizeProse($("#dialog"));$("#dialog").showModal();void hydrateImages();
 }
 function closeDialog(){S.dialogURLs.forEach(url=>URL.revokeObjectURL(url));S.dialogURLs=[];$("#dialog").close();dialogHandler=null;}
 $("#dialog-close").onclick=closeDialog;$("#dialog-cancel").onclick=closeDialog;
-$("#dialog-form").onsubmit=async event=>{event.preventDefault();if(!dialogHandler)return;$("#dialog-save").disabled=true;try{await dialogHandler(new FormData(event.target));closeDialog();render();}catch(e){$("#dialog-error").textContent=e.message;$("#dialog-error").hidden=false;}finally{$("#dialog-save").disabled=false;}};
+$("#dialog").addEventListener("cancel", event => { if ($("#dialog-save").disabled) event.preventDefault(); });
+function clearFieldError(control) {
+  const message = control.parentElement.querySelector(".field-error");
+  if (!message) return;
+  control.removeAttribute("aria-invalid");
+  const descriptions = (control.getAttribute("aria-describedby") || "").split(/\s+/).filter(id => id !== message.id);
+  if (descriptions.length) control.setAttribute("aria-describedby", descriptions.join(" "));
+  else control.removeAttribute("aria-describedby");
+  message.remove();
+}
+function showFormError(form, error) {
+  const detail = error.body;
+  let first;
+  const other = [];
+  for (const [name, messages] of Object.entries(detail && typeof detail === "object" && !Array.isArray(detail) ? detail : {})) {
+    const control = form.elements.namedItem(formFieldName(name));
+    const message = Array.isArray(messages) ? messages.join(" ") : errorMessage(messages);
+    if (!(control instanceof HTMLElement) || !control.matches("input:not([type=hidden]), select, textarea")) {
+      other.push(message);
+      continue;
+    }
+    const hint = document.createElement("span");
+    hint.className = "field-error";
+    hint.id = `dialog-error-${name}`;
+    hint.textContent = message;
+    control.setAttribute("aria-invalid", "true");
+    control.setAttribute("aria-describedby", [control.getAttribute("aria-describedby"), hint.id].filter(Boolean).join(" "));
+    control.after(hint);
+    const details = control.closest("details");
+    if (details) details.open = true;
+    first ||= control;
+  }
+  $("#dialog-error").textContent = other.join(" ") || (first ? "Review the highlighted fields." : error.message);
+  (first || $("#dialog-error")).focus();
+}
+$("#dialog-form").addEventListener("input", event => clearFieldError(event.target));
+$("#dialog-form").onsubmit = async event => {
+  event.preventDefault();
+  if (!dialogHandler) return;
+  const form = event.currentTarget;
+  for (const control of form.querySelectorAll('[aria-invalid="true"]')) clearFieldError(control);
+  $("#dialog-error").textContent = "";
+  $("#dialog-save").disabled = true;
+  $("#dialog-close").disabled = $("#dialog-cancel").disabled = true;
+  const data = new FormData();
+  for (const [name, value] of new FormData(form)) data.append(name.replace(/^workspace-field-/, ""), value);
+  try { await dialogHandler(data); closeDialog(); render(); }
+  catch (error) { showFormError(form, error); }
+  finally { $("#dialog-save").disabled = $("#dialog-close").disabled = $("#dialog-cancel").disabled = false; }
+};
 const values=form=>Object.fromEntries([...form.entries()].filter(([,value])=>!(value instanceof File)));
 const noteFiles=form=>form.getAll("files").filter(file=>file instanceof File&&file.size>0);
 const noteFileField=()=>'<label class="wide">Documents, images, audio or video (optional)<input type="file" name="files" multiple><span class="field-help">Up to 25 MB per file. The note and its files are saved together on this device before uploading.</span></label>';
 const onlineOnly=()=>{if(!navigator.onLine)throw new Error("This change needs a connection. Field tasks, visits, observations and files can still be saved offline.");};
 processingFiles=createProcessingFiles({data:()=>S.data,site:currentSite,canWrite:research,openForm,api,refreshCsrf,refreshWorkspace,render,esc,button,empty,toast,onlineOnly});
 async function mutate(endpoint,data,id){onlineOnly();await refreshCsrf();await api(`/api/${endpoint}/${id?id+"/":""}`,{method:id?"PATCH":"POST",data});await refreshWorkspace();toast("Saved.");}
-async function refreshWorkspace(){const b=await api("/api/bootstrap/");if(b.me.id!==S.me.id){freezeWorkspace();return;}S.me=b.me;S.sites=b.sites;S.checklists=b.checklists;S.protocols=b.protocols||[];if(!S.sites.some(s=>s.id===S.siteId))S.siteId=S.sites.find(s=>!s.is_archived)?.id||S.sites[0]?.id;await store.put("meta",`${S.me.id}:bootstrap`,b);populateSites();await loadSite(S.siteId,false);await loadOverview();if(teamAdmin())S.team=await api("/api/team/");}
+async function savePreparedProfile(ids) {
+  const account=S.me.id, siteIds=new Set(ids.map(Number));
+  const sites=S.sites.filter(site=>siteIds.has(site.id)&&!site.is_archived);
+  const {id,name,role}=S.me;
+  const prepared=sites.map(site=>site.id);
+  await store.putMany("meta", [
+    [`${account}:prepared-sites`,prepared],
+    [`${account}:bootstrap`,{me:{id,name,role},sites,checklists:S.checklists,protocols:S.protocols,workspace_session:S.sessionId}],
+  ]);
+  S.preparedSites=prepared;
+  S.prepared=prepared.length>0;
+}
+async function refreshWorkspace(){
+  const b=await api("/api/bootstrap/");
+  if(b.me.id!==S.me.id){freezeWorkspace();return;}
+  S.me=b.me;S.sites=b.sites;S.checklists=b.checklists;S.protocols=b.protocols||[];
+  if(!S.sites.some(s=>s.id===S.siteId))S.siteId=S.sites.find(s=>!s.is_archived)?.id||S.sites[0]?.id;
+  if(S.prepared)await savePreparedProfile(S.preparedSites);
+  populateSites();
+  await loadSite(S.siteId,false);
+  if(S.preparedSites?.includes(S.siteId))await saveFieldSnapshot(S.siteId,identity());
+  await loadOverview();if(teamAdmin())S.team=await api("/api/team/");
+}
 function taskForm(task){openForm(task?"Edit task":"Plan work at this site",`<div class="form-grid">${field("title","Task title",task?.title,{required:true,wide:true})}${field("details","Details / equipment to bring",task?.details,{type:"textarea",wide:true})}${field("priority","Priority",task?.priority||"normal",{options:[["normal","Normal"],["high","High"]]})}${field("due_date","Due date",task?.due_date,{type:"date"})}${noteFileField()}</div>`,async form=>{const data=values(form);if(task)await enqueue("task.edit",task.id,data,task.version,noteFiles(form));else await enqueue("task.create",uuid(),data,undefined,noteFiles(form));});}
 function visitForm(visit){openForm(visit?"Visit details":"Start a field visit",`<div class="form-grid">${field("date","Visit date",visit?.date||today(),{type:"date",required:true})}${field("classification","Visit type",visit?.classification||"routine",{options:[["routine","Routine"],["major","Major work"],["fault","Fault"]]})}${field("title","Visit title",visit?.title||"",{wide:true})}${field("crew","Crew",visit?.crew||S.me.name,{required:true,wide:true})}${visit?field("started_at","Recorded start (your local time)",localInput(visit.started_at),{type:"datetime-local",required:true,help:"Correct a device-clock error here before ending the visit."}):""}${visit?field("narrative","Field notes",visit.narrative,{type:"textarea",wide:true}):""}${noteFileField()}</div>`,async form=>{const id=visit?.id||uuid();if(visit&&form.get("started_at"))form.set("started_at",new Date(form.get("started_at")).toISOString());await enqueue(visit?"visit.edit":"visit.create",id,values(form),visit?.version,noteFiles(form));S.visitId=id;S.mode="onsite";S.view="field";},visit?"Save changes":"Start visit");}
 function noteForm(title,save){openForm(title,field("text","Observation","",{type:"textarea",required:true})+noteFileField(),form=>save(form.get("text"),noteFiles(form)));}
@@ -332,15 +425,20 @@ function checklistForm(checklist){openForm(checklist?"Edit maintenance checklist
 async function copy(text){if(navigator.clipboard){try{await navigator.clipboard.writeText(text);toast("Copied.");return;}catch{}}const box=document.createElement("textarea");box.value=text;document.body.append(box);box.select();document.execCommand("copy");box.remove();toast("Copied.");}
 async function downloadAttachment(id){const attachment=S.data.attachments.find(a=>a.id===id);let blob=attachment.pending?S.queue.find(q=>q.id===id)?.file:await store.get("downloads",`${S.me.id}:${attachment.url}`);if(!blob){const response=await privateFetch(attachment.url);if(!response.ok||response.redirected)throw new Error("Sign in to download this file.");blob=await response.blob();}const url=URL.createObjectURL(blob);const link=document.createElement("a");link.href=url;link.download=attachment.filename||"attachment";link.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
 async function prepareFieldwork(){
-  onlineOnly();openForm("Prepare for fieldwork",`<p>Choose sites to save on this device, including tasks, instrument reference information and attachments.</p><p class="small muted">Use a trusted device. Cached records and photographs remain available offline until you sign out and clear this device.</p>${field("sites","Sites",[S.siteId],{options:S.sites.filter(s=>!s.is_archived).map(s=>[s.id,s.code+" · "+s.name]),multiple:true})}<label><input type="checkbox" name="files" checked>Download attachments and protocols</label><div id="prepare-progress" class="small muted"></div>`,async form=>{
+  onlineOnly();
+  const defaults=S.preparedSites?.length?S.preparedSites:[S.siteId];
+  openForm("Prepare for fieldwork",`<p>Choose sites to add or refresh on this device, including tasks, instrument information and attachments.</p><p class="small muted">Use a trusted device. Prepared site copies stay available offline until you sign out and clear this account.</p>${field("sites","Sites",defaults,{options:S.sites.filter(s=>!s.is_archived).map(s=>[s.id,s.code+" · "+s.name]),multiple:true})}<label><input type="checkbox" name="files" checked>Download attachments and protocols</label><div id="prepare-progress" class="small muted" role="status"></div>`,async form=>{
     if(!("serviceWorker" in navigator))throw new Error("Offline reopening requires a browser with service-worker support and HTTPS (or localhost).");
     const ids=form.getAll("sites");if(!ids.length)throw new Error("Select at least one site.");
     const registration=await Promise.race([navigator.serviceWorker.ready,new Promise((_,reject)=>setTimeout(()=>reject(new Error("The offline app could not be installed. Check your connection and use HTTPS or localhost.")),15000))]);
-    await new Promise((resolve,reject)=>{const channel=new MessageChannel(),timer=setTimeout(()=>{channel.port1.close();reject(new Error("The app shell could not be saved. Try preparing again while connected."));},60000);channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();event.data.ok?resolve():reject(new Error(event.data.error));};registration.active.postMessage("CACHE_SHELL",[channel.port2]);});
+    await new Promise((resolve,reject)=>{const channel=new MessageChannel(),timer=setTimeout(()=>{channel.port1.close();reject(new Error("The app shell could not be saved. Try preparing again while connected."));},60000);channel.port1.onmessage=event=>{clearTimeout(timer);channel.port1.close();event.data.ok?resolve():reject(new Error(event.data.error));};registration.active.postMessage("PREPARE_OFFLINE_SHELL",[channel.port2]);});
     let count=0,missing=0;
-    for(const id of ids){$("#prepare-progress").textContent=`Saving ${S.sites.find(s=>s.id===Number(id)).code}…`;const account=S.me.id,revision=await store.get("meta",`${account}:snapshot-revision:${id}`)||0;const data=await api(`/api/snapshot/?site=${id}`);if(Number(data.site?.id)!==Number(id))throw new Error("Unexpected site response.");await store.saveSnapshot(account,Number(id),data,revision);if(form.has("files"))for(const a of data.attachments){try{const response=await privateFetch(a.url);if(!response.ok||response.redirected)throw new Error();await store.put("downloads",`${S.me.id}:${a.url}`,await response.blob());count++;}catch{missing++;}}}
+    const expected=identity();
+    for(const id of ids){$("#prepare-progress").textContent=`Saving ${S.sites.find(s=>s.id===Number(id)).code}…`;const data=await saveFieldSnapshot(id,expected);if(form.has("files"))for(const a of data.attachments){try{const response=await privateFetch(a.url);if(!response.ok||response.redirected)throw new Error();await store.put("downloads",`${expected.account}:${a.url}`,await response.blob());count++;}catch{missing++;}}}
     await resources.loadSchema();await resources.refreshProtocols();if(form.has("files"))for(const protocol of S.protocols.filter(p=>p.available!==false)){try{await resources.cacheProtocol(protocol);count++;}catch{missing++;}}
-    await store.put("meta",`${S.me.id}:prepared`,new Date().toISOString());S.prepared=true;toast(`${ids.length} sites and ${count} attachments saved for offline use.${missing?` ${missing} files could not be downloaded.`:""}`);
+    assertIdentity(expected);
+    await savePreparedProfile([...(S.preparedSites||[]),...ids]);
+    toast(`${ids.length} ${ids.length===1?"site":"sites"} and ${count} ${count===1?"attachment":"attachments"} saved for offline use.${missing?` ${missing} files could not be downloaded.`:""}`);
   },"Download selected sites");
 }
 async function queueDialog(){await readQueue();const all=await store.all("outbox"),other=all.filter(item=>item.account!==S.me.id).length,usage=await navigator.storage?.estimate?.().catch(()=>null);const counts=S.sites.map(site=>[site,S.queue.filter(item=>item.siteId===site.id).length]).filter(([,count])=>count);openForm("Synchronization queue",`<p class="small muted">${esc(S.me.name)}: ${S.queue.length} pending records${usage?` · Device storage ${(usage.usage/1024/1024).toFixed(1)} MiB used`:""}.</p>${counts.map(([site,count])=>`<p class="small">${esc(site.code)}: ${count} pending</p>`).join("")}${other?`<p class="notice small">Other saved accounts have ${other} pending records. Signing out here preserves their work.</p>`:""}<p class="small muted">Selected site last refreshed: ${time(S.base?.server_time)}. Use Export pending record for recovery before discarding a blocked entry.</p><p class="small muted">${S.queue.length} records remain on this device. A blocked item pauses later records so dependent work stays in order.</p>${S.queue.map(item=>`<div class="section-divider"><strong>${esc(item.kind==="upload"?item.file.name:item.operation.kind)}</strong><p class="small muted">${esc(S.sites.find(s=>s.id===item.siteId)?.code)} · ${time(new Date(item.order).toISOString())}</p>${item.error?`<div class="error">${esc(item.error.message)}</div>`:""}<div class="row-actions">${item.error?button("Review & retry","review-queue",item.id):""}${button("Export pending record","export-queue",item.id)}${button("Discard this record","discard-queue",item.id,"danger small")}</div></div>`).join("")||empty("Everything is synced")}`,async()=>{closeDialog();S.blocked=null;void synchronize();},"Sync now");}
@@ -428,13 +526,6 @@ document.addEventListener("keydown",event=>{
 let searchTimer;document.addEventListener("input",event=>{if(!event.target.dataset.search)return;S.filter=event.target.value;clearTimeout(searchTimer);const start=event.target.selectionStart,end=event.target.selectionEnd,key=event.target.dataset.search;searchTimer=setTimeout(()=>{render();const input=document.querySelector(`[data-search="${key}"]`);input?.focus();input?.setSelectionRange(start,end);},180);});
 document.addEventListener("change",event=>{if(event.target.dataset.filter){S.typeFilter=event.target.value;render();}});
 $("#site-select").onchange=async event=>{S.visitId=null;try{await loadSite(Number(event.target.value));}catch(error){toast(error.message,true);}};
-// Older prepared shells can still load the updated assets while offline.
-if(!$("#navigation-close"))$(".sidebar").insertAdjacentHTML("afterbegin",'<button id="navigation-close" class="icon-button navigation-close" aria-label="Close navigation">×</button>');
-if(!$("#navigation-backdrop"))document.body.insertAdjacentHTML("afterbegin",'<button id="navigation-backdrop" class="navigation-backdrop" aria-label="Close navigation" tabindex="-1" hidden></button>');
-$(".sidebar").id="workspace-navigation";
-$(".sidebar").setAttribute("aria-label","Workspace navigation");
-$("#mobile-menu").setAttribute("aria-controls","workspace-navigation");
-$("#mobile-menu").setAttribute("aria-label","Open navigation");
 // Keep a phone drawer accessible without allowing clicks behind it.
 const phoneNavigation=window.matchMedia("(max-width:760px)");
 function setNavigationOpen(open,{restoreFocus=true}={}){
@@ -479,24 +570,47 @@ $("#logout-button").onclick=()=>openForm("Sign out and clear this account's copi
 },"Sign out & clear account");
 window.addEventListener("online",()=>{S.online=true;updateConnection();void synchronize();});window.addEventListener("offline",()=>{S.online=false;updateConnection();});
 window.addEventListener("hashchange",()=>{const view=location.hash.slice(1);if(view&&view!==S.view)void navigate(view).catch(error=>toast(error.message,true));});
-function populateSites(){$("#site-select").innerHTML=S.sites.map(s=>`<option value="${s.id}">${esc(s.code)} · ${esc(s.name)}</option>`).join("");if(S.siteId)$("#site-select").value=S.siteId;}
+function populateSites() {
+  const select = $("#site-select");
+  select.replaceChildren(...S.sites.map(site => new Option(`${site.code} · ${site.name}`, site.id)));
+  if (S.siteId) select.value = S.siteId;
+}
 async function boot(){
   try{
     let bootstrap;
-    if(navigator.onLine){try{bootstrap=await api("/api/bootstrap/");await store.activateAccount(bootstrap.me.id,bootstrap.workspace_session);await store.put("meta",`${bootstrap.me.id}:bootstrap`,bootstrap);announceSession(bootstrap.me.id,bootstrap.workspace_session);}catch(e){if(e.status)throw e;}}
+    let connected=false;
+    if(navigator.onLine){try{bootstrap=await api("/api/bootstrap/");await store.activateAccount(bootstrap.me.id,bootstrap.workspace_session);connected=true;announceSession(bootstrap.me.id,bootstrap.workspace_session);}catch(e){if(e.status)throw e;}}
     if(!bootstrap){const account=await store.get("meta","active-account");bootstrap=await store.get("meta",`${account}:bootstrap`);}
     if(!bootstrap)throw new Error("Sign in online and prepare your sites before working offline.");
     S.sessionId=bootstrap.workspace_session||null;store.bindAccount(bootstrap.me.id,S.sessionId);
     S.me=bootstrap.me;S.sites=bootstrap.sites;S.checklists=bootstrap.checklists;S.protocols=navigator.onLine?(bootstrap.protocols||[]):((await store.get("meta",`${S.me.id}:protocols`))||bootstrap.protocols||[]);queueOrder=Math.max(queueOrder,...(await store.all("outbox")).map(q=>q.order||0));
-    S.siteId=(await store.get("meta",`${S.me.id}:selected`))||S.sites.find(s=>!s.is_archived)?.id||S.sites[0]?.id;
-    S.overview=(await store.get("meta",`${S.me.id}:overview`))||[];S.prepared=!!(await store.get("meta",`${S.me.id}:prepared`));
+    S.preparedSites=(await store.get("meta",`${S.me.id}:prepared-sites`))||[];S.prepared=S.preparedSites.length>0;
+    if(connected&&S.prepared)await savePreparedProfile(S.preparedSites);
+    const selected=await store.get("meta",`${S.me.id}:selected`);
+    S.siteId=(S.sites.some(site=>site.id===selected)?selected:null)||S.sites.find(s=>!s.is_archived)?.id||S.sites[0]?.id;
     $("#user-badge").textContent=S.me.name.split(/\s+/).map(x=>x[0]).slice(0,2).join("").toUpperCase();$("#user-badge").title=S.me.name+" · "+S.me.role;populateSites();await readQueue();await loadSite(S.siteId,false);await loadOverview();if(S.view==="badm")await resources.loadSchema();if(S.view==="admin"&&teamAdmin()&&navigator.onLine)S.team=await api("/api/team/");render();
     if(S.view==="knowledge"){await records.loadKnowledge();render();}
     if(S.view==="monitor")void monitor.load(true);
-    if("serviceWorker" in navigator)await navigator.serviceWorker.register("/sw.js",{scope:"/"});
+    if("serviceWorker" in navigator)void navigator.serviceWorker.register(workerURL("/sw.js"),{scope:"/"})
+      .then(registration=>{if(registration.active)return registration.update();})
+      .catch(error=>console.warn("Offline worker registration failed.",error));
     void synchronize();
-    setInterval(async()=>{if(S.frozen||document.hidden||!navigator.onLine||S.syncing||$("#dialog").open||$(".sidebar").classList.contains("visible"))return;if(S.queue.length){void synchronize();return;}if(S.view==="monitor"){await monitor.auto();return;}try{await loadSite(S.siteId,false);if(S.view==="overview")await loadOverview();render();}catch{}},60000);
-  }catch(e){$("#main").innerHTML=empty("Could not open the workspace",e.message);toast(e.message,true);}
+    let refreshing=false;
+    async function refreshVisibleWorkspace(){
+      if(S.frozen||!navigator.onLine||S.syncing||refreshing||S.siteRequest||$("#dialog").open)return;
+      if(S.queue.length){void synchronize();return;}
+      if(document.hidden||$(".sidebar").classList.contains("visible"))return;
+      refreshing=true;
+      try{
+        if(S.view==="monitor"){await monitor.auto();return;}
+        await loadSite(S.siteId,false);
+        if(S.view==="overview")await loadOverview();
+        if(!document.hidden&&!S.siteRequest&&!$("#dialog").open&&!$(".sidebar").classList.contains("visible"))render();
+      }catch{}finally{refreshing=false;}
+    }
+    setInterval(refreshVisibleWorkspace,60000);
+    document.addEventListener("visibilitychange",refreshVisibleWorkspace);
+  }catch(e){setMarkup($("#main"), empty("Could not open the workspace",e.message));toast(e.message,true);}
 }
 const resources=createResources({S,esc,rich,day,time,button,empty,field,openForm,api,refreshCsrf,refreshWorkspace,render,toast,onlineOnly,header,store,privateFetch});
 const monitor=createMonitor({S,esc,button,empty,header,time,api,render,toast,store});

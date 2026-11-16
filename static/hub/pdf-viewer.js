@@ -1,12 +1,19 @@
+import {setMarkup, workerURL} from "./markup.js";
+
 /* Render original PDFs locally: no third-party document viewer or upload. */
 export async function showPDF(container, data) {
   const pdfjs = await import("./vendor/pdfjs/pdf.mjs");
-  pdfjs.GlobalWorkerOptions.workerSrc = new URL("./vendor/pdfjs/pdf.worker.mjs", import.meta.url).href;
-  const loadingTask = pdfjs.getDocument({data,standardFontDataUrl:new URL("./vendor/pdfjs/standard_fonts/",import.meta.url).href,isEvalSupported:false});
-  const document = await loadingTask.promise;
-  if(!container.isConnected){await loadingTask.destroy();return ()=>{};}
+  const port = new Worker(workerURL("/static/hub/vendor/pdfjs/pdf.worker.mjs"), {type:"module"});
+  const worker = new pdfjs.PDFWorker({port});
+  const loadingTask = pdfjs.getDocument({data,worker,standardFontDataUrl:new URL("./vendor/pdfjs/standard_fonts/",import.meta.url).href,isEvalSupported:false});
+  async function dispose() {
+    try { await loadingTask.destroy(); }
+    finally { worker.destroy(); port.terminate(); }
+  }
+  const document = await loadingTask.promise.catch(async error=>{await dispose();throw error;});
+  if(!container.isConnected){await dispose();return ()=>{};}
   let pageNumber=1;
-  container.innerHTML='<div class="pdf-controls"><button type="button" class="button secondary small" data-pdf="previous">Previous page</button><span aria-live="polite" data-pdf="page"></span><button type="button" class="button secondary small" data-pdf="next">Next page</button></div><div class="pdf-canvas-wrap"><canvas aria-label="Protocol page"></canvas></div>';
+  setMarkup(container,'<div class="pdf-controls"><button type="button" class="button secondary small" data-pdf="previous">Previous page</button><span aria-live="polite" data-pdf="page"></span><button type="button" class="button secondary small" data-pdf="next">Next page</button></div><div class="pdf-canvas-wrap"><canvas aria-label="Protocol page"></canvas></div>');
   async function draw() {
     if(!container.isConnected)return;
     const previous=container.querySelector('[data-pdf="previous"]'),next=container.querySelector('[data-pdf="next"]');
@@ -22,6 +29,6 @@ export async function showPDF(container, data) {
   }
   container.querySelector('[data-pdf="previous"]').onclick=()=>{pageNumber--;void draw();};
   container.querySelector('[data-pdf="next"]').onclick=()=>{pageNumber++;void draw();};
-  await draw();
-  return ()=>loadingTask.destroy();
+  await draw().catch(async error=>{await dispose();throw error;});
+  return dispose;
 }

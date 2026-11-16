@@ -51,12 +51,19 @@ def snapshot(request):
     site = require_site(request.user, request.query_params.get("site"))
     visits = site.visits.select_related("site").prefetch_related("reports").all()
     equipment = Equipment.objects.filter(Q(site__in=accessible_sites(request.user)) | Q(site__isnull=True)).order_by("instrument", "serial_number")
-    attachments = Attachment.objects.filter(Q(site=site) | Q(equipment__in=equipment, site__in=accessible_sites(request.user))).distinct()
+    offline_site = site if request.query_params.get("offline") == "1" else None
+    if offline_site is not None:
+        equipment = equipment.filter(Q(site=site) | Q(deployments__site=site)).distinct()
+        attachments = Attachment.objects.filter(site=site)
+        legacy_files = legacy_attachments(site, equipment.filter(site=site))
+    else:
+        attachments = Attachment.objects.filter(Q(site=site) | Q(equipment__in=equipment, site__in=accessible_sites(request.user))).distinct()
+        legacy_files = legacy_attachments(site, equipment)
     caveats = DataCaveat.objects.filter(sites=site).prefetch_related("sites", "configurations").distinct()
     from .processing_files import library_state
     from .record_resources import CalibrationSerializer, knowledge_state
     from .resources_api import resource_state
-    return Response({"calibrations": CalibrationSerializer(site.calibrations.all(), many=True).data, "knowledge": knowledge_state(request.user), "processing_files": library_state(request.user), "resources": resource_state(site), "site": SiteSerializer(site).data, "tasks": TaskSerializer(site.tasks.all(), many=True).data, "visits": VisitSerializer(visits, many=True).data, "activities": TaskActivitySerializer(TaskActivity.objects.filter(task__site=site), many=True).data, "observations": VisitObservationSerializer(VisitObservation.objects.filter(visit__site=site), many=True).data, "equipment": EquipmentSerializer(equipment, many=True).data, "equipment_history": HistorySerializer(History.objects.filter(item__in=equipment), many=True).data, "deployments": DeploymentSerializer(site.deployments.all(), many=True).data, "configurations": ConfigurationSerializer(site.configurations.all(), many=True).data, "caveats": CaveatSerializer(caveats, many=True, context={"request": request}).data, "attachments": AttachmentSerializer(attachments, many=True).data + legacy_attachments(site, equipment), "dois": DOISerializer(site.doi_records.all(), many=True).data, "server_time": timezone.now()})
+    return Response({"calibrations": CalibrationSerializer(site.calibrations.all(), many=True).data, "knowledge": knowledge_state(request.user, offline_site), "processing_files": library_state(request.user, offline_site), "resources": resource_state(site), "site": SiteSerializer(site).data, "tasks": TaskSerializer(site.tasks.all(), many=True).data, "visits": VisitSerializer(visits, many=True).data, "activities": TaskActivitySerializer(TaskActivity.objects.filter(task__site=site), many=True).data, "observations": VisitObservationSerializer(VisitObservation.objects.filter(visit__site=site), many=True).data, "equipment": EquipmentSerializer(equipment, many=True).data, "equipment_history": HistorySerializer(History.objects.filter(item__in=equipment), many=True).data, "deployments": DeploymentSerializer(site.deployments.all(), many=True).data, "configurations": ConfigurationSerializer(site.configurations.all(), many=True).data, "caveats": CaveatSerializer(caveats, many=True, context={"request": request}).data, "attachments": AttachmentSerializer(attachments, many=True).data + legacy_files, "dois": DOISerializer(site.doi_records.all(), many=True).data, "server_time": timezone.now()})
 
 @api_view(["POST"])
 def sync(request):
@@ -427,4 +434,7 @@ def overview(request):
 def logout(request):
     from django.contrib.auth import logout as end_session
     end_session(request)
-    return Response({"ok": True})
+    response = Response({"ok": True})
+    if request.is_secure():
+        response["Clear-Site-Data"] = '"cache"'
+    return response
