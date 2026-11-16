@@ -241,8 +241,11 @@ def context():
             "status": caveat.status, "status_label": caveat.get_status_display(), "variables": caveat.variables,
             "period": caveat.period_label, "affected_from": logger_time(caveat.affected_from), "affected_to": logger_time(caveat.affected_to),
             "reviewed_at": caveat.reviewed_at, "resolved_at": caveat.resolved_at, "updated_at": caveat.updated_at,
-            "cross_check": clean_html(str(evidence.get("xref", ""))),
-            "needs_confirmation": clean_html(str(evidence.get("flag", ""))),
+            "source_resolution": clean_html(str(evidence.get("resolved") or "")),
+            "source_code": str(evidence.get("code") or ""),
+            "source_code_caption": str(evidence.get("codecap") or ""),
+            "cross_check": clean_html(str(evidence.get("xref") or "")),
+            "needs_confirmation": clean_html(str(evidence.get("flag") or "")),
             "plots": plots.get(caveat.pk, []), "links": links})
     # Processing files are maintained upstream; the public report links there.
     return {"sites": public_sites, "visits": public_visits, "caveats": public_caveats,

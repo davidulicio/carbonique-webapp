@@ -31,6 +31,15 @@ to operational notes require authentication and site access. Only the known
 imported scientific images are embedded publicly. Do not put confidential content
 in site/visit/caveat text, since those records are public.
 
+For the [November 2026 Field Notes revision](https://github.com/davidulicio/carbonique_fieldnotes/commit/be34eab0b3ba2cad72065b1c6b9d917103028ca9),
+preview the bundled reconciliation with `python manage.py sync_fieldnotes` on
+the app's database. After taking a database and media backup and reviewing the
+preview, run `python manage.py sync_fieldnotes --apply`. Resolve any reported
+conflicts in the team editor. New reference installations apply this revision
+with `setup_hub --with-reference`. The import preserves conflicting app edits,
+records the upstream revision, and does not reapply it to records already synced.
+The older source archive remains available as a historical reference.
+
 The public page and its timeline read the same current records. New visits,
 observations, completed work, caveats, review statuses, site descriptions,
 conditions, reference metadata, deployments and eligible INIs appear on the next

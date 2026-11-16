@@ -28,4 +28,5 @@ class Command(BaseCommand):
         if options["with_reference"]:
             call_command("import_resources")
             call_command("import_calibrations")
+            call_command("sync_fieldnotes", apply=True)
         self.stdout.write(self.style.SUCCESS("Carbonique Hub setup complete. Create a superuser with createsuperuser if needed."))
